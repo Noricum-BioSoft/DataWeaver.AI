@@ -3,6 +3,7 @@
   display: flex;
   height: 100vh;
   background-color: #f8f9fa;
+  position: relative;
 }
 
 /* Main Content */

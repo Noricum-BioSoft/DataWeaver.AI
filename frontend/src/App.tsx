@@ -1,21 +1,30 @@
-import React from 'react';
-import Sidebar from './components/Sidebar';
-import ConnectorsSection from './components/ConnectorsSection';
-import PipelineSection from './components/PipelineSection';
-import DashboardSection from './components/DashboardSection';
+import React, { useState } from 'react';
 import './App.css';
+import SidebarLayout from './components/SidebarLayout';
+import AIChatLayout from './components/AIChatLayout';
+import UIThemeToggle from './components/UIThemeToggle';
 
 const App: React.FC = () => {
+  const [currentTheme, setCurrentTheme] = useState<'sidebar' | 'dashboard'>('sidebar');
+
+  const handleThemeChange = (theme: 'sidebar' | 'dashboard') => {
+    setCurrentTheme(theme);
+  };
+
   return (
-    <div className="app-container">
-      <Sidebar />
-      <main className="main-content">
-        <div className="content-wrapper">
-          <ConnectorsSection />
-          <PipelineSection />
-          <DashboardSection />
-        </div>
-      </main>
+    <div className="App">
+      <div className="theme-toggle-container">
+        <UIThemeToggle 
+          currentTheme={currentTheme} 
+          onThemeChange={handleThemeChange} 
+        />
+      </div>
+      
+      {currentTheme === 'sidebar' ? (
+        <SidebarLayout />
+      ) : (
+        <AIChatLayout />
+      )}
     </div>
   );
 };

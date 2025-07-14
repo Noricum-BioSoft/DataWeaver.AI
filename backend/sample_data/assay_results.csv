@@ -1,0 +1,8 @@
+name,alias,sequence,mutations,result_value,result_unit,test_type,assay_name,technician
+Clone_7,Clone_7,MGT...L72F...K,L72F,25.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
+WT_Control,WT_Control,MGT...L72...K,,15.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
+Mutant_A,Mutant_A,MGT...R80K...K,R80K,8.5,μM/min,activity,Enzyme Activity Assay,Dr. Smith
+Double_Mutant,Double_Mutant,MGT...L72F...R80K...K,"L72F,R80K",2.1,μM/min,activity,Enzyme Activity Assay,Dr. Smith
+Clone_12,Clone_12,MGT...L72F...R80K...E120A...K,"L72F,R80K,E120A",0.8,μM/min,activity,Enzyme Activity Assay,Dr. Johnson
+Stability_Test_1,Stability_Test_1,MGT...L72F...K,L72F,85.2,%,stability,Thermal Stability Assay,Dr. Johnson
+Expression_Test_1,Expression_Test_1,MGT...L72F...K,L72F,12.5,mg/L,expression,Protein Expression Assay,Dr. Wilson 

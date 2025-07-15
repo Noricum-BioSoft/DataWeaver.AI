@@ -180,7 +180,7 @@ class TestCompleteWorkflow:
         assert wt_result["test"].design_id == design2.id
         
         # Check that Mutant_A didn't match (no corresponding design)
-        mutant_result = next(r for r in results if r["row"]["alias"] == "Mutant_A", None)
+        mutant_result = next((r for r in results if r["row"]["alias"] == "Mutant_A"), None)
         if mutant_result:
             assert mutant_result["match"]["matched"] is False
     

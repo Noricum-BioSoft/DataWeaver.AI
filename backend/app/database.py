@@ -8,9 +8,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL from environment or default
+# Use SQLite for development, PostgreSQL for production
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    "postgresql://postgres:password@localhost:5432/dataweaver"
+    "sqlite:///./dataweaver.db"  # SQLite for development
 )
 
 # Create engine
@@ -34,11 +35,9 @@ def get_db():
     finally:
         db.close()
 
-# Import all models to ensure they're registered
-from .models.workflow import Workflow, WorkflowStep
-from .models.file import File, FileMetadata, FileRelationship
-from .models.dataset import Dataset, DatasetMatch
-
 # Create all tables
 def create_tables():
+    # Import all models to ensure they're registered with the Base
+    from .models import Workflow, WorkflowStep, File, FileMetadata, FileRelationship, Dataset, DatasetMatch
+    from models.bio_entities import Design, Build, Test
     Base.metadata.create_all(bind=engine) 

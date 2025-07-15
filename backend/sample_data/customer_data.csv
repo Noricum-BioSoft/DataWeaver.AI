@@ -1,0 +1,11 @@
+id,customer_name,email,subscription_type,join_date,region,status
+1,John Smith,john.smith@email.com,Premium,2024-01-01,North,Active
+2,Sarah Johnson,sarah.j@email.com,Basic,2024-01-05,South,Active
+3,Michael Brown,mike.brown@email.com,Premium,2024-01-10,East,Active
+4,Emily Davis,emily.d@email.com,Basic,2024-01-15,West,Inactive
+5,David Wilson,david.w@email.com,Premium,2024-01-20,North,Active
+6,Lisa Anderson,lisa.a@email.com,Basic,2024-01-25,South,Active
+7,Robert Taylor,rob.t@email.com,Premium,2024-01-30,East,Active
+8,Jennifer White,jen.white@email.com,Basic,2024-02-05,West,Active
+9,Christopher Lee,chris.lee@email.com,Premium,2024-02-10,North,Inactive
+10,Amanda Garcia,amanda.g@email.com,Basic,2024-02-15,South,Active 

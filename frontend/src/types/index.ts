@@ -10,11 +10,11 @@ export interface Workflow {
 }
 
 export enum WorkflowStatus {
-  DRAFT = "draft",
-  RUNNING = "running",
-  COMPLETED = "completed",
-  FAILED = "failed",
-  CANCELLED = "cancelled"
+  DRAFT = "DRAFT",
+  RUNNING = "RUNNING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED"
 }
 
 export interface WorkflowCreate {
@@ -46,18 +46,18 @@ export interface WorkflowStep {
 }
 
 export enum StepStatus {
-  PENDING = "pending",
-  RUNNING = "running",
-  COMPLETED = "completed",
-  FAILED = "failed",
-  SKIPPED = "skipped"
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  SKIPPED = "SKIPPED"
 }
 
 export enum StepType {
-  INPUT = "input",
-  PROCESSING = "processing",
-  OUTPUT = "output",
-  EXTERNAL = "external"
+  INPUT = "INPUT",
+  PROCESSING = "PROCESSING",
+  OUTPUT = "OUTPUT",
+  EXTERNAL = "EXTERNAL"
 }
 
 export interface WorkflowStepCreate {
@@ -98,21 +98,21 @@ export interface AppFile {
 }
 
 export enum AppFileType {
-  CSV = "csv",
-  EXCEL = "excel",
-  TEXT = "text",
-  JSON = "json",
-  XML = "xml",
-  BINARY = "binary",
-  OTHER = "other"
+  CSV = "CSV",
+  EXCEL = "EXCEL",
+  TEXT = "TEXT",
+  JSON = "JSON",
+  XML = "XML",
+  BINARY = "BINARY",
+  OTHER = "OTHER"
 }
 
 export enum AppFileStatus {
-  UPLOADING = "uploading",
-  PROCESSING = "processing",
-  READY = "ready",
-  ERROR = "error",
-  DELETED = "deleted"
+  UPLOADING = "UPLOADING",
+  PROCESSING = "PROCESSING",
+  READY = "READY",
+  ERROR = "ERROR",
+  DELETED = "DELETED"
 }
 
 export interface FileUploadResponse {
@@ -143,11 +143,11 @@ export interface Dataset {
 }
 
 export enum DatasetStatus {
-  PENDING = "pending",
-  PROCESSING = "processing",
-  MATCHED = "matched",
-  UNMATCHED = "unmatched",
-  ERROR = "error"
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  MATCHED = "MATCHED",
+  UNMATCHED = "UNMATCHED",
+  ERROR = "ERROR"
 }
 
 export interface DatasetCreate {
@@ -178,10 +178,10 @@ export interface DatasetMatch {
 }
 
 export enum MatchType {
-  EXACT = "exact",
-  FUZZY = "fuzzy",
-  ML_BASED = "ml_based",
-  MANUAL = "manual"
+  EXACT = "EXACT",
+  FUZZY = "FUZZY",
+  ML_BASED = "ML_BASED",
+  MANUAL = "MANUAL"
 }
 
 // API Response Types

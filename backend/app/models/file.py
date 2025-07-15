@@ -1,26 +1,24 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, JSON, BigInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
 import enum
-
-Base = declarative_base()
+from ..database import Base
 
 class FileType(enum.Enum):
-    CSV = "csv"
-    EXCEL = "excel"
-    TEXT = "text"
-    JSON = "json"
-    XML = "xml"
-    BINARY = "binary"
-    OTHER = "other"
+    CSV = "CSV"
+    EXCEL = "EXCEL"
+    TEXT = "TEXT"
+    JSON = "JSON"
+    XML = "XML"
+    BINARY = "BINARY"
+    OTHER = "OTHER"
 
 class FileStatus(enum.Enum):
-    UPLOADING = "uploading"
-    PROCESSING = "processing"
-    READY = "ready"
-    ERROR = "error"
-    DELETED = "deleted"
+    UPLOADING = "UPLOADING"
+    PROCESSING = "PROCESSING"
+    READY = "READY"
+    ERROR = "ERROR"
+    DELETED = "DELETED"
 
 class File(Base):
     __tablename__ = "files"
@@ -52,7 +50,12 @@ class File(Base):
     parent_file = relationship("File", remote_side=[id])
     child_files = relationship("File", back_populates="parent_file")
     file_metadata = relationship("FileMetadata", back_populates="file", cascade="all, delete-orphan")
-    relationships = relationship("FileRelationship", back_populates="file", cascade="all, delete-orphan")
+    relationships = relationship(
+        "FileRelationship",
+        back_populates="file",
+        cascade="all, delete-orphan",
+        foreign_keys="[FileRelationship.file_id]"
+    )
 
 class FileMetadata(Base):
     __tablename__ = "file_metadata"
@@ -65,7 +68,7 @@ class FileMetadata(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    file = relationship("File", back_populates="metadata")
+    file = relationship("File", back_populates="file_metadata")
 
 class FileRelationship(Base):
     __tablename__ = "file_relationships"
@@ -78,5 +81,5 @@ class FileRelationship(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    file = relationship("File", foreign_keys=[file_id])
+    file = relationship("File", foreign_keys=[file_id], back_populates="relationships")
     related_file = relationship("File", foreign_keys=[related_file_id]) 

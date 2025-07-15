@@ -1,23 +1,21 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, JSON, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
 import enum
-
-Base = declarative_base()
+from ..database import Base
 
 class DatasetStatus(enum.Enum):
-    PENDING = "pending"
-    PROCESSING = "processing"
-    MATCHED = "matched"
-    UNMATCHED = "unmatched"
-    ERROR = "error"
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    MATCHED = "MATCHED"
+    UNMATCHED = "UNMATCHED"
+    ERROR = "ERROR"
 
 class MatchType(enum.Enum):
-    EXACT = "exact"
-    FUZZY = "fuzzy"
-    ML_BASED = "ml_based"
-    MANUAL = "manual"
+    EXACT = "EXACT"
+    FUZZY = "FUZZY"
+    ML_BASED = "ML_BASED"
+    MANUAL = "MANUAL"
 
 class Dataset(Base):
     __tablename__ = "datasets"

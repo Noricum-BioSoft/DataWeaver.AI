@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import files, workflows, datasets
+from app.api import bio_matcher
 from api import bio_entities
 
 app = FastAPI(
@@ -22,6 +23,7 @@ app.add_middleware(
 app.include_router(files.router, prefix="/api")
 app.include_router(workflows.router, prefix="/api")
 app.include_router(datasets.router, prefix="/api")
+app.include_router(bio_matcher.router, prefix="/api")
 app.include_router(bio_entities.router, prefix="/api")
 
 @app.get("/")

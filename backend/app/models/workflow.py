@@ -1,30 +1,28 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
 import enum
-
-Base = declarative_base()
+from ..database import Base
 
 class WorkflowStatus(enum.Enum):
-    DRAFT = "draft"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    DRAFT = "DRAFT"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 class StepStatus(enum.Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    SKIPPED = "skipped"
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
 
 class StepType(enum.Enum):
-    INPUT = "input"
-    PROCESSING = "processing"
-    OUTPUT = "output"
-    EXTERNAL = "external"
+    INPUT = "INPUT"
+    PROCESSING = "PROCESSING"
+    OUTPUT = "OUTPUT"
+    EXTERNAL = "EXTERNAL"
 
 class Workflow(Base):
     __tablename__ = "workflows"

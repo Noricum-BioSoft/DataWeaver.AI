@@ -9,7 +9,9 @@ import {
   AlertCircle,
   TrendingUp,
   Download,
-  Eye
+  Eye,
+  Database,
+  FileDown
 } from 'lucide-react';
 import './ResultPanel.css';
 
@@ -41,6 +43,107 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
       </div>
     </div>
   );
+
+  const renderMergedData = (data: any) => (
+    <div className="result-card merged-data">
+      <div className="result-header">
+        <Database size={20} />
+        <h3>Merged CSV Data</h3>
+        <div className="merge-stats">
+          <span className="stat-item">
+            <strong>{data.totalRows}</strong> total rows
+          </span>
+          <span className="stat-item">
+            <strong>{data.matchedRows}</strong> matched
+          </span>
+          <span className="stat-item">
+            <strong>{data.unmatchedRows}</strong> unmatched
+          </span>
+        </div>
+      </div>
+      <div className="result-content">
+        <div className="merged-data-preview">
+          <div className="data-table">
+            <table>
+              <thead>
+                <tr>
+                  {data.headers.map((header: string, index: number) => (
+                    <th key={index}>{header}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.sampleRows.map((row: any[], rowIndex: number) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell: any, cellIndex: number) => (
+                      <td key={cellIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data.sampleRows.length < data.totalRows && (
+            <p className="table-note">
+              Showing first {data.sampleRows.length} rows of {data.totalRows} total rows
+            </p>
+          )}
+        </div>
+        <div className="merged-data-actions">
+          <a
+            href={data.downloadUrl}
+            download={data.fileName}
+            className="download-button"
+          >
+            <FileDown size={16} />
+            <span>Download Merged CSV</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderVisualizationResult = (data: any) => {
+    return (
+      <div className="result-card visualization-result">
+        <div className="result-header">
+          <BarChart3 size={20} />
+          <h3>Data Visualization</h3>
+          <div className="visualization-info">
+            <span className="plot-type">{data.plotType} plot</span>
+            <span className="data-info">{data.dataShape[0]} rows, {data.dataShape[1]} columns</span>
+          </div>
+        </div>
+        <div className="result-content">
+          <div className="visualization-container">
+            <img 
+              src={`data:image/png;base64,${data.plotData}`} 
+              alt={`${data.plotType} visualization`}
+              className="plot-image"
+            />
+          </div>
+          <div className="visualization-details">
+            <div className="data-columns">
+              <h4>Available Columns:</h4>
+              <div className="columns-list">
+                {data.columns.map((col: string, index: number) => (
+                  <span key={index} className={`column-tag ${data.numericColumns.includes(col) ? 'numeric' : 'text'}`}>
+                    {col}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="visualization-actions">
+              <button className="download-plot-button">
+                <Download size={16} />
+                <span>Download Plot</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderWorkflowList = (data: any[]) => (
     <div className="result-card workflow-list">
@@ -155,6 +258,12 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
     switch (result.type) {
       case 'connector':
         return renderConnectorResult(result.data);
+      case 'merged-data':
+        return renderMergedData(result.data);
+      case 'visualization':
+        return renderVisualizationResult(result.data);
+      case 'visualization-result':
+        return renderVisualizationResult(result.data);
       case 'workflow-list':
         return renderWorkflowList(result.data);
       case 'chart':

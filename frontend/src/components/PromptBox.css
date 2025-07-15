@@ -54,10 +54,17 @@
   border-radius: 12px;
   padding: 0.75rem;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .prompt-input-container:focus-within {
   border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.prompt-input-container.drag-over {
+  border-color: #3b82f6;
+  background: #eff6ff;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -83,6 +90,30 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.upload-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-button:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .voice-button {
@@ -234,6 +265,81 @@
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* Uploaded Files Display */
+.uploaded-files-display {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.files-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.file-item svg {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.file-name {
+  flex: 1;
+  color: #374151;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  color: #6b7280;
+  font-size: 0.7rem;
+}
+
+.remove-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.remove-file:hover {
+  background: #dc2626;
 }
 
 @media (max-width: 768px) {

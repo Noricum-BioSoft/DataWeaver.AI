@@ -4,24 +4,24 @@ from datetime import datetime
 from enum import Enum
 
 class WorkflowStatus(str, Enum):
-    DRAFT = "draft"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    DRAFT = "DRAFT"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 class StepStatus(str, Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    SKIPPED = "skipped"
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
 
 class StepType(str, Enum):
-    INPUT = "input"
-    PROCESSING = "processing"
-    OUTPUT = "output"
-    EXTERNAL = "external"
+    INPUT = "INPUT"
+    PROCESSING = "PROCESSING"
+    OUTPUT = "OUTPUT"
+    EXTERNAL = "EXTERNAL"
 
 # Workflow Schemas
 class WorkflowCreate(BaseModel):

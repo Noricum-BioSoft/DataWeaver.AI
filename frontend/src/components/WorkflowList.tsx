@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Play, Pause, CheckCircle, XCircle } from 'lucide-react';
 import { workflowApi } from '../services/api';
 import { Workflow, WorkflowStatus } from '../types';
+import WorkflowCreationForm from './WorkflowCreationForm';
 
 interface WorkflowListProps {
   onWorkflowSelect?: (workflow: Workflow) => void;
@@ -15,6 +16,7 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     loadWorkflows();
@@ -110,7 +112,10 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Workflows</h2>
-        <button className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button 
+          onClick={() => setShowCreateForm(true)}
+          className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
           <Plus className="h-4 w-4 mr-2" />
           New Workflow
         </button>
@@ -126,7 +131,10 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No workflows yet</h3>
           <p className="text-gray-500 mb-4">Create your first workflow to get started</p>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button 
+            onClick={() => setShowCreateForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
             Create Workflow
           </button>
         </div>
@@ -190,6 +198,15 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
           ))}
         </div>
       )}
+
+      <WorkflowCreationForm
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        onWorkflowCreated={(workflow) => {
+          setWorkflows(prev => [workflow, ...prev]);
+          setShowCreateForm(false);
+        }}
+      />
     </div>
   );
 };

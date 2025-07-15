@@ -16,7 +16,8 @@ import {
 } from '../types';
 
 // API base configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+// Use relative URLs since we have proxy configured in package.json
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -253,6 +254,127 @@ export const datasetApi = {
   // Get workflow matches
   getWorkflowMatches: async (workflowId: number): Promise<DatasetMatch[]> => {
     const response = await api.get(`/datasets/workflow/${workflowId}/matches`);
+    return response.data;
+  },
+};
+
+// Bio-Matcher API
+export const bioMatcherApi = {
+  // Create workflow session
+  createWorkflowSession: async (): Promise<{ session_id: string; message: string }> => {
+    const response = await api.post('/bio/create-workflow-session');
+    return response.data;
+  },
+
+  // Merge two CSV files with session support
+  mergeFiles: async (formData: FormData): Promise<{
+    headers: string[];
+    rows: any[][];
+    totalRows: number;
+    matchedRows: number;
+    unmatchedRows: number;
+    session_id?: string;
+    workflow_step: string;
+  }> => {
+    const response = await api.post('/bio/merge-files', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Generate visualization from CSV data or session data
+  generateVisualization: async (
+    file?: File,
+    plotType: string = "scatter",
+    xColumn?: string,
+    yColumn?: string,
+    sessionId?: string,
+    useSessionData: boolean = false
+  ): Promise<{
+    plot_type: string;
+    plot_data: string;
+    columns: string[];
+    data_shape: [number, number];
+    numeric_columns: string[];
+    session_id?: string;
+    workflow_step: string;
+  }> => {
+    const formData = new FormData();
+    if (file) formData.append('file', file);
+    formData.append('plot_type', plotType);
+    if (xColumn) formData.append('x_column', xColumn);
+    if (yColumn) formData.append('y_column', yColumn);
+    if (sessionId) formData.append('session_id', sessionId);
+    formData.append('use_session_data', useSessionData.toString());
+
+    const response = await api.post('/bio/generate-visualization', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get workflow status
+  getWorkflowStatus: async (sessionId: string): Promise<{
+    session_id: string;
+    created_at: string;
+    last_updated: string;
+    steps: any[];
+    has_merged_data: boolean;
+    has_visualization_data: boolean;
+  }> => {
+    const response = await api.get(`/bio/workflow-status/${sessionId}`);
+    return response.data;
+  },
+
+  // Get workflow history
+  getWorkflowHistory: async (sessionId: string): Promise<{
+    session_id: string;
+    history: any[];
+  }> => {
+    const response = await api.get(`/bio/workflow-history/${sessionId}`);
+    return response.data;
+  },
+
+  // Upload test results
+  uploadTestResults: async (
+    file: File,
+    testType: string = "activity",
+    assayName?: string,
+    protocol?: string
+  ): Promise<any> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('test_type', testType);
+    if (assayName) formData.append('assay_name', assayName);
+    if (protocol) formData.append('protocol', protocol);
+
+    const response = await api.post('/bio/upload-test-results', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Get designs
+  getDesigns: async (): Promise<any[]> => {
+    const response = await api.get('/bio/designs');
+    return response.data;
+  },
+
+  // Get builds
+  getBuilds: async (): Promise<any[]> => {
+    const response = await api.get('/bio/builds');
+    return response.data;
+  },
+
+  // Get tests
+  getTests: async (): Promise<any[]> => {
+    const response = await api.get('/bio/tests');
     return response.data;
   },
 };

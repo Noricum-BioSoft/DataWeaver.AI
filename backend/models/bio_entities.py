@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import hashlib
-from .base import Base
+from app.database import Base
 
 
 class Design(Base):

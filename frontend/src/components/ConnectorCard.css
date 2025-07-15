@@ -1,0 +1,106 @@
+.connector-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.connector-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.connector-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.connector-icon {
+  font-size: 2rem;
+  margin-right: 1rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.connector-info {
+  flex: 1;
+}
+
+.connector-name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.connector-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.connected {
+  background: #28a745;
+}
+
+.status-indicator.disconnected {
+  background: #dc3545;
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.connector-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.last-synced {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.connect-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #007bff;
+  color: white;
+}
+
+.connect-button:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.connect-button.connected {
+  background: #28a745;
+}
+
+.connect-button.connected:hover {
+  background: #1e7e34;
+} 

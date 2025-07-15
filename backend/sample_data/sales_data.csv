@@ -1,0 +1,11 @@
+id,product,sales_amount,region,date,category,units_sold
+1,Product_A,1250.50,North,2024-01-15,Electronics,25
+2,Product_B,890.75,South,2024-01-16,Clothing,18
+3,Product_C,2100.00,East,2024-01-17,Electronics,42
+4,Product_D,675.25,West,2024-01-18,Home,15
+5,Product_E,1450.80,North,2024-01-19,Electronics,29
+6,Product_F,320.50,South,2024-01-20,Clothing,8
+7,Product_G,1890.00,East,2024-01-21,Electronics,38
+8,Product_H,445.75,West,2024-01-22,Home,12
+9,Product_I,2100.25,North,2024-01-23,Electronics,42
+10,Product_J,780.00,South,2024-01-24,Clothing,16 

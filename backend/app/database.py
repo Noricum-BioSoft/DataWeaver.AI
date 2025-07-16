@@ -38,6 +38,9 @@ def get_db():
 # Create all tables
 def create_tables():
     # Import all models to ensure they're registered with the Base
-    from .models import Workflow, WorkflowStep, File, FileMetadata, FileRelationship, Dataset, DatasetMatch
-    from models.bio_entities import Design, Build, Test
+    from .models import (
+        Workflow, WorkflowStep, File, FileMetadata, FileRelationship, 
+        Dataset, DatasetMatch, DesignPhase, BuildPhase, TestPhase,
+        WorkflowProject, WorkflowFile, WorkflowCorrelation
+    )
     Base.metadata.create_all(bind=engine) 

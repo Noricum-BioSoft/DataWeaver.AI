@@ -11,19 +11,31 @@ sys.path.insert(0, str(backend_dir))
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
-from app.database import get_db
+from app.database import get_db, Base
 from models.bio_entities import Design, Build, Test
 from main import app
 
-# Test database URL
-TEST_DATABASE_URL = "sqlite:///./test.db"
+# Test database configuration
+USE_POSTGRES = os.getenv("USE_POSTGRES", "false").lower() == "true"
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///./test.db")
 
 @pytest.fixture(scope="session")
 def test_engine():
     """Create test database engine"""
-    engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-    # Import Base from the same place bio_entities gets it
-    from models.base import Base
+    if USE_POSTGRES:
+        # PostgreSQL configuration
+        try:
+            engine = create_engine(TEST_DATABASE_URL)
+            # Test connection
+            connection = engine.connect()
+            connection.close()
+        except Exception as e:
+            pytest.skip(f"PostgreSQL not available: {e}")
+    else:
+        # SQLite configuration
+        engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+    
+    # Create tables
     Base.metadata.create_all(bind=engine)
     yield engine
     Base.metadata.drop_all(bind=engine)
@@ -31,7 +43,12 @@ def test_engine():
 @pytest.fixture(scope="function")
 def db_session(test_engine):
     """Create database session for each test"""
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+    TestingSessionLocal = sessionmaker(
+        autocommit=False, 
+        autoflush=False, 
+        expire_on_commit=False, 
+        bind=test_engine
+    )
     session = TestingSessionLocal()
     yield session
     session.rollback()
@@ -39,7 +56,7 @@ def db_session(test_engine):
 
 @pytest.fixture(scope="function")
 def client(db_session):
-    """Create test client with database session"""
+    """Create test client with shared database session"""
     def override_get_db():
         try:
             yield db_session
@@ -94,8 +111,5 @@ def temp_csv_file(sample_csv_content):
     with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
         f.write(sample_csv_content)
         temp_file_path = f.name
-    
     yield temp_file_path
-    
-    # Clean up
     os.unlink(temp_file_path) 

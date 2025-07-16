@@ -79,7 +79,7 @@ class BioEntityMatcher:
         ).first()
         
         if design:
-            design_mutations = self.parse_mutations(design.mutation_list)
+            design_mutations = self.parse_mutations(design.mutation_list or "")
             overlap = len(set(mutations) & set(design_mutations))
             print(f"DEBUG: mutations={mutations}, design_mutations={design_mutations}, overlap={overlap}, len(mutations)={len(mutations)}, len(design_mutations)={len(design_mutations)}")
             if overlap == len(mutations) == len(design_mutations):
@@ -89,7 +89,7 @@ class BioEntityMatcher:
                 print("DEBUG: partial match")
                 return design, None, 0.6
             print("DEBUG: no match")
-            return design, None, 0.0
+            return design, None, 0.4  # Lower score for pattern match but no overlap
         
         # Try builds
         build = self.db.query(Build).filter(
@@ -98,7 +98,7 @@ class BioEntityMatcher:
         ).first()
         
         if build:
-            build_mutations = self.parse_mutations(build.mutation_list)
+            build_mutations = self.parse_mutations(build.mutation_list or "")
             overlap = len(set(mutations) & set(build_mutations))
             print(f"DEBUG: mutations={mutations}, build_mutations={build_mutations}, overlap={overlap}, len(mutations)={len(mutations)}, len(build_mutations)={len(build_mutations)}")
             if overlap == len(mutations) == len(build_mutations):
@@ -108,7 +108,7 @@ class BioEntityMatcher:
                 print("DEBUG: partial match (build)")
                 return None, build, 0.6
             print("DEBUG: no match (build)")
-            return None, build, 0.0
+            return None, build, 0.4  # Lower score for pattern match but no overlap
         
         return None, None, 0.0
     
@@ -291,13 +291,24 @@ class BioEntityMatcher:
         return results
     
     def get_lineage(self, design_id: str) -> Dict[str, Any]:
-        """Get complete lineage for a design"""
-        design = self.db.query(Design).filter(Design.id == design_id).first()
-        if not design:
-            return None
+        """Get lineage information for a design"""
+        design = self.db.query(Design).filter(
+            Design.id == design_id,
+            Design.is_active == True
+        ).first()
         
-        builds = self.db.query(Build).filter(Build.design_id == design_id).all()
-        tests = self.db.query(Test).filter(Test.design_id == design_id).all()
+        if not design:
+            return {"error": "Design not found"}
+        
+        builds = self.db.query(Build).filter(
+            Build.design_id == design_id,
+            Build.is_active == True
+        ).all()
+        
+        tests = self.db.query(Test).filter(
+            Test.design_id == design_id,
+            Test.is_active == True
+        ).all()
         
         return {
             "design": design,
@@ -307,15 +318,21 @@ class BioEntityMatcher:
 
 
 def parse_upload_file(file_content: bytes, filename: str) -> List[Dict[str, Any]]:
-    """Parse uploaded file content"""
-    if filename.endswith('.csv'):
-        # Parse CSV content
-        content = file_content.decode('utf-8')
-        reader = csv.DictReader(io.StringIO(content))
-        return list(reader)
-    elif filename.endswith('.xlsx'):
-        # For Excel files, we'll return an empty list for now
-        # In production, you'd use openpyxl or xlrd
-        return []
-    else:
-        raise ValueError("Unsupported file format") 
+    """Parse uploaded file content into list of dictionaries"""
+    try:
+        # Try CSV first
+        if filename.lower().endswith('.csv'):
+            content = file_content.decode('utf-8')
+            reader = csv.DictReader(io.StringIO(content))
+            return [dict(row) for row in reader]
+        
+        # Try Excel (would need openpyxl)
+        elif filename.lower().endswith(('.xlsx', '.xls')):
+            # For now, return empty list - would need openpyxl
+            return []
+        
+        else:
+            raise ValueError(f"Unsupported file format: {filename}")
+    
+    except Exception as e:
+        raise ValueError(f"Error parsing file: {str(e)}") 

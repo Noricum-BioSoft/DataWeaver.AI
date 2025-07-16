@@ -10,6 +10,8 @@ A comprehensive data management system with AI-powered workflow automation, file
 - **Data Visualization**: Generate scatter plots, histograms, correlation heatmaps, and boxplots
 - **Workflow Session Management**: Persistent data storage between processing steps
 - **Biological Entity Management**: Specialized support for protein sequences and assay data
+- **Real File Processing**: Complete file upload, storage, and processing pipeline
+- **Integration Testing**: Comprehensive test suite with PostgreSQL support
 - **Scalable Architecture**: Support for large datasets and parallel workflows
 
 ## 🏗️ Architecture
@@ -19,6 +21,7 @@ A comprehensive data management system with AI-powered workflow automation, file
 - **Database**: PostgreSQL with SQLAlchemy ORM
 - **File Storage**: Structured file system with metadata tracking
 - **Visualization**: Matplotlib/Seaborn for data plotting
+- **Testing**: pytest with PostgreSQL integration tests
 
 ## 🚀 Quick Start
 
@@ -73,6 +76,65 @@ start.bat help       # Show all options
    cd backend
    alembic upgrade head
    ```
+
+## 🧪 Testing
+
+### Integration Tests
+
+Run the comprehensive integration test suite:
+
+```bash
+cd backend
+
+# Set up PostgreSQL test database
+export TEST_DATABASE_URL="postgresql://username@localhost:5432/datweaver_test"
+export USE_POSTGRES=true
+
+# Run integration tests
+python run_integration_tests.py --type integration
+```
+
+### Test Coverage
+
+The integration test suite covers:
+- ✅ Complete file upload workflow
+- ✅ API endpoint integration
+- ✅ Data processing pipeline
+- ✅ Error handling and recovery
+- ✅ Performance and scalability
+- ✅ System monitoring and health checks
+- ✅ Data export and import functionality
+
+## 📁 File Processing
+
+### Upload and Process Files
+
+**Upload a CSV file:**
+```bash
+curl -X POST "http://localhost:8000/api/files/upload" \
+  -F "file=@assay_results.csv"
+```
+
+**Process uploaded file for bio entities:**
+```bash
+curl -X POST "http://localhost:8000/api/bio-entities/process-file/{file_id}" \
+  -H "Content-Type: application/json" \
+  -d '{"process_type": "assay_results"}'
+```
+
+### Supported File Formats
+
+- **CSV**: Comma-separated values with automatic column detection
+- **Excel**: .xlsx and .xls files (planned)
+- **JSON**: Structured data files (planned)
+
+### File Processing Pipeline
+
+1. **Upload**: Files are validated and stored with unique identifiers
+2. **Metadata Extraction**: File properties and structure are analyzed
+3. **Content Processing**: CSV parsing with intelligent column mapping
+4. **Entity Creation**: Automatic creation of Design and Test records
+5. **Relationship Mapping**: Links between entities based on data patterns
 
 ## 💬 AI Chat Interface
 
@@ -158,7 +220,7 @@ After merging, request visualizations:
 ### Create Design Entity
 
 ```bash
-curl -X POST "http://localhost:8000/api/bio/designs" \
+curl -X POST "http://localhost:8000/api/bio-entities/designs" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "WT_Protein",
@@ -166,15 +228,14 @@ curl -X POST "http://localhost:8000/api/bio/designs" \
     "description": "Wild type protein sequence",
     "sequence": "MGT...L72...K",
     "sequence_type": "protein",
-    "mutation_list": "",
-    "generation": 0
+    "mutation_list": ""
   }'
 ```
 
 ### Create Build Entity
 
 ```bash
-curl -X POST "http://localhost:8000/api/bio/builds" \
+curl -X POST "http://localhost:8000/api/bio-entities/builds" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Mutant_L72F",
@@ -189,7 +250,7 @@ curl -X POST "http://localhost:8000/api/bio/builds" \
   }'
 ```
 
-### Upload Test Results
+### Upload and Process Test Results
 
 Create `assay_results.csv`:
 
@@ -201,14 +262,19 @@ Mutant_A,Mutant_A,MGT...R80K...K,R80K,8.5,μM/min,activity,Enzyme Activity Assay
 Double_Mutant,Double_Mutant,MGT...L72F...R80K...K,"L72F,R80K",2.1,μM/min,activity,Enzyme Activity Assay,Dr. Johnson
 ```
 
-Upload via API:
-
+**Upload and process:**
 ```bash
-curl -X POST "http://localhost:8000/api/bio/upload-test-results" \
-  -F "file=@assay_results.csv" \
-  -F "test_type=activity" \
-  -F "assay_name=Enzyme Activity Assay"
+# 1. Upload file
+curl -X POST "http://localhost:8000/api/files/upload" \
+  -F "file=@assay_results.csv"
+
+# 2. Process for bio entities (use file_id from upload response)
+curl -X POST "http://localhost:8000/api/bio-entities/process-file/{file_id}" \
+  -H "Content-Type: application/json" \
+  -d '{"process_type": "assay_results"}'
 ```
+
+**Result**: Automatic creation of Design and Test entities with proper relationships.
 
 ## 🔄 Workflow Management
 
@@ -250,126 +316,3 @@ curl -X POST "http://localhost:8000/workflows/1/steps/" \
     }
   }'
 ```
-
-## 📁 File Formats
-
-### Supported File Types
-- **CSV**: Comma-separated values (primary format)
-- **Excel**: .xlsx, .xls files
-- **FASTA**: Biological sequences
-- **JSON**: Structured data
-- **Text**: Plain text files
-
-### CSV Format Examples
-
-**Biological Data:**
-```csv
-name,alias,sequence,mutations,result_value,result_unit,test_type,assay_name,technician
-Clone_7,Clone_7,MGT...L72F...K,L72F,25.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
-WT_Control,WT_Control,MGT...L72...K,,15.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
-```
-
-**General Data:**
-```csv
-id,name,value,category,date
-1,Sample_A,15.5,Group_1,2024-01-15
-2,Sample_B,22.3,Group_2,2024-01-16
-3,Sample_C,18.7,Group_1,2024-01-17
-```
-
-## 🏗️ Project Structure
-
-```
-DataWeaver.AI/
-├── backend/                 # FastAPI backend
-│   ├── app/
-│   │   ├── models/         # Database models
-│   │   ├── schemas/        # Pydantic schemas
-│   │   ├── api/            # API routes
-│   │   ├── services/       # Business logic
-│   │   └── utils/          # Utilities
-│   ├── alembic/            # Database migrations
-│   ├── services/           # Core services
-│   │   ├── bio_matcher.py  # Biological data matching
-│   │   └── workflow_state.py # Session management
-│   └── requirements.txt
-├── frontend/               # React frontend
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   │   ├── AIChatLayout.tsx    # AI Chat interface
-│   │   │   ├── PromptBox.tsx       # Input with file upload
-│   │   │   ├── ChatHistory.tsx     # Message display
-│   │   │   └── ResultPanel.tsx     # Results and visualizations
-│   │   ├── services/       # API services
-│   │   └── types/          # TypeScript types
-│   └── package.json
-├── docs/                   # Documentation
-├── start.sh               # Startup script (macOS/Linux)
-├── start.bat              # Startup script (Windows)
-└── setup.sh               # Initial setup script
-```
-
-## 🔧 Services
-
-The application consists of the following services:
-
-- **Frontend**: React development server (port 3000)
-- **Backend**: FastAPI server (port 8000)
-- **Database**: PostgreSQL (port 5432)
-- **Cache**: Redis (port 6379)
-
-## 🎯 Key Features
-
-### AI Chat Interface
-- Natural language processing for data operations
-- Drag-and-drop file upload with visual feedback
-- Smart command detection and routing
-- Real-time processing status updates
-
-### File Processing
-- Automatic format detection and validation
-- Intelligent CSV merging with column matching
-- Progress tracking and error handling
-- Download capabilities for processed data
-
-### Data Visualization
-- Multiple chart types (scatter, histogram, heatmap, boxplot)
-- Interactive plot generation
-- Column information and data statistics
-- Download options for generated visualizations
-
-### Session Management
-- Persistent data storage between steps
-- Workflow history tracking
-- Session-based data isolation
-- Automatic cleanup of old sessions
-
-## 🚀 Getting Started
-
-1. **Clone the repository**
-2. **Run the startup script**: `./start.sh`
-3. **Open the application**: http://localhost:3000
-4. **Start with AI Chat**: Use natural language to upload and process data
-5. **Try the examples**: Upload sample CSV files and request visualizations
-
-## 📚 Example Workflows
-
-### Basic Data Analysis
-1. Upload two CSV files via drag-and-drop
-2. Type "merge these files" in the chat
-3. Type "visualize the data in a scatter plot"
-4. Download the merged data and visualization
-
-### Biological Data Processing
-1. Upload sequence and measurement CSV files
-2. Request "merge the files and show me a correlation heatmap"
-3. Analyze the relationships between sequence properties and measurements
-4. Download the analysis results
-
-### Multi-Step Workflow
-1. Create a new session: "Start a new data analysis session"
-2. Upload files and merge: "Upload these files and merge them"
-3. Generate multiple visualizations: "Create a histogram and a scatter plot"
-4. Review workflow history and download results
-
-The system is designed to be intuitive and powerful, allowing users to focus on data analysis rather than technical implementation details.

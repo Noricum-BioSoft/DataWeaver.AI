@@ -235,7 +235,16 @@ DataWeaver.AI/
 └── test_data/             # Sample data files
 ```
 
-## 🔍 API Endpoints
+## 🔍 API Documentation
+
+### Interactive API Docs
+- **Swagger UI**: Visit `http://localhost:8000/docs` when the server is running
+- **ReDoc**: Visit `http://localhost:8000/redoc` for alternative documentation
+
+### OpenAPI Specification
+- **YAML Format**: `docs/openapi.yaml`
+- **JSON Format**: `docs/openapi.json`
+- **Complete API Reference**: `docs/API.md`
 
 ### Core Endpoints
 - `POST /api/bio/create-workflow-session` - Create new session

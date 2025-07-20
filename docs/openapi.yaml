@@ -1,0 +1,1158 @@
+openapi: 3.0.3
+info:
+  title: DataWeaver.AI API
+  description: |
+    Comprehensive API for DataWeaver.AI - an intelligent data processing platform with AI-powered workflow automation, file management, and visualization capabilities.
+    
+    ## Features
+    - File upload and processing
+    - Intelligent data merging
+    - Session-based workflow management
+    - Data visualization generation
+    - AI-powered data analysis
+    - Biological entity management
+    
+    ## Authentication
+    Currently, the API operates without authentication for development. Production deployments will include API key authentication.
+    
+    ## Rate Limiting
+    Currently, no rate limiting is implemented. Production deployments will include rate limiting based on API keys.
+  version: 1.0.0
+  contact:
+    name: DataWeaver.AI Support
+    email: contact@dataweaver.ai
+    url: https://github.com/your-username/DataWeaver.AI
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.dataweaver.ai
+    description: Production server
+
+tags:
+  - name: Session Management
+    description: Workflow session creation and management
+  - name: File Operations
+    description: File upload and processing operations
+  - name: Data Analysis
+    description: Data analysis and visualization
+  - name: Data Q&A
+    description: AI-powered data question and answer
+  - name: AI Chat
+    description: General AI chat interface
+  - name: Biological Entities
+    description: Biological entity management and processing
+
+paths:
+  /api/bio/create-workflow-session:
+    post:
+      tags:
+        - Session Management
+      summary: Create a new workflow session
+      description: Creates a new workflow session for data processing and analysis
+      operationId: createWorkflowSession
+      responses:
+        '200':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+                    description: Unique session identifier
+                    example: "3cae542c-259d-422e-964e-984e2d484560"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Session created successfully"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/clear-session/{session_id}:
+    delete:
+      tags:
+        - Session Management
+      summary: Clear a workflow session
+      description: Clears all data from a specific workflow session
+      operationId: clearSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: Session identifier
+          schema:
+            type: string
+            format: uuid
+          example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Session cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+                    description: Session identifier
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Session cleared successfully"
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/workflow-status/{session_id}:
+    get:
+      tags:
+        - Session Management
+      summary: Get workflow session status
+      description: Returns the current status and metadata of a workflow session
+      operationId: getWorkflowStatus
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: Session identifier
+          schema:
+            type: string
+            format: uuid
+          example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Session status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+                    description: Session identifier
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Session creation timestamp
+                  last_updated:
+                    type: string
+                    format: date-time
+                    description: Last activity timestamp
+                  steps:
+                    type: array
+                    description: Workflow steps performed
+                    items:
+                      $ref: '#/components/schemas/WorkflowStep'
+                  has_merged_data:
+                    type: boolean
+                    description: Whether session has merged data
+                  has_visualization_data:
+                    type: boolean
+                    description: Whether session has visualization data
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/upload-single-file:
+    post:
+      tags:
+        - File Operations
+      summary: Upload a single CSV file
+      description: Uploads a single CSV file to a workflow session
+      operationId: uploadSingleFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to upload
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier (optional)
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          description: Invalid file format or size
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/merge-session-files:
+    post:
+      tags:
+        - File Operations
+      summary: Merge files in session
+      description: Merges all uploaded files in a workflow session
+      operationId: mergeSessionFiles
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Files merged successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: No files to merge or merge failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/merge-files:
+    post:
+      tags:
+        - File Operations
+      summary: Merge multiple files directly
+      description: Merges multiple CSV files uploaded in a single request
+      operationId: mergeFiles
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Multiple CSV files to merge
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier (optional)
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Files merged successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeResponse'
+        '400':
+          description: Invalid files or merge failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/generate-visualization:
+    post:
+      tags:
+        - Data Analysis
+      summary: Generate data visualization
+      description: Generates charts and visualizations from data
+      operationId: generateVisualization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file (optional)
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier (optional)
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+                plot_type:
+                  type: string
+                  enum: [scatter, histogram, correlation, boxplot]
+                  description: Type of chart to generate
+                  example: "scatter"
+                x_column:
+                  type: string
+                  description: X-axis column name
+                  example: "abundance"
+                y_column:
+                  type: string
+                  description: Y-axis column name
+                  example: "expression_level"
+                use_session_data:
+                  type: boolean
+                  description: Use session data instead of uploaded file
+                  example: true
+      responses:
+        '200':
+          description: Visualization generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualizationResponse'
+        '400':
+          description: Invalid parameters or data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Visualization service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/explain-visualization:
+    post:
+      tags:
+        - Data Analysis
+      summary: Explain visualization
+      description: Get AI explanation of a generated visualization
+      operationId: explainVisualization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+                plot_type:
+                  type: string
+                  enum: [scatter, histogram, correlation, boxplot]
+                  description: Type of chart
+                  example: "scatter"
+                x_column:
+                  type: string
+                  description: X-axis column name
+                  example: "abundance"
+                y_column:
+                  type: string
+                  description: Y-axis column name
+                  example: "expression_level"
+      responses:
+        '200':
+          description: Visualization explanation generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualizationExplanationResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/analyze-data:
+    post:
+      tags:
+        - Data Analysis
+      summary: Analyze data comprehensively
+      description: Performs comprehensive data analysis including statistics, quality checks, and insights
+      operationId: analyzeData
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file (optional)
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier (optional)
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+                use_session_data:
+                  type: boolean
+                  description: Use session data instead of uploaded file
+                  example: true
+      responses:
+        '200':
+          description: Data analysis completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataAnalysisResponse'
+        '400':
+          description: Invalid data or analysis failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/data-qa/ask:
+    post:
+      tags:
+        - Data Q&A
+      summary: Ask questions about data
+      description: Ask natural language questions about uploaded or session data
+      operationId: askDataQuestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+                - session_id
+              properties:
+                question:
+                  type: string
+                  description: Natural language question about the data
+                  example: "What columns are in the data?"
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Question answered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataQAResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/data-qa/suggestions/{session_id}:
+    get:
+      tags:
+        - Data Q&A
+      summary: Get suggested questions
+      description: Get AI-suggested questions based on the data in a session
+      operationId: getDataSuggestions
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: Session identifier
+          schema:
+            type: string
+            format: uuid
+          example: "3cae542c-259d-422e-964e-984e2d484560"
+      responses:
+        '200':
+          description: Suggestions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                    description: List of suggested questions
+                    example: ["What columns are in the data?", "Are there any missing values?", "What is the correlation between abundance and expression?"]
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/general-chat/chat:
+    post:
+      tags:
+        - AI Chat
+      summary: General AI chat
+      description: General AI chat interface for data-related questions and assistance
+      operationId: generalChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  description: User message
+                  example: "Help me understand this data"
+                session_id:
+                  type: string
+                  format: uuid
+                  description: Session identifier (optional)
+                  example: "3cae542c-259d-422e-964e-984e2d484560"
+                context:
+                  type: object
+                  description: Additional context (optional)
+      responses:
+        '200':
+          description: Chat response generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/upload-test-results:
+    post:
+      tags:
+        - Biological Entities
+      summary: Upload biological test results
+      description: Upload and process biological assay results with automatic entity matching
+      operationId: uploadTestResults
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file with test results
+                test_type:
+                  type: string
+                  description: Type of test (e.g., activity, stability)
+                  example: "activity"
+                assay_name:
+                  type: string
+                  description: Name of the assay
+                  example: "Enzyme Activity Assay"
+                protocol:
+                  type: string
+                  description: Protocol description (optional)
+      responses:
+        '200':
+          description: Test results processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BioTestResultsResponse'
+        '400':
+          description: Invalid file or processing failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/designs:
+    get:
+      tags:
+        - Biological Entities
+      summary: Get biological designs
+      description: Retrieve all biological design entities
+      operationId: getDesigns
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+          description: Maximum number of designs to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of designs to skip
+      responses:
+        '200':
+          description: Designs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BioDesign'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/builds:
+    get:
+      tags:
+        - Biological Entities
+      summary: Get biological builds
+      description: Retrieve all biological build entities
+      operationId: getBuilds
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+          description: Maximum number of builds to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of builds to skip
+      responses:
+        '200':
+          description: Builds retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BioBuild'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/bio/tests:
+    get:
+      tags:
+        - Biological Entities
+      summary: Get biological tests
+      description: Retrieve all biological test entities
+      operationId: getTests
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+          description: Maximum number of tests to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of tests to skip
+      responses:
+        '200':
+          description: Tests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BioTest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: "File upload failed"
+        status_code:
+          type: integer
+          description: HTTP status code
+          example: 400
+        error_type:
+          type: string
+          description: Type of error
+          example: "validation_error"
+
+    WorkflowStep:
+      type: object
+      properties:
+        step_type:
+          type: string
+          description: Type of workflow step
+          example: "upload_single_file"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the step was executed
+        metadata:
+          type: object
+          description: Step-specific metadata
+
+    FileUploadResponse:
+      type: object
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+          description: Column headers
+          example: ["protein_id", "abundance", "condition"]
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Data rows
+          example: [["PROT001", "150.5", "control"], ["PROT002", "89.2", "treatment"]]
+        totalRows:
+          type: integer
+          description: Total number of rows
+          example: 100
+        matchedRows:
+          type: integer
+          description: Number of matched rows
+          example: 100
+        unmatchedRows:
+          type: integer
+          description: Number of unmatched rows
+          example: 0
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+        workflow_step:
+          type: string
+          description: Workflow step performed
+          example: "upload_single_file"
+        filename:
+          type: string
+          description: Original filename
+          example: "protein_abundance.csv"
+
+    MergeResponse:
+      type: object
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+          description: Column headers
+          example: ["protein_id", "abundance", "condition", "expression_level", "tissue"]
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Merged data rows
+        totalRows:
+          type: integer
+          description: Total number of rows
+          example: 100
+        matchedRows:
+          type: integer
+          description: Number of matched rows
+          example: 95
+        unmatchedRows:
+          type: integer
+          description: Number of unmatched rows
+          example: 5
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+        workflow_step:
+          type: string
+          description: Workflow step performed
+          example: "merge_session_files"
+        merge_column:
+          type: string
+          description: Column used for merging
+          example: "protein_id"
+        common_columns:
+          type: array
+          items:
+            type: string
+          description: Common columns across files
+          example: ["protein_id"]
+        message:
+          type: string
+          description: Success message
+          example: "Successfully merged session files"
+
+    VisualizationResponse:
+      type: object
+      properties:
+        plot_type:
+          type: string
+          description: Type of chart generated
+          example: "scatter"
+        plot_json:
+          type: object
+          description: Plotly JSON configuration
+        columns:
+          type: array
+          items:
+            type: string
+          description: Columns used in visualization
+          example: ["abundance", "expression_level"]
+        data_shape:
+          type: array
+          items:
+            type: integer
+          description: Shape of data used
+          example: [100, 2]
+        numeric_columns:
+          type: array
+          items:
+            type: string
+          description: Numeric columns in data
+          example: ["abundance", "expression_level"]
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+        workflow_step:
+          type: string
+          description: Workflow step performed
+          example: "generate_visualization"
+
+    VisualizationExplanationResponse:
+      type: object
+      properties:
+        plot_type:
+          type: string
+          description: Type of chart
+          example: "scatter"
+        data_shape:
+          type: array
+          items:
+            type: integer
+          description: Shape of data
+          example: [100, 2]
+        analysis:
+          type: object
+          properties:
+            trends:
+              type: array
+              items:
+                type: string
+              description: Identified trends
+              example: ["Positive correlation between abundance and expression"]
+            correlations:
+              type: array
+              items:
+                type: object
+              description: Correlation analysis
+            outliers:
+              type: array
+              items:
+                type: object
+              description: Outlier detection
+            insights:
+              type: array
+              items:
+                type: string
+              description: Key insights
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+
+    DataAnalysisResponse:
+      type: object
+      properties:
+        dataset_info:
+          type: object
+          description: Basic dataset information
+        insights:
+          type: array
+          items:
+            type: string
+          description: Key insights about the data
+        quality_analysis:
+          type: object
+          description: Data quality assessment
+        statistical_analysis:
+          type: object
+          description: Statistical summaries
+        correlation_analysis:
+          type: object
+          description: Correlation analysis
+        pattern_analysis:
+          type: object
+          description: Pattern detection
+        recommendations:
+          type: array
+          items:
+            type: string
+          description: Recommendations for further analysis
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+
+    DataQAResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: Answer to the question
+          example: "The dataset contains 4 columns: protein_id, abundance, condition, and expression_level"
+        confidence:
+          type: string
+          enum: [low, medium, high]
+          description: Confidence level of the answer
+          example: "high"
+        data_points:
+          type: array
+          items:
+            type: object
+          description: Supporting data points
+        session_id:
+          type: string
+          format: uuid
+          description: Session identifier
+
+    ChatResponse:
+      type: object
+      properties:
+        response:
+          type: string
+          description: AI response
+          example: "I can help you analyze your data. What would you like to know?"
+        suggestions:
+          type: array
+          items:
+            type: string
+          description: Suggested follow-up questions
+        confidence:
+          type: string
+          enum: [low, medium, high]
+          description: Confidence level
+          example: "high"
+        context:
+          type: object
+          description: Additional context
+
+    BioTestResultsResponse:
+      type: object
+      properties:
+        total_rows:
+          type: integer
+          description: Total number of rows processed
+          example: 100
+        matched_rows:
+          type: integer
+          description: Number of rows successfully matched
+          example: 95
+        unmatched_rows:
+          type: integer
+          description: Number of unmatched rows
+          example: 5
+        high_confidence:
+          type: integer
+          description: Number of high confidence matches
+          example: 80
+        medium_confidence:
+          type: integer
+          description: Number of medium confidence matches
+          example: 15
+        low_confidence:
+          type: integer
+          description: Number of low confidence matches
+          example: 0
+        matches:
+          type: array
+          items:
+            type: object
+          description: Detailed match information
+        errors:
+          type: array
+          items:
+            type: object
+          description: Processing errors
+
+    BioDesign:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Design identifier
+        name:
+          type: string
+          description: Design name
+          example: "WT_Protein"
+        alias:
+          type: string
+          description: Alternative name
+          example: "Wild_Type"
+        sequence:
+          type: string
+          description: Biological sequence
+          example: "MGT...L72...K"
+        mutations:
+          type: string
+          description: Mutation list
+          example: "L72F,R80K"
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    BioBuild:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Build identifier
+        name:
+          type: string
+          description: Build name
+          example: "L72F_Mutant"
+        design_id:
+          type: string
+          format: uuid
+          description: Associated design ID
+        construct_type:
+          type: string
+          description: Type of construct
+          example: "plasmid"
+        build_status:
+          type: string
+          description: Build status
+          example: "completed"
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    BioTest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Test identifier
+        name:
+          type: string
+          description: Test name
+          example: "L72F_Activity_Test"
+        test_type:
+          type: string
+          description: Type of test
+          example: "activity"
+        result_value:
+          type: number
+          description: Test result value
+          example: 25.0
+        design_id:
+          type: string
+          format: uuid
+          description: Associated design ID
+        build_id:
+          type: string
+          format: uuid
+          description: Associated build ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (future implementation)
+
+  examples:
+    FileUploadExample:
+      summary: Example file upload
+      value:
+        headers: ["protein_id", "abundance", "condition"]
+        rows: [["PROT001", "150.5", "control"], ["PROT002", "89.2", "treatment"]]
+        totalRows: 100
+        matchedRows: 100
+        unmatchedRows: 0
+        session_id: "3cae542c-259d-422e-964e-984e2d484560"
+        workflow_step: "upload_single_file"
+        filename: "protein_abundance.csv"
+
+    MergeExample:
+      summary: Example merge response
+      value:
+        headers: ["protein_id", "abundance", "condition", "expression_level", "tissue"]
+        rows: [["PROT001", "150.5", "control", "0.85", "liver"]]
+        totalRows: 100
+        matchedRows: 95
+        unmatchedRows: 5
+        session_id: "3cae542c-259d-422e-964e-984e2d484560"
+        workflow_step: "merge_session_files"
+        merge_column: "protein_id"
+        common_columns: ["protein_id"]
+        message: "Successfully merged session files"
+
+    ErrorExample:
+      summary: Example error response
+      value:
+        detail: "File upload failed: Invalid CSV format"
+        status_code: 400
+        error_type: "validation_error" 

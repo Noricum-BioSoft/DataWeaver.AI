@@ -499,9 +499,40 @@ npm install axios
 ### cURL
 Available on most systems by default.
 
+## OpenAPI Specification
+
+The complete API specification is available in multiple formats:
+
+- **YAML Format**: `docs/openapi.yaml`
+- **JSON Format**: `docs/openapi.json`
+- **Interactive Docs**: Visit `http://localhost:8000/docs` when the server is running
+
+### Using the OpenAPI Spec
+
+#### Generate Client Libraries
+```bash
+# Using openapi-generator-cli
+npx @openapitools/openapi-generator-cli generate \
+  -i docs/openapi.yaml \
+  -g python \
+  -o ./generated/python-client
+
+# Using swagger-codegen
+swagger-codegen generate \
+  -i docs/openapi.yaml \
+  -l python \
+  -o ./generated/python-client
+```
+
+#### Import into API Testing Tools
+- **Postman**: Import `docs/openapi.yaml`
+- **Insomnia**: Import `docs/openapi.yaml`
+- **Swagger UI**: Use the interactive docs at `/docs`
+
 ## Support
 
 For API support:
 - **Documentation**: This file and `/docs` endpoint
+- **OpenAPI Spec**: `docs/openapi.yaml` and `docs/openapi.json`
 - **Issues**: GitHub Issues
 - **Discussions**: GitHub Discussions 

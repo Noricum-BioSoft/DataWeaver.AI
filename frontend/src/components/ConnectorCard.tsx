@@ -18,7 +18,7 @@ const ConnectorCard: React.FC<ConnectorCardProps> = ({
 }) => {
   const handleConnect = () => {
     console.log(`Connecting to ${name}...`);
-    // TODO: Implement connection logic
+    // Connection logic will be implemented in future versions
   };
 
   return (

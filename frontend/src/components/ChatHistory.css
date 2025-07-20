@@ -67,15 +67,131 @@
 
 .message-text {
   margin: 0 0 0.5rem 0;
+  font-size: 1.125rem; /* Increased from 0.875rem */
+  line-height: 1.5; /* Improved line height */
+}
+
+/* Markdown styling */
+.message-text h1,
+.message-text h2,
+.message-text h3,
+.message-text h4,
+.message-text h5,
+.message-text h6 {
+  margin: 1rem 0 0.5rem 0;
+  font-weight: 600;
+  color: inherit;
+}
+
+.message-text h1 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.message-text h2 {
+  font-size: 1.25rem;
+  color: #374151;
+}
+
+.message-text h3 {
+  font-size: 1.125rem;
+  color: #4b5563;
+}
+
+.message-text p {
+  margin: 0.5rem 0;
+}
+
+.message-text ul,
+.message-text ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message-text li {
+  margin: 0.25rem 0;
+}
+
+.message-text strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.message-text em {
+  font-style: italic;
+}
+
+.message-text code {
+  background: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.875rem;
-  line-height: 1.4;
+}
+
+.message-text pre {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+  border: 1px solid #e5e7eb;
+}
+
+.message-text pre code {
+  background: none;
+  padding: 0;
+}
+
+.message-text blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.message-text hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+/* User message specific styling */
+.message-container.user .message-text h1,
+.message-container.user .message-text h2,
+.message-container.user .message-text h3,
+.message-container.user .message-text h4,
+.message-container.user .message-text h5,
+.message-container.user .message-text h6 {
+  color: white;
+}
+
+.message-container.user .message-text strong {
+  color: white;
+}
+
+.message-container.user .message-text code {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.message-container.user .message-text pre {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.message-container.user .message-text blockquote {
+  border-left-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .message-time {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
   opacity: 0.7;
 }
 
@@ -151,6 +267,6 @@
   }
   
   .message-text {
-    font-size: 0.8rem;
+    font-size: 1rem; /* Increased from 0.8rem */
   }
 } 

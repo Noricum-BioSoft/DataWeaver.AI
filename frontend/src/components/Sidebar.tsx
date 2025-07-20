@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => {
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Command submitted:', command);
-    // TODO: Implement command processing
+    // Command processing will be implemented in future versions
     setCommand('');
   };
 

@@ -1,274 +1,575 @@
 # DataWeaver.AI Setup Guide
 
-## 🔐 Security and Environment Configuration
+## Overview
 
-### Environment Variables
+This guide will help you set up DataWeaver.AI on your local machine for development or production use. The system consists of a FastAPI backend and a React frontend.
 
-The application uses environment variables for configuration. **Never commit actual .env files to version control** as they may contain sensitive information.
+## Prerequisites
 
-#### Backend Configuration
+### System Requirements
 
-1. **Copy the example file**:
-   ```bash
-   cp backend/env.example backend/.env
-   ```
+- **Operating System**: macOS, Linux, or Windows
+- **Python**: 3.8 or higher
+- **Node.js**: 16 or higher
+- **Memory**: 4GB RAM minimum (8GB recommended)
+- **Storage**: 2GB free space
+- **Network**: Internet connection for package installation
 
-2. **Edit the configuration**:
-   ```bash
-   # Database Configuration
-   DATABASE_URL=postgresql://username:password@localhost:5432/dataweaver
-   
-   # File Storage
-   STORAGE_PATH=storage
-   
-   # Logging
-   LOG_LEVEL=INFO
-   
-   # API Configuration
-   API_HOST=0.0.0.0
-   API_PORT=8000
-   
-   # Security (for production)
-   SECRET_KEY=your-secret-key-here
-   ALGORITHM=HS256
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   
-   # Redis Configuration (optional)
-   REDIS_URL=redis://localhost:6379
-   
-   # File Upload Limits
-   MAX_FILE_SIZE=52428800  # 50MB in bytes
-   ```
+### Required Software
 
-#### Frontend Configuration
-
-1. **Copy the example file**:
-   ```bash
-   cp frontend/env.example frontend/.env
-   ```
-
-2. **Edit the configuration**:
-   ```bash
-   # API Configuration
-   REACT_APP_API_URL=http://localhost:8000/api
-   
-   # Development Settings
-   REACT_APP_ENVIRONMENT=development
-   REACT_APP_DEBUG=true
-   
-   # Feature Flags
-   REACT_APP_ENABLE_AI_CHAT=true
-   REACT_APP_ENABLE_FILE_UPLOAD=true
-   REACT_APP_ENABLE_VISUALIZATION=true
-   ```
-
-### Security Best Practices
-
-#### 1. Environment Variables
-- ✅ **Do**: Use `.env` files for local development
-- ✅ **Do**: Use `env.example` files as templates
-- ❌ **Don't**: Commit actual `.env` files to version control
-- ❌ **Don't**: Include passwords or secrets in example files
-
-#### 2. Database Security
-- ✅ **Do**: Use strong passwords for database connections
-- ✅ **Do**: Use environment variables for database URLs
-- ❌ **Don't**: Include database credentials in code
-- ❌ **Don't**: Use default passwords in production
-
-#### 3. API Security
-- ✅ **Do**: Use HTTPS in production
-- ✅ **Do**: Implement proper authentication
-- ✅ **Do**: Validate all inputs
-- ❌ **Don't**: Expose sensitive endpoints without protection
-
-#### 4. File Upload Security
-- ✅ **Do**: Validate file types and sizes
-- ✅ **Do**: Scan uploaded files for malware
-- ✅ **Do**: Store files in secure locations
-- ❌ **Don't**: Trust user-provided file names
-- ❌ **Don't**: Execute uploaded files
-
-### Production Deployment
-
-#### Environment Variables for Production
-
+#### Python Environment
 ```bash
-# Database (use strong passwords)
-DATABASE_URL=postgresql://user:strong_password@db_host:5432/dataweaver
+# Check Python version
+python3 --version  # Should be 3.8+
 
-# Security (generate strong secret keys)
-SECRET_KEY=your-very-long-random-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# File Storage (use secure paths)
-STORAGE_PATH=/secure/storage/path
-
-# Logging
-LOG_LEVEL=WARNING
-
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
-
-# File Upload Limits
-MAX_FILE_SIZE=52428800
+# Install pip if not available
+python3 -m ensurepip --upgrade
 ```
 
-#### Security Checklist
-
-- [ ] **Database**: Use strong passwords and secure connections
-- [ ] **API Keys**: Generate unique, strong secret keys
-- [ ] **HTTPS**: Enable SSL/TLS encryption
-- [ ] **Authentication**: Implement proper user authentication
-- [ ] **Authorization**: Add role-based access control
-- [ ] **Input Validation**: Validate all user inputs
-- [ ] **File Uploads**: Implement secure file handling
-- [ ] **Logging**: Configure secure logging
-- [ ] **Monitoring**: Set up security monitoring
-- [ ] **Backups**: Implement secure data backups
-
-### Development Setup
-
-#### 1. Clone the Repository
+#### Node.js Environment
 ```bash
+# Check Node.js version
+node --version  # Should be 16+
+
+# Check npm version
+npm --version   # Should be 6+
+```
+
+#### Git
+```bash
+# Check Git version
+git --version
+```
+
+## Quick Start (Automated)
+
+### Option 1: Automated Setup Script
+
+**macOS/Linux:**
+```bash
+# Clone the repository
 git clone https://github.com/your-username/DataWeaver.AI.git
 cd DataWeaver.AI
+
+# Make setup script executable
+chmod +x setup.sh
+
+# Run automated setup
+./setup.sh
 ```
 
-#### 2. Set Up Environment Variables
-```bash
-# Backend
-cp backend/env.example backend/.env
-# Edit backend/.env with your configuration
+**Windows:**
+```cmd
+# Clone the repository
+git clone https://github.com/your-username/DataWeaver.AI.git
+cd DataWeaver.AI
 
-# Frontend
-cp frontend/env.example frontend/.env
-# Edit frontend/.env with your configuration
+# Run automated setup
+setup.bat
 ```
 
-#### 3. Install Dependencies
+### Option 2: Start Scripts
+
+**macOS/Linux:**
 ```bash
-# Backend
+# Make start script executable
+chmod +x start.sh
+
+# Start all services
+./start.sh
+
+# Or start specific services
+./start.sh backend    # Backend only
+./start.sh frontend   # Frontend only
+./start.sh status     # Check service status
+```
+
+**Windows:**
+```cmd
+# Start all services
+start.bat
+
+# Or start specific services
+start.bat backend    # Backend only
+start.bat frontend   # Frontend only
+start.bat status     # Check service status
+```
+
+## Manual Setup
+
+### Step 1: Backend Setup
+
+#### 1.1 Create Python Virtual Environment
+```bash
 cd backend
-pip install -r requirements.txt
 
-# Frontend
-cd frontend
-npm install
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+
+# On Windows:
+venv\Scripts\activate
 ```
 
-#### 4. Set Up Database
+#### 1.2 Install Python Dependencies
 ```bash
+# Upgrade pip
+pip install --upgrade pip
+
+# Install requirements
+pip install -r requirements.txt
+```
+
+#### 1.3 Configure Environment
+```bash
+# Copy environment template
+cp env.example .env
+
+# Edit environment variables
+nano .env  # or use your preferred editor
+```
+
+**Environment Variables:**
+```bash
+# Database
+DATABASE_URL=sqlite:///./dataweaver.db
+# For PostgreSQL: DATABASE_URL=postgresql://user:password@localhost/dataweaver
+
+# Security
+SECRET_KEY=your-secret-key-here
+
+# Development
+DEBUG=True
+LOG_LEVEL=INFO
+
+# File Storage
+STORAGE_PATH=./storage
+MAX_FILE_SIZE=10485760  # 10MB
+
+# Session Management
+SESSION_TIMEOUT=86400  # 24 hours
+```
+
+#### 1.4 Database Setup
+
+**SQLite (Default - Development):**
+```bash
+# No additional setup required
+# Database will be created automatically
+```
+
+**PostgreSQL (Production):**
+```bash
+# Install PostgreSQL
+# macOS:
+brew install postgresql
+
+# Ubuntu:
+sudo apt-get install postgresql postgresql-contrib
+
 # Create database
 createdb dataweaver
 
 # Run migrations
-cd backend
 alembic upgrade head
 ```
 
-#### 5. Start Services
+#### 1.5 Start Backend Server
 ```bash
-# Start all services
-./start.sh
+# Development mode
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-# Or start individually
-./start.sh backend
-./start.sh frontend
+# Production mode
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
-### Troubleshooting
+### Step 2: Frontend Setup
 
-#### Common Issues
+#### 2.1 Install Node.js Dependencies
+```bash
+cd frontend
 
-1. **Database Connection Errors**
-   - Check `DATABASE_URL` in `.env`
-   - Ensure PostgreSQL is running
-   - Verify database exists
+# Install dependencies
+npm install
+```
 
-2. **File Upload Errors**
-   - Check `STORAGE_PATH` exists and is writable
-   - Verify file size limits
-   - Check file format validation
+#### 2.2 Configure Environment
+```bash
+# Copy environment template
+cp env.example .env
 
-3. **API Connection Errors**
-   - Verify `REACT_APP_API_URL` in frontend `.env`
-   - Check backend is running on correct port
-   - Ensure CORS is configured
+# Edit environment variables
+nano .env
+```
 
-4. **Permission Errors**
-   - Check file permissions for storage directory
-   - Verify database user permissions
-   - Check log file write permissions
+**Environment Variables:**
+```bash
+REACT_APP_API_URL=http://localhost:8000/api
+REACT_APP_ENVIRONMENT=development
+```
 
-#### Security Issues
+#### 2.3 Start Frontend Development Server
+```bash
+# Development mode
+npm start
 
-1. **Exposed Credentials**
-   - Remove any committed `.env` files
-   - Regenerate any exposed secrets
-   - Update database passwords
+# Build for production
+npm run build
+```
 
-2. **File Upload Vulnerabilities**
-   - Validate file types server-side
-   - Implement file size limits
-   - Scan uploaded files
+### Step 3: Verify Installation
 
-3. **API Security**
-   - Implement authentication
-   - Add rate limiting
-   - Validate all inputs
+#### 3.1 Check Backend
+```bash
+# Test backend health
+curl http://localhost:8000/health
 
-### Monitoring and Logging
+# Check API documentation
+open http://localhost:8000/docs
+```
 
-#### Log Configuration
+#### 3.2 Check Frontend
+```bash
+# Open frontend in browser
+open http://localhost:3000
+```
+
+#### 3.3 Test Complete Workflow
+1. **Upload test files** from `test_data/` directory
+2. **Merge files** using chat interface
+3. **Generate visualizations** from merged data
+4. **Ask questions** about the data
+
+## Production Setup
+
+### Docker Deployment
+
+#### 1. Create Dockerfile
+```dockerfile
+# Backend Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+RUN alembic upgrade head
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+#### 2. Create docker-compose.yml
+```yaml
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db/dataweaver
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=dataweaver
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+#### 3. Deploy with Docker
+```bash
+# Build and start services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+### Systemd Service (Linux)
+
+#### 1. Create Service File
+```bash
+sudo nano /etc/systemd/system/dataweaver.service
+```
+
+#### 2. Add Service Configuration
+```ini
+[Unit]
+Description=DataWeaver.AI Backend
+After=network.target
+
+[Service]
+Type=simple
+User=dataweaver
+WorkingDirectory=/opt/dataweaver/backend
+Environment=PATH=/opt/dataweaver/backend/venv/bin
+ExecStart=/opt/dataweaver/backend/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### 3. Enable and Start Service
+```bash
+sudo systemctl enable dataweaver
+sudo systemctl start dataweaver
+sudo systemctl status dataweaver
+```
+
+## Configuration Options
+
+### Backend Configuration
+
+#### Database Options
+```bash
+# SQLite (Development)
+DATABASE_URL=sqlite:///./dataweaver.db
+
+# PostgreSQL (Production)
+DATABASE_URL=postgresql://user:password@localhost/dataweaver
+
+# MySQL (Alternative)
+DATABASE_URL=mysql://user:password@localhost/dataweaver
+```
+
+#### Security Settings
+```bash
+# Generate secure secret key
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Set in environment
+SECRET_KEY=your-generated-secret-key
+```
+
+#### File Storage
+```bash
+# Local storage (default)
+STORAGE_PATH=./storage
+
+# Cloud storage (future)
+STORAGE_PATH=s3://your-bucket/dataweaver
+
+# Note: storage/, uploads/, and logs/ directories are gitignored
+# They will be created automatically when the application starts
+```
+
+### Frontend Configuration
+
+#### API Endpoints
 ```bash
 # Development
-LOG_LEVEL=DEBUG
+REACT_APP_API_URL=http://localhost:8000/api
 
 # Production
-LOG_LEVEL=WARNING
+REACT_APP_API_URL=https://api.dataweaver.ai/api
 ```
 
-#### Security Monitoring
-- Monitor failed login attempts
-- Track file upload patterns
-- Log API access patterns
-- Monitor database queries
-
-### Backup and Recovery
-
-#### Database Backups
+#### Feature Flags
 ```bash
-# Create backup
-pg_dump dataweaver > backup.sql
-
-# Restore backup
-psql dataweaver < backup.sql
+# Enable/disable features
+REACT_APP_ENABLE_VOICE_INPUT=true
+REACT_APP_ENABLE_FILE_EXPORT=true
+REACT_APP_ENABLE_COLLABORATION=false
 ```
 
-#### File Storage Backups
+## Troubleshooting
+
+### Common Issues
+
+#### Port Conflicts
 ```bash
-# Backup uploaded files
-tar -czf storage_backup.tar.gz storage/
+# Check what's using the ports
+lsof -i :8000
+lsof -i :3000
 
-# Restore files
-tar -xzf storage_backup.tar.gz
+# Kill processes if needed
+kill -9 <PID>
 ```
 
-### Compliance and Standards
+#### Python Environment Issues
+```bash
+# Recreate virtual environment
+rm -rf venv
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-#### Data Protection
-- Implement data encryption at rest
-- Use secure transmission protocols
-- Follow GDPR/privacy regulations
-- Implement data retention policies
+#### Node.js Issues
+```bash
+# Clear npm cache
+npm cache clean --force
 
-#### Security Standards
-- Follow OWASP guidelines
-- Implement secure coding practices
-- Regular security audits
-- Keep dependencies updated
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
 
-This setup guide ensures your DataWeaver.AI installation is secure and properly configured for both development and production environments. 
+#### Database Issues
+```bash
+# Reset database
+rm -f dataweaver.db
+alembic upgrade head
+
+# Check database connection
+python -c "from app.database import engine; print(engine.execute('SELECT 1').fetchone())"
+```
+
+### Performance Tuning
+
+#### Backend Optimization
+```bash
+# Increase worker processes
+gunicorn main:app -w 8 -k uvicorn.workers.UvicornWorker
+
+# Enable caching
+pip install redis
+# Configure Redis in settings
+
+# Database optimization
+# Add indexes for frequently queried columns
+```
+
+#### Frontend Optimization
+```bash
+# Build optimized version
+npm run build
+
+# Serve with nginx
+sudo apt-get install nginx
+# Configure nginx for static files
+```
+
+### Monitoring
+
+#### Health Checks
+```bash
+# Backend health
+curl http://localhost:8000/health
+
+# Frontend health
+curl http://localhost:3000
+
+# Database health
+python -c "from app.database import engine; print('DB OK' if engine.execute('SELECT 1').fetchone() else 'DB ERROR')"
+```
+
+#### Logs
+```bash
+# Backend logs
+tail -f backend/logs/app.log
+
+# Frontend logs
+# Check browser developer console
+
+# System logs
+journalctl -u dataweaver -f
+```
+
+## Development Setup
+
+### IDE Configuration
+
+#### VS Code
+```json
+{
+  "python.defaultInterpreterPath": "./backend/venv/bin/python",
+  "python.linting.enabled": true,
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true
+}
+```
+
+#### PyCharm
+1. **Open project** in PyCharm
+2. **Configure interpreter** to `backend/venv/bin/python`
+3. **Install plugins**: Python, React, TypeScript
+4. **Configure run configurations** for backend and frontend
+
+### Development Tools
+
+#### Code Quality
+```bash
+# Backend linting
+pip install black flake8 mypy
+black backend/
+flake8 backend/
+mypy backend/
+
+# Frontend linting
+npm run lint
+npm run type-check
+```
+
+#### Testing
+```bash
+# Backend tests
+cd backend
+pytest tests/ -v
+
+# Frontend tests
+cd frontend
+npm test
+
+# Integration tests
+python test_integration.py
+```
+
+## Security Considerations
+
+### Development
+- **Use environment variables** for sensitive data
+- **Don't commit secrets** to version control
+- **Use HTTPS** in production
+- **Implement rate limiting** for API endpoints
+
+### Production
+- **Use strong secret keys**
+- **Enable HTTPS/TLS**
+- **Implement authentication** (planned)
+- **Set up monitoring** and alerting
+- **Regular security updates**
+
+## Support
+
+### Getting Help
+- **Documentation**: Check `/docs` folder
+- **Issues**: Report on GitHub
+- **Discussions**: Use GitHub Discussions
+- **Email**: contact@dataweaver.ai
+
+### Contributing
+1. **Fork the repository**
+2. **Create feature branch**
+3. **Make changes** following style guidelines
+4. **Add tests** for new functionality
+5. **Submit pull request**
+
+---
+
+**DataWeaver.AI** - Making data analysis accessible and powerful. 

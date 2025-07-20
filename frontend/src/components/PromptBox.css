@@ -4,42 +4,7 @@
   border-top: 1px solid #e5e7eb;
 }
 
-.prompt-history {
-  margin-bottom: 1rem;
-}
 
-.history-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.history-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.history-chip {
-  padding: 0.25rem 0.75rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  font-size: 0.75rem;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.history-chip:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
 
 .prompt-form {
   position: relative;
@@ -72,7 +37,7 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 0.875rem;
+  font-size: 1.125rem; /* Increased from 0.875rem */
   color: #1f2937;
   background: transparent;
 }
@@ -186,9 +151,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.125rem; /* Increased padding */
   border-bottom: 1px solid #e5e7eb;
-  font-size: 0.75rem;
+  font-size: 1rem; /* Increased from 0.75rem */
   font-weight: 500;
   color: #6b7280;
 }
@@ -270,18 +235,20 @@
 /* Uploaded Files Display */
 .uploaded-files-display {
   margin-bottom: 1rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
+  max-height: 15vh;
+  overflow-y: auto;
 }
 
 .files-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
   color: #6b7280;
   font-weight: 500;
 }
@@ -289,18 +256,18 @@
 .files-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .file-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 .file-item svg {
@@ -345,15 +312,6 @@
 @media (max-width: 768px) {
   .prompt-box {
     padding: 0.75rem;
-  }
-  
-  .history-chips {
-    gap: 0.25rem;
-  }
-  
-  .history-chip {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
   }
   
   .prompt-input-container {

@@ -1,324 +1,427 @@
 # DataWeaver.AI User Guide
 
-## 🚀 Getting Started
+## Introduction
 
-### First Time Setup
+DataWeaver.AI is an intelligent data processing platform that helps you upload, merge, analyze, and visualize your data through natural language interactions. Whether you're working with protein data, sales figures, or any other CSV datasets, DataWeaver.AI makes data analysis accessible and intuitive.
 
-1. **Start the Application**
+## Getting Started
+
+### 1. Access the Application
+
+1. **Start the application** using the provided scripts:
    ```bash
-   # Make startup script executable
-   chmod +x start.sh
-   
-   # Start all services
+   # macOS/Linux
    ./start.sh
+   
+   # Windows
+   start.bat
    ```
 
-2. **Access the Application**
-   - Open your browser to: http://localhost:3000
-   - The AI Chat interface will be the default view
-
-3. **Verify Services**
-   - Backend API: http://localhost:8000
-   - Frontend: http://localhost:3000
-   - Database: PostgreSQL on port 5432
-
-## 💬 AI Chat Interface
-
-### Overview
-The AI Chat provides a natural language interface for data processing and analysis. You can upload files, merge data, generate visualizations, and manage workflows using simple commands.
-
-### Basic Commands
-
-#### File Upload
-```
-"Upload these CSV files"
-"Drag and drop the sequence files"
-"Upload the assay results"
-```
-
-#### Data Processing
-```
-"Merge these files"
-"Combine the data"
-"Process the uploaded files"
-```
-
-#### Visualization
-```
-"Visualize the data in a scatter plot"
-"Create a histogram of the results"
-"Show me a correlation heatmap"
-"Generate a boxplot of the measurements"
-```
-
-#### Workflow Management
-```
-"Create a new workflow called Protein Analysis"
-"Start a new session for data processing"
-"Show me the workflow history"
-```
-
-## 📊 Complete Workflow Example
-
-### Step 1: Upload Files
-1. **Drag and drop** two CSV files into the chat input area
-2. **Wait for upload confirmation** - you'll see file names displayed
-3. **Files are automatically validated** for format and content
-
-### Step 2: Merge Data
-1. **Type**: "Merge these files"
-2. **System automatically**:
-   - Identifies matching ID columns
-   - Merges the data
-   - Shows merge statistics
-   - Provides download link
-
-### Step 3: Visualize Data
-1. **Type**: "Visualize the data in a scatter plot"
-2. **System generates**:
-   - Interactive plot
-   - Column information
-   - Download option
-
-### Step 4: Download Results
-1. **Click download buttons** for:
-   - Merged CSV data
-   - Generated visualizations
-2. **Files are saved** to your local machine
-
-## 🧬 Biological Data Processing
-
-### Uploading Sequence Data
-1. **Prepare CSV file** with columns:
-   - `id`: Unique identifier
-   - `name`: Sequence name
-   - `sequence`: Protein/DNA sequence
-   - `length`: Sequence length
-   - `mutation_type`: Type of mutation (optional)
-
-2. **Upload via AI Chat**:
+2. **Open your browser** and navigate to:
    ```
-   "Upload the sequence data"
+   http://localhost:3000
    ```
 
-### Uploading Assay Results
-1. **Prepare CSV file** with columns:
-   - `id`: Matching identifier
-   - `name`: Sample name
-   - `result_value`: Measurement value
-   - `result_unit`: Unit of measurement
-   - `test_type`: Type of test
-   - `technician`: Person who performed test
+3. **You'll see the main interface** with:
+   - AI Chat area (main interaction point)
+   - File upload area (drag & drop)
+   - Navigation sidebar
+   - Status indicators
 
-2. **Upload and merge**:
-   ```
-   "Upload the assay results and merge with sequences"
-   ```
+### 2. Your First Workflow
 
-### Biological Entity Management
-1. **Create Design Entities**:
-   - Use API endpoint: `POST /api/bio/designs`
-   - Include sequence information
-   - Specify mutation details
+Let's walk through a complete example using protein data:
 
-2. **Create Build Entities**:
-   - Link to design entities
-   - Include construct information
-   - Track build status
+#### Step 1: Upload Files
+1. **Prepare your CSV files** (e.g., protein_abundance.csv, protein_expression.csv)
+2. **Drag and drop** them into the upload area
+3. **Wait for confirmation** - you'll see a success message for each file
 
-3. **Upload Test Results**:
-   - Use API endpoint: `POST /api/bio/upload-test-results`
-   - Include assay metadata
-   - Link to biological entities
+#### Step 2: Merge the Data
+1. **Type in the chat**: "merge the files"
+2. **Wait for processing** - the system will:
+   - Identify common columns (like protein_id)
+   - Merge all your files
+   - Show you the results
 
-## 📈 Data Visualization
+#### Step 3: Analyze the Data
+1. **Ask questions** like:
+   - "What columns are in the data?"
+   - "How many rows do we have?"
+   - "Are there any missing values?"
 
-### Available Plot Types
+#### Step 4: Create Visualizations
+1. **Request charts** like:
+   - "Create a scatter plot of abundance vs expression"
+   - "Make a histogram of the abundance values"
+   - "Show me a correlation matrix"
 
-#### Scatter Plot
-- **Use for**: Relationship between two numeric variables
-- **Command**: "Create a scatter plot of X vs Y"
-- **Example**: "Show me a scatter plot of activity vs concentration"
+## Core Features
 
-#### Histogram
-- **Use for**: Distribution of a single variable
-- **Command**: "Create a histogram of X"
-- **Example**: "Show me a histogram of activity values"
+### File Upload
 
-#### Correlation Heatmap
-- **Use for**: Relationships between all numeric columns
-- **Command**: "Generate a correlation heatmap"
-- **Example**: "Show me correlations between all variables"
+#### Supported Formats
+- **CSV files** (primary format)
+- **JSON files** (basic support)
+- **Excel files** (limited support)
 
-#### Box Plot
-- **Use for**: Distribution comparison across categories
-- **Command**: "Create a boxplot of X by Y"
-- **Example**: "Make a boxplot of activity by technician"
+#### Upload Process
+1. **Drag and drop** files into the upload area
+2. **Multiple files** can be uploaded at once
+3. **Automatic validation** checks file format and content
+4. **Progress indicators** show upload status
+5. **Success confirmation** for each file
 
-### Visualization Best Practices
+#### File Requirements
+- **Maximum size**: 10MB per file
+- **Encoding**: UTF-8 recommended
+- **Headers**: First row should contain column names
+- **Data types**: Mixed data types supported
 
-1. **Data Requirements**:
-   - Minimum 2 rows for visualization
-   - Numeric columns for plotting
-   - Categorical columns for grouping
+### Data Merging
 
-2. **Column Selection**:
-   - System automatically detects numeric columns
-   - You can specify columns in commands
-   - Invalid columns will show error message
+#### How It Works
+1. **Column Analysis**: System finds common columns across files
+2. **ID Detection**: Identifies primary key columns (e.g., protein_id, customer_id)
+3. **Smart Merging**: Performs outer join on common ID columns
+4. **Result Summary**: Shows matched vs unmatched rows
 
-3. **Plot Customization**:
-   - System chooses optimal settings
-   - Colors and styles are automatically selected
-   - Download options for high-resolution images
+#### Merge Strategy
+- **Outer Join**: Keeps all rows from all files
+- **ID Matching**: Uses common identifier columns
+- **Column Preservation**: Keeps all columns from all files
+- **Missing Data**: Fills with null values where data doesn't match
 
-## 🔄 Workflow Session Management
-
-### Creating Sessions
-1. **Start new session**:
-   ```
-   "Start a new data analysis session"
-   ```
-
-2. **Session features**:
-   - Persistent data storage
-   - Workflow history tracking
-   - Automatic cleanup after inactivity
-
-### Session Commands
+#### Example Merge
 ```
-"Show me the current session status"
-"List the uploaded files"
-"Show the workflow history"
-"Clear the session data"
+File 1: protein_abundance.csv
+- protein_id, abundance, condition
+
+File 2: protein_expression.csv  
+- protein_id, expression_level, tissue
+
+Result: Merged dataset
+- protein_id, abundance, condition, expression_level, tissue
 ```
 
-### Session Benefits
-- **Data persistence**: Files and merged data stay available
-- **Multi-step workflows**: Build complex analyses step by step
-- **History tracking**: See what operations were performed
-- **Download management**: Access all generated files
+### Data Analysis
 
-## 📁 File Format Requirements
+#### Asking Questions
+You can ask natural language questions about your data:
 
-### CSV Files
-- **Encoding**: UTF-8
-- **Delimiter**: Comma (,)
-- **Header row**: Required with column names
-- **Data types**: Consistent per column
-- **Size limit**: 50MB maximum
+**Basic Questions:**
+- "What columns are in the data?"
+- "How many rows do we have?"
+- "Show me the first few rows"
 
-### Required Columns for Merging
-- **ID column**: Must be present in both files
-- **Matching values**: IDs should match between files
-- **Unique names**: Column names should be unique
+**Statistical Questions:**
+- "What's the average value in column X?"
+- "Are there any outliers?"
+- "What's the correlation between X and Y?"
 
-### Example CSV Structure
-```csv
-id,name,value,category,date
-1,Sample_A,15.5,Group_1,2024-01-15
-2,Sample_B,22.3,Group_2,2024-01-16
-3,Sample_C,18.7,Group_1,2024-01-17
-```
+**Data Quality Questions:**
+- "Are there any missing values?"
+- "How many unique values are in column X?"
+- "What are the data types of each column?"
 
-## 🛠️ Troubleshooting
+#### Getting Insights
+The system provides:
+- **Statistical summaries** (mean, median, standard deviation)
+- **Data quality analysis** (missing values, duplicates)
+- **Correlation analysis** (relationships between columns)
+- **Outlier detection** (unusual data points)
+- **Recommendations** (suggestions for further analysis)
+
+### Visualization
+
+#### Available Chart Types
+
+**Scatter Plots**
+- Use: "Create a scatter plot of X vs Y"
+- Best for: Showing relationships between two variables
+- Example: "Show abundance vs expression level"
+
+**Histograms**
+- Use: "Make a histogram of column X"
+- Best for: Showing distribution of values
+- Example: "Show the distribution of abundance values"
+
+**Correlation Matrices**
+- Use: "Create a correlation matrix"
+- Best for: Showing relationships between all numeric columns
+- Example: "Show correlations between all numeric columns"
+
+**Box Plots**
+- Use: "Create a box plot of X by Y"
+- Best for: Comparing distributions across categories
+- Example: "Show abundance by condition"
+
+#### Chart Customization
+- **Automatic column selection** based on data types
+- **Smart defaults** for chart appearance
+- **Interactive features** (zoom, pan, hover)
+- **Export capabilities** (PNG, SVG)
+
+### AI Chat Interface
+
+#### Natural Language Processing
+The AI understands various ways to express the same request:
+
+**File Operations:**
+- "merge the files" = "combine the datasets" = "join the data"
+
+**Analysis Requests:**
+- "what's in the data?" = "describe the dataset" = "summarize the data"
+
+**Visualization Requests:**
+- "create a scatter plot" = "plot X vs Y" = "show relationship between X and Y"
+
+#### Context Awareness
+The AI remembers:
+- **Uploaded files** and their contents
+- **Previous questions** and answers
+- **Generated visualizations**
+- **Session state** throughout your workflow
+
+#### Suggestions
+The system provides:
+- **Follow-up questions** based on your data
+- **Analysis suggestions** for deeper insights
+- **Visualization recommendations** for your data type
+
+## Advanced Features
+
+### Session Management
+
+#### Session Lifecycle
+1. **Automatic creation** when you first upload files
+2. **Persistent storage** of all uploaded data
+3. **24-hour timeout** for automatic cleanup
+4. **Manual clearing** available through chat
+
+#### Session Data
+- **Uploaded files** and their metadata
+- **Merged datasets** and results
+- **Generated visualizations** and charts
+- **Analysis results** and insights
+- **Chat history** and context
+
+### Biological Data Support
+
+#### Specialized Features
+- **Protein sequence analysis**
+- **Assay result processing**
+- **Biological entity tracking**
+- **Sequence matching algorithms**
+
+#### Biological Workflows
+1. **Upload assay results** (CSV with protein data)
+2. **Automatic matching** to known sequences
+3. **Confidence scoring** for matches
+4. **Lineage tracking** for design-build-test workflows
+
+### Data Export
+
+#### Available Formats
+- **CSV export** of merged data
+- **PNG/SVG export** of visualizations
+- **JSON export** of analysis results
+- **PDF reports** (planned feature)
+
+#### Export Process
+1. **Request export** through chat
+2. **Choose format** and options
+3. **Download file** to your computer
+4. **Share results** with colleagues
+
+## Troubleshooting
 
 ### Common Issues
 
 #### File Upload Problems
-- **Issue**: File not uploading
-- **Solution**: Check file size (max 50MB) and format (CSV required)
-- **Issue**: Upload stuck
-- **Solution**: Refresh page and try again
+**Problem**: File upload fails
+**Solutions**:
+- Check file size (max 10MB)
+- Ensure file is CSV format
+- Verify UTF-8 encoding
+- Check for valid headers
 
-#### Merge Problems
-- **Issue**: "No matching columns found"
-- **Solution**: Ensure both files have an ID column with matching values
-- **Issue**: "Merge failed"
-- **Solution**: Check CSV format and column consistency
+**Problem**: Files don't merge properly
+**Solutions**:
+- Ensure files have common ID columns
+- Check column names match exactly
+- Verify data types are consistent
+- Look for missing values in ID columns
 
-#### Visualization Problems
-- **Issue**: "No numeric columns found"
-- **Solution**: Ensure data has numeric columns for plotting
-- **Issue**: "Visualization failed"
-- **Solution**: Check data quality and try different plot types
+#### Analysis Issues
+**Problem**: Can't generate visualizations
+**Solutions**:
+- Ensure you have numeric columns
+- Check for sufficient data (min 2 rows)
+- Verify column names are correct
+- Try different chart types
 
-#### Session Problems
-- **Issue**: Session expired
-- **Solution**: Create new session and re-upload files
-- **Issue**: Data not persisting
-- **Solution**: Check session status and recreate if needed
+**Problem**: AI doesn't understand your question
+**Solutions**:
+- Rephrase your question more simply
+- Be specific about column names
+- Use natural language
+- Check the data context
 
-### Error Messages
-
-#### File Errors
-- `FILE_TOO_LARGE`: Reduce file size below 50MB
-- `INVALID_FORMAT`: Convert to CSV format
-- `MISSING_HEADERS`: Add column headers to CSV
-
-#### Merge Errors
-- `NO_ID_COLUMN`: Add ID column to both files
-- `NO_MATCHING_IDS`: Ensure ID values match between files
-- `COLUMN_CONFLICT`: Rename duplicate column names
-
-#### Visualization Errors
-- `NO_NUMERIC_COLUMNS`: Add numeric data columns
-- `INSUFFICIENT_DATA`: Ensure at least 2 rows of data
-- `INVALID_COLUMN`: Check column names exist in data
-
-## 📚 Advanced Features
-
-### API Integration
-- **Direct API access**: Use endpoints for programmatic access
-- **Batch processing**: Upload multiple files via API
-- **Custom workflows**: Build complex automation scripts
-
-### Data Export
-- **Merged data**: Download as CSV
-- **Visualizations**: Download as PNG images
-- **Session data**: Export complete workflow state
-
-### Performance Optimization
-- **Large files**: System handles up to 10,000 rows efficiently
-- **Multiple sessions**: Run parallel workflows
-- **Caching**: Results cached for faster access
-
-## 🎯 Best Practices
-
-### Data Preparation
-1. **Clean your data** before uploading
-2. **Use consistent formats** for dates and numbers
-3. **Include meaningful column names**
-4. **Validate data types** per column
-
-### Workflow Design
-1. **Plan your analysis** before starting
-2. **Use descriptive file names**
-3. **Document your workflow** steps
-4. **Save important results** locally
-
-### Visualization
-1. **Choose appropriate plot types** for your data
-2. **Consider your audience** when selecting visualizations
-3. **Use clear column names** for better plot labels
-4. **Download high-resolution images** for presentations
-
-## 📞 Support
+#### Performance Issues
+**Problem**: Slow processing
+**Solutions**:
+- Reduce file sizes
+- Use fewer columns
+- Close other browser tabs
+- Check server status
 
 ### Getting Help
-- **Check the documentation**: Review this guide and API docs
-- **Try sample data**: Use provided example files
-- **Test with small files**: Start with simple examples
-- **Check error messages**: Read detailed error descriptions
 
-### Sample Data
-- **Location**: `backend/sample_data/`
-- **Files**: `sequences.csv`, `assay_results.csv`, `sales_data.csv`
-- **Purpose**: Testing and learning system features
+#### Built-in Help
+- **Type "help"** in the chat for basic commands
+- **Ask "what can I do?"** for feature overview
+- **Use "show me the data"** to see current state
 
-### System Status
-- **Check services**: `./start.sh status`
-- **View logs**: Check terminal output for error messages
-- **Restart services**: `./start.sh restart`
+#### Error Messages
+- **Read error messages** carefully for specific issues
+- **Check file formats** if upload fails
+- **Verify column names** if merge fails
+- **Look at data preview** if analysis fails
 
-The DataWeaver.AI system is designed to be intuitive and powerful, allowing you to focus on data analysis rather than technical implementation details. 
+#### Support Resources
+- **Documentation**: Check the `/docs` folder
+- **API Reference**: Visit `/docs` endpoint
+- **GitHub Issues**: Report bugs and feature requests
+- **Community**: Use GitHub Discussions
+
+## Best Practices
+
+### Data Preparation
+
+#### Before Upload
+1. **Clean your data** (remove duplicates, fix errors)
+2. **Standardize column names** (consistent naming)
+3. **Check data types** (numeric vs text)
+4. **Handle missing values** (fill or remove)
+5. **Validate file format** (CSV with headers)
+
+#### File Organization
+1. **Use descriptive filenames** (e.g., "protein_abundance_2024.csv")
+2. **Include metadata** in column names
+3. **Use consistent ID columns** across files
+4. **Document your data** with clear descriptions
+
+### Workflow Optimization
+
+#### Efficient Analysis
+1. **Start with overview** ("what's in the data?")
+2. **Check data quality** ("are there missing values?")
+3. **Explore relationships** ("show correlations")
+4. **Create visualizations** ("plot X vs Y")
+5. **Export results** for further analysis
+
+#### Session Management
+1. **Use one session** per analysis project
+2. **Clear sessions** when starting new projects
+3. **Export important results** before clearing
+4. **Document your workflow** for reproducibility
+
+### Collaboration
+
+#### Sharing Results
+1. **Export merged data** as CSV
+2. **Save visualizations** as images
+3. **Document your analysis** process
+4. **Share session IDs** for team collaboration
+
+#### Team Workflows
+1. **Standardize file formats** across team
+2. **Use consistent naming** conventions
+3. **Document analysis steps** clearly
+4. **Version control** your data files
+
+## Examples
+
+### Protein Analysis Workflow
+
+```
+1. Upload files:
+   - protein_abundance.csv
+   - protein_expression.csv
+   - protein_sequences.csv
+   - protein_spr.csv
+
+2. Merge data:
+   "merge the files"
+
+3. Explore data:
+   "What columns do we have?"
+   "How many proteins are in the dataset?"
+   "Are there any missing values?"
+
+4. Create visualizations:
+   "Create a scatter plot of abundance vs expression"
+   "Show the distribution of SPR values"
+   "Create a correlation matrix of all numeric columns"
+
+5. Analyze relationships:
+   "What's the correlation between abundance and expression?"
+   "Are there any outliers in the SPR data?"
+   "Which proteins have the highest expression?"
+
+6. Export results:
+   "Export the merged data as CSV"
+   "Save the correlation plot as PNG"
+```
+
+### Sales Data Analysis
+
+```
+1. Upload files:
+   - sales_2023.csv
+   - customer_data.csv
+   - product_catalog.csv
+
+2. Merge data:
+   "merge the files using customer_id"
+
+3. Analyze performance:
+   "What's the total sales for 2023?"
+   "Which products sell best?"
+   "Show sales by region"
+
+4. Create visualizations:
+   "Create a histogram of sales amounts"
+   "Show sales trends over time"
+   "Create a scatter plot of customer age vs sales"
+
+5. Get insights:
+   "What's the average order value?"
+   "Which customers are most valuable?"
+   "Are there seasonal patterns in sales?"
+```
+
+## Future Features
+
+### Planned Enhancements
+- **Advanced visualizations** (3D plots, interactive charts)
+- **Machine learning integration** (predictive analytics)
+- **Real-time collaboration** (shared sessions)
+- **Advanced file formats** (Parquet, HDF5)
+- **Cloud storage integration** (AWS S3, Google Cloud)
+- **Workflow templates** (predefined analysis patterns)
+- **Advanced data validation** (automated quality checks)
+- **Export capabilities** (PDF reports, Excel exports)
+
+### User Experience Improvements
+- **Drag-and-drop interface** enhancements
+- **Real-time preview** of data changes
+- **Undo/redo functionality** for operations
+- **Keyboard shortcuts** for power users
+- **Custom themes** and personalization
+- **Mobile responsiveness** improvements
+
+---
+
+**DataWeaver.AI** - Making data analysis accessible and intuitive for everyone. 

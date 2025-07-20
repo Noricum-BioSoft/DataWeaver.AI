@@ -27,13 +27,13 @@ class StepType(str, Enum):
 class WorkflowCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    workflow_metadata: Optional[Dict[str, Any]] = None
 
 class WorkflowUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
     status: Optional[WorkflowStatus] = None
-    metadata: Optional[Dict[str, Any]] = None
+    workflow_metadata: Optional[Dict[str, Any]] = None
 
 class WorkflowResponse(BaseModel):
     id: int
@@ -42,7 +42,7 @@ class WorkflowResponse(BaseModel):
     status: WorkflowStatus
     created_at: datetime
     updated_at: Optional[datetime]
-    metadata: Optional[Dict[str, Any]]
+    workflow_metadata: Optional[Dict[str, Any]]
     
     class Config:
         from_attributes = True

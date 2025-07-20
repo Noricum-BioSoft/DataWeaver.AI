@@ -18,7 +18,7 @@
 }
 
 .app-title {
-  font-size: 1.5rem;
+  font-size: 1.75rem; /* Increased from 1.5rem */
   font-weight: 700;
   color: #1f2937;
   margin: 0;
@@ -43,10 +43,10 @@
 
 .search-input {
   width: 100%;
-  padding: 10px 12px 10px 40px;
+  padding: 12px 12px 12px 40px; /* Increased padding */
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px; /* Increased from 14px */
   background: #f9fafb;
   transition: all 0.3s ease;
 }
@@ -106,12 +106,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px; /* Increased padding */
   border: none;
   border-radius: 8px;
   background: transparent;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 16px; /* Increased from 14px */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -140,11 +140,11 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px; /* Increased padding */
   border: none;
   background: transparent;
   color: #374151;
-  font-size: 14px;
+  font-size: 16px; /* Increased from 14px */
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -169,7 +169,7 @@
   }
   
   .app-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem; /* Increased from 1.25rem */
   }
   
   .search-form {

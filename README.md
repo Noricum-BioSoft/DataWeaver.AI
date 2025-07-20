@@ -4,6 +4,7 @@ A comprehensive data management system with AI-powered workflow automation, file
 
 ## 🚀 Features
 
+### Core Functionality
 - **AI Chat Interface**: Natural language data processing and analysis
 - **Drag-and-Drop File Upload**: Seamless file handling with automatic format detection
 - **Smart File Merging**: Automatic CSV merging with intelligent column matching
@@ -11,17 +12,38 @@ A comprehensive data management system with AI-powered workflow automation, file
 - **Workflow Session Management**: Persistent data storage between processing steps
 - **Biological Entity Management**: Specialized support for protein sequences and assay data
 - **Real File Processing**: Complete file upload, storage, and processing pipeline
-- **Integration Testing**: Comprehensive test suite with PostgreSQL support
-- **Scalable Architecture**: Support for large datasets and parallel workflows
+
+### Technical Capabilities
+- **Multi-file Upload**: Upload multiple CSV files individually
+- **Intelligent Merging**: Merge files based on common ID columns (e.g., protein_id)
+- **Session-based Workflows**: Maintain state across multiple processing steps
+- **Data Analysis**: Q&A interface for exploring uploaded data
+- **Visualization Generation**: Create plots from merged datasets
+- **Error Handling**: Robust error handling with user-friendly messages
 
 ## 🏗️ Architecture
 
-- **Frontend**: React with TypeScript, Tailwind CSS
-- **Backend**: FastAPI with Python
+### Backend (FastAPI + Python)
+- **Framework**: FastAPI with async/await support
 - **Database**: PostgreSQL with SQLAlchemy ORM
 - **File Storage**: Structured file system with metadata tracking
-- **Visualization**: Matplotlib/Seaborn for data plotting
-- **Testing**: pytest with PostgreSQL integration tests
+- **Data Processing**: Pandas for CSV manipulation and analysis
+- **Visualization**: Plotly for interactive charts
+- **Session Management**: In-memory session storage with timeout
+
+### Frontend (React + TypeScript)
+- **Framework**: React 18 with TypeScript
+- **Styling**: Tailwind CSS for modern, responsive design
+- **State Management**: React hooks for local state
+- **API Integration**: Axios for backend communication
+- **File Handling**: Drag-and-drop file upload with progress tracking
+
+### Key Components
+- **AI Chat Interface**: Natural language interaction for data operations
+- **File Upload System**: Multi-file upload with validation
+- **Merge Engine**: Intelligent CSV merging based on common columns
+- **Visualization Engine**: Dynamic chart generation from merged data
+- **Session Manager**: Persistent workflow state across operations
 
 ## 🚀 Quick Start
 
@@ -59,8 +81,15 @@ start.bat help       # Show all options
 1. **Backend Setup**:
    ```bash
    cd backend
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
-   uvicorn main:app --reload
+   
+   # Set up database (if PostgreSQL is available)
+   alembic upgrade head
+   
+   # Start backend server
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 2. **Frontend Setup**:
@@ -70,249 +99,241 @@ start.bat help       # Show all options
    npm start
    ```
 
-3. **Database Setup**:
+3. **Access the Application**:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+
+## 📖 Usage Guide
+
+### Basic Workflow
+
+1. **Upload Files**:
+   - Drag and drop CSV files into the upload area
+   - Files are uploaded individually and stored in session
+   - Supported formats: CSV, JSON, Excel (basic support)
+
+2. **Merge Files**:
+   - Ask "merge the files" in the chat interface
+   - System automatically identifies common ID columns
+   - Merges all uploaded files into a single dataset
+
+3. **Analyze Data**:
+   - Ask questions about your data: "What columns are in the data?"
+   - Get statistical summaries: "Show me the average values"
+   - Explore relationships: "Are there correlations between columns?"
+
+4. **Visualize Data**:
+   - Request visualizations: "Create a scatter plot"
+   - Generate different chart types: "Make a histogram"
+   - Get plot explanations: "Explain this visualization"
+
+### Example Workflow
+
+```
+1. Upload protein_abundance.csv, protein_expression.csv, protein_sequences.csv, protein_spr.csv
+2. Ask: "merge the files"
+3. Ask: "What columns are in the merged data?"
+4. Ask: "Create a scatter plot of abundance vs expression_level"
+5. Ask: "Explain this visualization"
+```
+
+### Supported File Types
+
+- **CSV Files**: Primary format with automatic column detection
+- **JSON Files**: Basic support for structured data
+- **Excel Files**: Limited support (requires pandas)
+
+### Data Analysis Features
+
+- **Column Analysis**: Identify data types, missing values, unique counts
+- **Statistical Summaries**: Mean, median, standard deviation
+- **Correlation Analysis**: Find relationships between numeric columns
+- **Outlier Detection**: Identify unusual data points
+- **Data Quality**: Check for missing values and data consistency
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**Backend (.env)**:
+```bash
+DATABASE_URL=postgresql://user:password@localhost/dataweaver
+SECRET_KEY=your-secret-key
+DEBUG=True
+```
+
+**Frontend (.env)**:
+```bash
+REACT_APP_API_URL=http://localhost:8000/api
+REACT_APP_ENVIRONMENT=development
+```
+
+### Database Setup
+
+1. **Install PostgreSQL**:
    ```bash
-   # Run database migrations
+   # macOS
+   brew install postgresql
+   
+   # Ubuntu
+   sudo apt-get install postgresql postgresql-contrib
+   ```
+
+2. **Create Database**:
+   ```bash
+   createdb dataweaver
+   ```
+
+3. **Run Migrations**:
+   ```bash
    cd backend
    alembic upgrade head
    ```
 
 ## 🧪 Testing
 
-### Integration Tests
-
-Run the comprehensive integration test suite:
-
+### Backend Tests
 ```bash
 cd backend
-
-# Set up PostgreSQL test database
-export TEST_DATABASE_URL="postgresql://username@localhost:5432/datweaver_test"
-export USE_POSTGRES=true
-
-# Run integration tests
-python run_integration_tests.py --type integration
+pytest tests/
 ```
 
-### Test Coverage
-
-The integration test suite covers:
-- ✅ Complete file upload workflow
-- ✅ API endpoint integration
-- ✅ Data processing pipeline
-- ✅ Error handling and recovery
-- ✅ Performance and scalability
-- ✅ System monitoring and health checks
-- ✅ Data export and import functionality
-
-## 📁 File Processing
-
-### Upload and Process Files
-
-**Upload a CSV file:**
+### Frontend Tests
 ```bash
-curl -X POST "http://localhost:8000/api/files/upload" \
-  -F "file=@assay_results.csv"
+cd frontend
+npm test
 ```
 
-**Process uploaded file for bio entities:**
+### Integration Tests
 ```bash
-curl -X POST "http://localhost:8000/api/bio-entities/process-file/{file_id}" \
-  -H "Content-Type: application/json" \
-  -d '{"process_type": "assay_results"}'
+# Run the test script
+python test_merge_functionality.py
 ```
 
-### Supported File Formats
-
-- **CSV**: Comma-separated values with automatic column detection
-- **Excel**: .xlsx and .xls files (planned)
-- **JSON**: Structured data files (planned)
-
-### File Processing Pipeline
-
-1. **Upload**: Files are validated and stored with unique identifiers
-2. **Metadata Extraction**: File properties and structure are analyzed
-3. **Content Processing**: CSV parsing with intelligent column mapping
-4. **Entity Creation**: Automatic creation of Design and Test records
-5. **Relationship Mapping**: Links between entities based on data patterns
-
-## 💬 AI Chat Interface
-
-The AI Chat provides a natural language interface for data processing and analysis.
-
-### Example Commands
-
-#### File Upload and Processing
-```
-"Upload these CSV files and merge them"
-"Drag and drop the sequence files and merge them"
-"Upload the assay results and process them"
-```
-
-#### Data Visualization
-```
-"Visualize the data in a scatter plot"
-"Create a histogram of the results"
-"Show me a correlation heatmap"
-"Generate a boxplot of the measurements"
-```
-
-#### Workflow Management
-```
-"Create a new workflow called Protein Analysis Pipeline"
-"Start a new session for data processing"
-"Show me the workflow history"
-```
-
-### Complete Workflow Example
-
-1. **Upload Files**: Drag and drop two CSV files into the chat
-2. **Merge Data**: Type "merge these files" - system automatically merges on ID column
-3. **Visualize**: Type "visualize the data in a scatter plot" - generates interactive charts
-4. **Download**: Click download buttons for merged data or visualizations
-
-## 📊 Data Processing Examples
-
-### File Merging
-
-Upload two CSV files with matching ID columns:
-
-**sequences.csv:**
-```csv
-id,name,sequence,length
-1,WT_Protein,MGT...L72...K,150
-2,Mutant_L72F,MGT...L72F...K,150
-3,Mutant_R80K,MGT...R80K...K,150
-```
-
-**measurements.csv:**
-```csv
-id,activity,concentration,technician
-1,15.0,0.5,Dr. Smith
-2,25.0,0.5,Dr. Smith
-3,8.5,0.5,Dr. Johnson
-```
-
-**Result**: Automatically merged on ID column with statistics:
-- Total rows: 3
-- Matched rows: 3
-- Unmatched rows: 0
-
-### Data Visualization
-
-After merging, request visualizations:
+## 📁 Project Structure
 
 ```
-"Create a scatter plot of activity vs concentration"
-"Show me a histogram of activity values"
-"Generate a correlation heatmap"
-"Make a boxplot of activity by technician"
+DataWeaver.AI/
+├── backend/                 # FastAPI backend
+│   ├── app/
+│   │   ├── api/            # API endpoints
+│   │   ├── models/         # Database models
+│   │   ├── schemas/        # Pydantic schemas
+│   │   └── services/       # Business logic
+│   ├── alembic/            # Database migrations
+│   ├── tests/              # Backend tests
+│   └── requirements.txt    # Python dependencies
+├── frontend/               # React frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── services/       # API services
+│   │   └── types/          # TypeScript types
+│   └── package.json        # Node.js dependencies
+├── docs/                   # Documentation
+├── scripts/                # Utility scripts
+└── test_data/             # Sample data files
 ```
 
-**Available Plot Types:**
-- **Scatter Plot**: Relationship between two numeric variables
-- **Histogram**: Distribution of a single variable
-- **Correlation Heatmap**: Relationships between all numeric columns
-- **Box Plot**: Distribution comparison across categories
+## 🔍 API Endpoints
 
-## 🧬 Biological Entity Management
+### Core Endpoints
+- `POST /api/bio/create-workflow-session` - Create new session
+- `POST /api/bio/upload-single-file` - Upload individual file
+- `POST /api/bio/merge-session-files` - Merge uploaded files
+- `POST /api/bio/generate-visualization` - Create charts
+- `POST /api/data-qa/ask` - Data analysis Q&A
+- `POST /api/general-chat/chat` - General AI chat
 
-### Create Design Entity
+### Session Management
+- `GET /api/bio/workflow-status/{session_id}` - Get session status
+- `GET /api/bio/workflow-history/{session_id}` - Get workflow history
+- `DELETE /api/bio/clear-session/{session_id}` - Clear session
 
-```bash
-curl -X POST "http://localhost:8000/api/bio-entities/designs" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "WT_Protein",
-    "alias": "Wild_Type",
-    "description": "Wild type protein sequence",
-    "sequence": "MGT...L72...K",
-    "sequence_type": "protein",
-    "mutation_list": ""
-  }'
-```
+## 🐛 Troubleshooting
 
-### Create Build Entity
+### Common Issues
 
-```bash
-curl -X POST "http://localhost:8000/api/bio-entities/builds" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Mutant_L72F",
-    "alias": "L72F_Mutant",
-    "description": "L72F mutation variant",
-    "sequence": "MGT...L72F...K",
-    "sequence_type": "protein",
-    "mutation_list": "L72F",
-    "design_id": "design-uuid-here",
-    "construct_type": "plasmid",
-    "build_status": "completed"
-  }'
-```
+1. **Port Conflicts**:
+   ```bash
+   # Check what's using the ports
+   lsof -i :8000
+   lsof -i :3000
+   
+   # Kill processes if needed
+   kill -9 <PID>
+   ```
 
-### Upload and Process Test Results
+2. **Database Connection**:
+   ```bash
+   # Check PostgreSQL status
+   brew services list | grep postgresql
+   
+   # Start PostgreSQL if needed
+   brew services start postgresql
+   ```
 
-Create `assay_results.csv`:
+3. **Frontend Build Issues**:
+   ```bash
+   cd frontend
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
 
-```csv
-name,alias,sequence,mutations,result_value,result_unit,test_type,assay_name,technician
-Clone_7,Clone_7,MGT...L72F...K,L72F,25.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
-WT_Control,WT_Control,MGT...L72...K,,15.0,μM/min,activity,Enzyme Activity Assay,Dr. Smith
-Mutant_A,Mutant_A,MGT...R80K...K,R80K,8.5,μM/min,activity,Enzyme Activity Assay,Dr. Smith
-Double_Mutant,Double_Mutant,MGT...L72F...R80K...K,"L72F,R80K",2.1,μM/min,activity,Enzyme Activity Assay,Dr. Johnson
-```
+4. **Backend Import Errors**:
+   ```bash
+   cd backend
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
-**Upload and process:**
-```bash
-# 1. Upload file
-curl -X POST "http://localhost:8000/api/files/upload" \
-  -F "file=@assay_results.csv"
+### Logs
 
-# 2. Process for bio entities (use file_id from upload response)
-curl -X POST "http://localhost:8000/api/bio-entities/process-file/{file_id}" \
-  -H "Content-Type: application/json" \
-  -d '{"process_type": "assay_results"}'
-```
+- **Backend logs**: Check terminal where uvicorn is running
+- **Frontend logs**: Check browser developer console
+- **Database logs**: Check PostgreSQL logs
 
-**Result**: Automatic creation of Design and Test entities with proper relationships.
+## 🤝 Contributing
 
-## 🔄 Workflow Management
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/new-feature`
+3. **Make your changes**
+4. **Run tests**: `pytest tests/` and `npm test`
+5. **Commit your changes**: `git commit -am 'Add new feature'`
+6. **Push to the branch**: `git push origin feature/new-feature`
+7. **Submit a pull request**
 
-### Create Workflow
+## 📄 License
 
-```bash
-curl -X POST "http://localhost:8000/workflows/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Protein Analysis Pipeline",
-    "description": "Complete workflow for protein sequence analysis and validation",
-    "status": "draft"
-  }'
-```
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Add Workflow Steps
+## 🆘 Support
 
-```bash
-curl -X POST "http://localhost:8000/workflows/1/steps/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Sequence Upload",
-    "description": "Upload protein sequence files",
-    "step_type": "input",
-    "order_index": 1
-  }'
+- **Documentation**: Check the `/docs` folder for detailed guides
+- **Issues**: Report bugs and feature requests via GitHub Issues
+- **Discussions**: Use GitHub Discussions for questions and ideas
 
-curl -X POST "http://localhost:8000/workflows/1/steps/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Sequence Analysis",
-    "description": "Analyze protein sequences for mutations",
-    "step_type": "processing",
-    "order_index": 2,
-    "external_provider": "bioinformatics_tool",
-    "external_config": {
-      "tool": "blast",
-      "database": "nr"
-    }
-  }'
-```
+## 🚀 Roadmap
+
+### Planned Features
+- [ ] Advanced visualization options (3D plots, interactive charts)
+- [ ] Machine learning integration for data analysis
+- [ ] Real-time collaboration features
+- [ ] Advanced file format support (Parquet, HDF5)
+- [ ] Cloud storage integration (AWS S3, Google Cloud Storage)
+- [ ] Workflow templates and sharing
+- [ ] Advanced data validation and cleaning tools
+- [ ] Export capabilities (PDF reports, Excel exports)
+
+### Technical Improvements
+- [ ] Performance optimization for large datasets
+- [ ] Caching layer for frequently accessed data
+- [ ] Advanced security features
+- [ ] Multi-tenant architecture
+- [ ] API rate limiting and authentication
+- [ ] Comprehensive test coverage
+- [ ] CI/CD pipeline setup
+
+---
+
+**DataWeaver.AI** - Making data analysis accessible through AI-powered workflows.

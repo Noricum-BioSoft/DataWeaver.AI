@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Bot, Clock } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import ResultPanel from './ResultPanel';
 import './ChatHistory.css';
 
@@ -35,7 +36,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages, isProcessing }) => 
           
           <div className="message-content">
             <div className="message-bubble">
-              <p className="message-text">{message.content}</p>
+              <div className="message-text">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
               <div className="message-time">
                 <Clock size={12} />
                 <span>{formatTime(message.timestamp)}</span>

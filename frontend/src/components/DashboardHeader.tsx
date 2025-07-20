@@ -9,7 +9,7 @@ const DashboardHeader: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // TODO: Implement search functionality
+    // Search functionality will be implemented in future versions
   };
 
   return (

@@ -345,3 +345,12 @@ Thumbs.db
 # Local development files
 local_settings.py
 settings_local.py
+
+# DataWeaver.AI specific
+backend/storage/
+backend/uploads/
+backend/logs/
+*.csv
+*.json
+*.xlsx
+*.xls

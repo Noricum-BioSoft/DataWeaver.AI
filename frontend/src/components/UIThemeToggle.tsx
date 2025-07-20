@@ -1,10 +1,10 @@
 import React from 'react';
-import { Layout, Grid, Database } from 'lucide-react';
+import { Layout, Grid } from 'lucide-react';
 import './UIThemeToggle.css';
 
 interface UIThemeToggleProps {
-  currentTheme: 'sidebar' | 'dashboard' | 'bio-matcher';
-  onThemeChange: (theme: 'sidebar' | 'dashboard' | 'bio-matcher') => void;
+  currentTheme: 'sidebar' | 'dashboard';
+  onThemeChange: (theme: 'sidebar' | 'dashboard') => void;
 }
 
 const UIThemeToggle: React.FC<UIThemeToggleProps> = ({
@@ -24,17 +24,7 @@ const UIThemeToggle: React.FC<UIThemeToggleProps> = ({
           <span>AI Chat</span>
         </button>
         
-        {/* Bio-Matcher button - secondary option */}
-        <button
-          className={`toggle-button ${currentTheme === 'bio-matcher' ? 'active' : ''}`}
-          onClick={() => onThemeChange('bio-matcher')}
-          title="Bio-Matcher"
-        >
-          <Database size={16} />
-          <span>Bio-Matcher</span>
-        </button>
-        
-        {/* Sidebar button - tertiary option */}
+        {/* Sidebar button - secondary option */}
         <button
           className={`toggle-button ${currentTheme === 'sidebar' ? 'active' : ''}`}
           onClick={() => onThemeChange('sidebar')}

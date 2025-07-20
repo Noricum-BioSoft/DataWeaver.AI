@@ -47,6 +47,31 @@ check_port() {
     fi
 }
 
+# Function to free a port by killing processes using it
+free_port() {
+    local port=$1
+    local service=$2
+    local pids=$(lsof -ti:$port 2>/dev/null)
+    
+    if [ -n "$pids" ]; then
+        print_status "Freeing port $port by killing PIDs: $pids"
+        kill -9 $pids 2>/dev/null
+        sleep 2
+        
+        # Check if port is now free
+        if [ -z "$(lsof -ti:$port 2>/dev/null)" ]; then
+            print_success "Port $port is now free"
+            return 0
+        else
+            print_error "Failed to free port $port"
+            return 1
+        fi
+    else
+        print_status "Port $port is already free"
+        return 0
+    fi
+}
+
 # Function to wait for a service to be ready
 wait_for_service() {
     local host=$1
@@ -190,10 +215,16 @@ run_migrations() {
 start_backend() {
     print_status "Starting backend server..."
     
-    # Check if backend is already running
+    # Check if backend is already running and free the port if needed
     if check_port $BACKEND_PORT "Backend"; then
         print_warning "Backend is already running on port $BACKEND_PORT"
-        return 0
+        read -p "Do you want to kill the existing process and start fresh? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            free_port $BACKEND_PORT "Backend"
+        else
+            return 0
+        fi
     fi
     
     cd backend
@@ -218,10 +249,16 @@ start_backend() {
 start_frontend() {
     print_status "Starting frontend server..."
     
-    # Check if frontend is already running
+    # Check if frontend is already running and free the port if needed
     if check_port $FRONTEND_PORT "Frontend"; then
         print_warning "Frontend is already running on port $FRONTEND_PORT"
-        return 0
+        read -p "Do you want to kill the existing process and start fresh? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            free_port $FRONTEND_PORT "Frontend"
+        else
+            return 0
+        fi
     fi
     
     cd frontend
@@ -400,6 +437,12 @@ case "${1:-}" in
     "redis")
         start_redis
         ;;
+    "force")
+        print_status "Force mode: Automatically freeing ports..."
+        free_port $BACKEND_PORT "Backend"
+        free_port $FRONTEND_PORT "Frontend"
+        main
+        ;;
     "help"|"-h"|"--help")
         echo "DataWeaver.AI Startup Script"
         echo ""
@@ -412,6 +455,7 @@ case "${1:-}" in
         echo "  frontend   Start only frontend"
         echo "  db         Start only PostgreSQL"
         echo "  redis      Start only Redis"
+        echo "  force      Start all services, automatically free ports"
         echo "  help       Show this help"
         echo ""
         exit 0

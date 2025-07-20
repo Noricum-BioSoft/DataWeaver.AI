@@ -1,0 +1,260 @@
+.data-context-panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.data-context-header {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.data-context-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.data-context-summary {
+  font-size: 14px;
+  color: #6b7280;
+  background: #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.data-context-content {
+  padding: 0;
+}
+
+.data-context-section {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.data-context-section:last-child {
+  border-bottom: none;
+}
+
+.section-header {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+  transition: background-color 0.2s ease;
+}
+
+.section-header:hover {
+  background: #f3f4f6;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.section-toggle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.section-content {
+  padding: 0 20px 16px 20px;
+  background: #ffffff;
+}
+
+.empty-section {
+  padding: 16px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.context-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.context-item:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.item-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.item-description {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.item-metadata {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+.metadata-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  font-size: 12px;
+}
+
+.metadata-row:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.metadata-row span:first-child {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.metadata-row span:last-child {
+  color: #111827;
+  font-weight: 600;
+}
+
+.data-context-loading,
+.data-context-error,
+.data-context-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.data-context-loading {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.data-context-error {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .data-context-panel {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .data-context-header {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .data-context-header h3 {
+    color: #f9fafb;
+  }
+
+  .data-context-summary {
+    background: #374151;
+    color: #d1d5db;
+  }
+
+  .section-header {
+    background: #111827;
+  }
+
+  .section-header:hover {
+    background: #1f2937;
+  }
+
+  .section-title {
+    color: #d1d5db;
+  }
+
+  .section-content {
+    background: #1f2937;
+  }
+
+  .context-item {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .context-item:hover {
+    border-color: #4b5563;
+  }
+
+  .item-name {
+    color: #f9fafb;
+  }
+
+  .item-description {
+    color: #9ca3af;
+  }
+
+  .item-metadata {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  .metadata-row span:first-child {
+    color: #9ca3af;
+  }
+
+  .metadata-row span:last-child {
+    color: #f9fafb;
+  }
+
+  .metadata-row:not(:last-child) {
+    border-color: #4b5563;
+  }
+} 

@@ -2,7 +2,9 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import files, workflows, datasets
 from app.api import bio_matcher
-from api import bio_entities
+from app.api import intelligent_merge
+from app.api import data_qa
+from app.api import general_chat
 from sqlalchemy import create_engine, text
 from app.database import get_db
 from sqlalchemy.orm import Session
@@ -27,7 +29,9 @@ app.include_router(files.router, prefix="/api")
 app.include_router(workflows.router, prefix="/api")
 app.include_router(datasets.router, prefix="/api")
 app.include_router(bio_matcher.router, prefix="/api")
-app.include_router(bio_entities.router, prefix="/api/bio-entities")
+app.include_router(intelligent_merge.router, prefix="/api")
+app.include_router(data_qa.router, prefix="/api/data-qa")
+app.include_router(general_chat.router, prefix="/api")
 
 @app.get("/")
 def read_root():

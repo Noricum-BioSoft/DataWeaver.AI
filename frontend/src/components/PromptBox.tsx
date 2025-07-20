@@ -7,7 +7,7 @@ interface PromptBoxProps {
   onVoiceToggle: () => void;
   isListening: boolean;
   isProcessing: boolean;
-  onFileUpload?: (files: File[]) => void;
+  onFileUpload?: (files: File[]) => Promise<void>;
 }
 
 const PromptBox: React.FC<PromptBoxProps> = ({
@@ -21,12 +21,6 @@ const PromptBox: React.FC<PromptBoxProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [promptHistory] = useState([
-    'Show me my recent files',
-    'Connect to Google Drive',
-    'Create a new workflow',
-    'Visualize test results from the past 30 days'
-  ]);
 
   const suggestions = [
     'Show unmatched datasheets from Vendor X',
@@ -54,7 +48,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
@@ -73,7 +67,11 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Call the file upload handler if provided
       if (onFileUpload) {
-        onFileUpload(csvFiles);
+        try {
+          await onFileUpload(csvFiles);
+        } catch (error) {
+          console.error('Error uploading files:', error);
+        }
       }
       
       // Submit the upload message
@@ -95,9 +93,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
     setShowSuggestions(false);
   };
 
-  const handleHistoryClick = (historyItem: string) => {
-    setPrompt(historyItem);
-  };
+
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
@@ -111,7 +107,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const csvFiles = files.filter(file => 
       file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
@@ -126,7 +122,11 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Call the file upload handler if provided
       if (onFileUpload) {
-        onFileUpload(csvFiles);
+        try {
+          await onFileUpload(csvFiles);
+        } catch (error) {
+          console.error('Error uploading files:', error);
+        }
       }
       
       // Submit the upload message
@@ -139,26 +139,6 @@ const PromptBox: React.FC<PromptBoxProps> = ({
 
   return (
     <div className="prompt-box">
-      {/* Prompt History */}
-      {promptHistory.length > 0 && (
-        <div className="prompt-history">
-          <div className="history-header">
-            <Clock size={16} />
-            <span>Recent Commands</span>
-          </div>
-          <div className="history-chips">
-            {promptHistory.map((item, index) => (
-              <button
-                key={index}
-                className="history-chip"
-                onClick={() => handleHistoryClick(item)}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Uploaded Files Display */}
       {uploadedFiles.length > 0 && (

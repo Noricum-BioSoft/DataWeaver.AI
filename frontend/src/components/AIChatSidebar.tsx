@@ -13,9 +13,19 @@ import './AIChatSidebar.css';
 
 interface AIChatSidebarProps {
   onPromptSelect: (prompt: string) => void;
+  onFilesClick?: () => void;
+  onConnectorsClick?: () => void;
+  onVendorsClick?: () => void;
+  onDashboardClick?: () => void;
 }
 
-const AIChatSidebar: React.FC<AIChatSidebarProps> = ({ onPromptSelect }) => {
+const AIChatSidebar: React.FC<AIChatSidebarProps> = ({ 
+  onPromptSelect,
+  onFilesClick,
+  onConnectorsClick,
+  onVendorsClick,
+  onDashboardClick
+}) => {
   const menuItems = [
     {
       id: 'home',
@@ -76,7 +86,25 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({ onPromptSelect }) => {
               <li key={item.id} className="nav-item">
                 <button
                   className="nav-button"
-                  onClick={() => onPromptSelect(item.prompt)}
+                  onClick={() => {
+                    // Handle specific sidebar actions
+                    switch (item.id) {
+                      case 'files':
+                        onFilesClick?.();
+                        break;
+                      case 'connectors':
+                        onConnectorsClick?.();
+                        break;
+                      case 'vendors':
+                        onVendorsClick?.();
+                        break;
+                      case 'dashboard':
+                        onDashboardClick?.();
+                        break;
+                      default:
+                        onPromptSelect(item.prompt);
+                    }
+                  }}
                   title={item.prompt}
                 >
                   <IconComponent size={20} />

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Send, Mic, MicOff, Clock, ChevronDown, Upload, FileText } from 'lucide-react';
+import { Send, Mic, MicOff, Upload, FileText, ChevronDown, ChevronUp, FileDown } from 'lucide-react';
 import './PromptBox.css';
 
 interface PromptBoxProps {
@@ -7,7 +7,13 @@ interface PromptBoxProps {
   onVoiceToggle: () => void;
   isListening: boolean;
   isProcessing: boolean;
-  onFileUpload?: (files: File[]) => void;
+  onFileUpload?: (files: File[]) => Promise<void>;
+  generatedFiles?: Array<{
+    name: string;
+    size: string;
+    downloadUrl: string;
+    type: string;
+  }>;
 }
 
 const PromptBox: React.FC<PromptBoxProps> = ({
@@ -15,26 +21,14 @@ const PromptBox: React.FC<PromptBoxProps> = ({
   onVoiceToggle,
   isListening,
   isProcessing,
-  onFileUpload
+  onFileUpload,
+  generatedFiles = []
 }) => {
   const [prompt, setPrompt] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [promptHistory] = useState([
-    'Show me my recent files',
-    'Connect to Google Drive',
-    'Create a new workflow',
-    'Visualize test results from the past 30 days'
-  ]);
-
-  const suggestions = [
-    'Show unmatched datasheets from Vendor X',
-    'Connect my Google Drive',
-    'Visualize test results from the past 30 days',
-    'Create a new data pipeline',
-    'Show workflow performance metrics'
-  ];
+  const [showUploadedFiles, setShowUploadedFiles] = useState(false);
+  const [showGeneratedFiles, setShowGeneratedFiles] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -50,15 +44,13 @@ const PromptBox: React.FC<PromptBoxProps> = ({
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragOver(false);
-
+    
     const files = Array.from(e.dataTransfer.files);
     const csvFiles = files.filter(file => 
       file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
@@ -73,7 +65,11 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Call the file upload handler if provided
       if (onFileUpload) {
-        onFileUpload(csvFiles);
+        try {
+          await onFileUpload(csvFiles);
+        } catch (error) {
+          console.error('Error uploading files:', error);
+        }
       }
       
       // Submit the upload message
@@ -86,32 +82,10 @@ const PromptBox: React.FC<PromptBoxProps> = ({
     if (prompt.trim() && !isProcessing) {
       onSubmit(prompt);
       setPrompt('');
-      setShowSuggestions(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setPrompt(suggestion);
-    setShowSuggestions(false);
-  };
-
-  const handleHistoryClick = (historyItem: string) => {
-    setPrompt(historyItem);
-  };
-
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const csvFiles = files.filter(file => 
       file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
@@ -126,7 +100,11 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Call the file upload handler if provided
       if (onFileUpload) {
-        onFileUpload(csvFiles);
+        try {
+          await onFileUpload(csvFiles);
+        } catch (error) {
+          console.error('Error uploading files:', error);
+        }
       }
       
       // Submit the upload message
@@ -139,49 +117,85 @@ const PromptBox: React.FC<PromptBoxProps> = ({
 
   return (
     <div className="prompt-box">
-      {/* Prompt History */}
-      {promptHistory.length > 0 && (
-        <div className="prompt-history">
-          <div className="history-header">
-            <Clock size={16} />
-            <span>Recent Commands</span>
-          </div>
-          <div className="history-chips">
-            {promptHistory.map((item, index) => (
-              <button
-                key={index}
-                className="history-chip"
-                onClick={() => handleHistoryClick(item)}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Uploaded Files Display */}
-      {uploadedFiles.length > 0 && (
-        <div className="uploaded-files-display">
-          <div className="files-header">
-            <FileText size={16} />
-            <span>Uploaded Files ({uploadedFiles.length})</span>
-          </div>
-          <div className="files-list">
-            {uploadedFiles.map((file, index) => (
-              <div key={index} className="file-item">
-                <FileText size={14} />
-                <span className="file-name">{file.name}</span>
-                <span className="file-size">{formatFileSize(file.size)}</span>
-                <button
-                  onClick={() => removeFile(index)}
-                  className="remove-file"
-                  title="Remove file"
-                >
-                  ×
-                </button>
+      {/* Files Display Section */}
+      {(uploadedFiles.length > 0 || generatedFiles.length > 0) && (
+        <div className="files-display-section">
+          <div className="files-grid">
+            {/* Uploaded Files Column */}
+            {uploadedFiles.length > 0 && (
+              <div className="uploaded-files-display">
+                <div className="files-header">
+                  <div className="files-title-section">
+                    <FileText size={16} />
+                    <span>Uploaded Files ({uploadedFiles.length})</span>
+                  </div>
+                  <button
+                    className="files-toggle"
+                    onClick={() => setShowUploadedFiles(!showUploadedFiles)}
+                    title={showUploadedFiles ? 'Hide files' : 'Show files'}
+                  >
+                    {showUploadedFiles ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                </div>
+                {showUploadedFiles && (
+                  <div className="files-list">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="file-item">
+                        <span className="file-name">{file.name}</span>
+                        <span className="file-size">({(file.size / 1024).toFixed(1)} KB)</span>
+                        <button
+                          className="remove-file"
+                          onClick={() => {
+                            const newFiles = uploadedFiles.filter((_, i) => i !== index);
+                            setUploadedFiles(newFiles);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
+            )}
+
+            {/* Generated Files Column */}
+            {generatedFiles.length > 0 && (
+              <div className="generated-files-display">
+                <div className="files-header">
+                  <div className="files-title-section">
+                    <FileText size={16} />
+                    <span>Generated Files ({generatedFiles.length})</span>
+                  </div>
+                  <button
+                    className="files-toggle"
+                    onClick={() => setShowGeneratedFiles(!showGeneratedFiles)}
+                    title={showGeneratedFiles ? 'Hide files' : 'Show files'}
+                  >
+                    {showGeneratedFiles ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                </div>
+                {showGeneratedFiles && (
+                  <div className="files-list">
+                    {generatedFiles.map((file, index) => (
+                      <div key={index} className="file-item">
+                        <span className="file-name">{file.name}</span>
+                        <span className="file-size">({file.size})</span>
+                        <a
+                          href={file.downloadUrl}
+                          download={file.name}
+                          className="download-file"
+                          title="Download file"
+                        >
+                          <FileDown size={14} />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -202,7 +216,6 @@ const PromptBox: React.FC<PromptBoxProps> = ({
             placeholder="Ask me anything about your data, workflows, or visualizations... (or drag CSV files here)"
             className="prompt-input"
             disabled={isProcessing}
-            onFocus={() => setShowSuggestions(true)}
           />
           
           <div className="prompt-actions">
@@ -245,42 +258,14 @@ const PromptBox: React.FC<PromptBoxProps> = ({
           </div>
         </div>
 
-        {/* Auto-suggestions */}
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="suggestions-dropdown">
-            <div className="suggestions-header">
-              <span>Suggestions</span>
-              <button
-                type="button"
-                className="close-suggestions"
-                onClick={() => setShowSuggestions(false)}
-              >
-                <ChevronDown size={16} />
-              </button>
-            </div>
-            <div className="suggestions-list">
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="suggestion-item"
-                  onClick={() => handleSuggestionClick(suggestion)}
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
+        {/* Processing Indicator */}
+        {isProcessing && (
+          <div className="processing-indicator">
+            <div className="processing-spinner"></div>
+            <span>AI is processing your request...</span>
           </div>
         )}
       </form>
-
-      {/* Processing Indicator */}
-      {isProcessing && (
-        <div className="processing-indicator">
-          <div className="processing-spinner"></div>
-          <span>AI is processing your request...</span>
-        </div>
-      )}
     </div>
   );
 };

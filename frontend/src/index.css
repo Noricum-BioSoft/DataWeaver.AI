@@ -10,6 +10,61 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px; /* Increased base font size */
+  line-height: 1.6; /* Improved line height for readability */
+}
+
+/* Ensure minimum readable font sizes for all text elements */
+p, span, div, button, input, textarea, select, label {
+  font-size: 1.125rem !important; /* Increased to 18px minimum */
+}
+
+/* Increase heading sizes */
+h1 { font-size: 2.25rem !important; }
+h2 { font-size: 2rem !important; }
+h3 { font-size: 1.75rem !important; }
+h4 { font-size: 1.5rem !important; }
+h5 { font-size: 1.25rem !important; }
+h6 { font-size: 1.125rem !important; }
+
+/* Force larger font sizes for specific elements */
+.nav-item, .menu-item, .sidebar-item {
+  font-size: 1.125rem !important;
+}
+
+.button, .btn {
+  font-size: 1.125rem !important;
+}
+
+.placeholder {
+  font-size: 1.125rem !important;
+}
+
+/* Additional aggressive font size overrides for AI Chat components */
+.ai-chat-main *,
+.prompt-box *,
+.chat-history *,
+.ai-chat-header *,
+.ai-chat-sidebar * {
+  font-size: 1.125rem !important;
+}
+
+/* Specific overrides for common elements */
+input, textarea, select {
+  font-size: 1.125rem !important;
+}
+
+button {
+  font-size: 1.125rem !important;
+}
+
+span, p, div {
+  font-size: 1.125rem !important;
+}
+
+/* Ensure placeholder text is also larger */
+::placeholder {
+  font-size: 1.125rem !important;
 }
 
 code {

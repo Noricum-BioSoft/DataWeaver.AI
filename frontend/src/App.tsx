@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import './App.css';
 import SidebarLayout from './components/SidebarLayout';
 import AIChatLayout from './components/AIChatLayout';
-import BioMatcherPage from './components/BioMatcherPage';
 import UIThemeToggle from './components/UIThemeToggle';
 
 const App: React.FC = () => {
   // Default to AI Chat interface
-  const [currentTheme, setCurrentTheme] = useState<'sidebar' | 'dashboard' | 'bio-matcher'>('dashboard');
+  const [currentTheme, setCurrentTheme] = useState<'sidebar' | 'dashboard'>('dashboard');
 
-  const handleThemeChange = (theme: 'sidebar' | 'dashboard' | 'bio-matcher') => {
+  const handleThemeChange = (theme: 'sidebar' | 'dashboard') => {
     setCurrentTheme(theme);
   };
 
@@ -24,7 +23,6 @@ const App: React.FC = () => {
       
       {currentTheme === 'sidebar' && <SidebarLayout />}
       {currentTheme === 'dashboard' && <AIChatLayout />}
-      {currentTheme === 'bio-matcher' && <BioMatcherPage />}
     </div>
   );
 };

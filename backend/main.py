@@ -1,8 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import files, workflows, datasets
 from app.api import bio_matcher
-from api import bio_entities
+from app.api import intelligent_merge
+from app.api import data_qa
+from app.api import general_chat
+from sqlalchemy import create_engine, text
+from app.database import get_db
+from sqlalchemy.orm import Session
 
 app = FastAPI(
     title="DataWeaver.AI API",
@@ -24,7 +29,9 @@ app.include_router(files.router, prefix="/api")
 app.include_router(workflows.router, prefix="/api")
 app.include_router(datasets.router, prefix="/api")
 app.include_router(bio_matcher.router, prefix="/api")
-app.include_router(bio_entities.router, prefix="/api")
+app.include_router(intelligent_merge.router, prefix="/api")
+app.include_router(data_qa.router, prefix="/api/data-qa")
+app.include_router(general_chat.router, prefix="/api")
 
 @app.get("/")
 def read_root():
@@ -32,4 +39,23 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
+
+@app.get("/api/system/info")
+def get_system_info():
+    """Get system information"""
+    return {
+        "version": "1.0.0",
+        "database_status": "connected",
+        "environment": "development"
+    }
+
+@app.get("/api/system/db-status")
+def get_database_status(db: Session = Depends(get_db)):
+    """Check database connectivity"""
+    try:
+        # Try to execute a simple query
+        db.execute(text("SELECT 1"))
+        return {"connected": True, "status": "healthy"}
+    except Exception as e:
+        return {"connected": False, "status": str(e)} 

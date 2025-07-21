@@ -51,7 +51,7 @@
 
 .stat-content h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
   font-weight: 500;
   color: #6b7280;
   text-transform: uppercase;
@@ -60,14 +60,14 @@
 
 .stat-value {
   margin: 0 0 0.25rem 0;
-  font-size: 1.875rem;
+  font-size: 2.125rem; /* Increased from 1.875rem */
   font-weight: 700;
   color: #1f2937;
 }
 
 .stat-change {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
   font-weight: 500;
 }
 

@@ -10,24 +10,29 @@
     "@types/node": "^16.11.56",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "@types/react-dropzone": "^5.1.0",
+    "@types/react-plotly.js": "^2.6.3",
+    "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.14",
+    "axios": "^1.4.0",
+    "buffer": "^6.0.3",
+    "clsx": "^1.2.1",
+    "lucide-react": "^0.263.1",
+    "plotly.js-dist": "^3.0.1",
+    "postcss": "^8.4.24",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.7.4",
-    "web-vitals": "^2.1.4",
-    "axios": "^1.4.0",
-    "react-router-dom": "^6.14.1",
-    "@types/react-router-dom": "^5.3.3",
     "react-dropzone": "^14.2.3",
-    "@types/react-dropzone": "^5.1.0",
-    "react-query": "^3.39.3",
     "react-hook-form": "^7.45.4",
     "react-hot-toast": "^2.4.1",
-    "lucide-react": "^0.263.1",
-    "clsx": "^1.2.1",
+    "react-markdown": "^10.1.0",
+    "react-plotly.js": "^2.6.0",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.14.1",
+    "react-scripts": "5.0.1",
     "tailwindcss": "^3.3.2",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.24"
+    "typescript": "^4.7.4",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -53,5 +58,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8000"
-} 
+  "proxy": "http://localhost:8000",
+  "devDependencies": {
+    "@types/plotly.js": "^3.0.2"
+  }
+}

@@ -1,0 +1,102 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-container.sidebar-visible {
+  /* Default state with sidebar visible */
+}
+
+.app-container.sidebar-hidden .sidebar {
+  transform: translateX(-100%);
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.content-wrapper {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2rem;
+  transition: padding 0.3s ease;
+}
+
+/* Floating toggle button */
+.floating-toggle-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.floating-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.floating-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-container.sidebar-hidden .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .content-wrapper {
+    padding: 1rem;
+  }
+  
+  .floating-toggle-btn {
+    top: 10px;
+    left: 10px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+/* Tablet and smaller desktop */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 280px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .sidebar {
+    width: 350px;
+  }
+} 

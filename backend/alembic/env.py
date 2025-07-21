@@ -9,7 +9,14 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from app.database import Base
-from app.models import *
+# Import only the new workflow models to avoid conflicts with existing tables
+from app.models.workflow import Workflow, WorkflowStep
+from app.models.file import File, FileMetadata, FileRelationship
+from app.models.dataset import Dataset, DatasetMatch
+from app.models.workflow_phases import (
+    DesignPhase, BuildPhase, TestPhase, WorkflowProject, 
+    WorkflowFile, WorkflowCorrelation
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

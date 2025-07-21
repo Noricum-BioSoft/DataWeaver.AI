@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, FileText, Database, CheckCircle, AlertCircle } from 'lucide-react';
 import { bioMatcherApi } from '../services/api';
+import DataContextPanel from './DataContextPanel';
 import './BioMatcherUpload.css';
 
 interface UploadedFile {
@@ -26,6 +27,7 @@ const BioMatcherUpload: React.FC = () => {
   const [mergedData, setMergedData] = useState<MergedData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -111,15 +113,15 @@ const BioMatcherUpload: React.FC = () => {
     setUploadedFiles(newFiles);
     setSuccess(`Uploaded ${newFiles.length} file(s)`);
 
-    // Auto-merge if 2 files are selected
-    if (newFiles.length === 2) {
+    // Auto-merge if 2 or more files are selected
+    if (newFiles.length >= 2) {
       handleMerge(newFiles);
     }
   }, []);
 
   const handleMerge = async (files: UploadedFile[]) => {
-    if (files.length !== 2) {
-      setError('Please upload exactly 2 CSV files to merge');
+    if (files.length < 2) {
+      setError('Please upload at least 2 CSV files to merge');
       return;
     }
 
@@ -128,9 +130,22 @@ const BioMatcherUpload: React.FC = () => {
     setSuccess(null);
 
     try {
+      // Create session if not exists
+      if (!sessionId) {
+        const sessionResponse = await bioMatcherApi.createWorkflowSession();
+        setSessionId(sessionResponse.session_id);
+      }
+
       const formData = new FormData();
-      formData.append('file1', files[0].file);
-      formData.append('file2', files[1].file);
+      // Add all files to the files array
+      files.forEach((file) => {
+        formData.append('files', file.file);
+      });
+      
+      // Add session ID if available
+      if (sessionId) {
+        formData.append('session_id', sessionId);
+      }
 
       const result = await bioMatcherApi.mergeFiles(formData);
       setMergedData(result);
@@ -168,7 +183,7 @@ const BioMatcherUpload: React.FC = () => {
     <div className="bio-matcher-upload">
       <div className="upload-header">
         <h2>Bio-Matcher File Upload</h2>
-        <p>Drag and drop 2 CSV files to automatically merge them</p>
+        <p>Drag and drop 2 or more CSV files to automatically merge them</p>
       </div>
 
       {/* Drag & Drop Area */}
@@ -195,7 +210,7 @@ const BioMatcherUpload: React.FC = () => {
             <h3>Drag & Drop CSV Files Here</h3>
             <p>or click to browse</p>
             <p className="upload-hint">
-              Upload 2 CSV files to automatically merge them
+              Upload 2 or more CSV files to automatically merge them
             </p>
           </div>
         </label>
@@ -219,7 +234,7 @@ const BioMatcherUpload: React.FC = () => {
       {/* Uploaded Files */}
       {uploadedFiles.length > 0 && (
         <div className="uploaded-files">
-          <h3>Uploaded Files ({uploadedFiles.length}/2)</h3>
+          <h3>Uploaded Files ({uploadedFiles.length})</h3>
           <div className="file-list">
             {uploadedFiles.map(file => (
               <div key={file.id} className="file-item">
@@ -238,7 +253,7 @@ const BioMatcherUpload: React.FC = () => {
             ))}
           </div>
 
-          {uploadedFiles.length === 2 && !isProcessing && !mergedData && (
+          {uploadedFiles.length >= 2 && !isProcessing && !mergedData && (
             <button
               onClick={() => handleMerge(uploadedFiles)}
               className="merge-button"
@@ -302,6 +317,11 @@ const BioMatcherUpload: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Data Context Panel */}
+      {sessionId && (
+        <DataContextPanel sessionId={sessionId} />
       )}
     </div>
   );

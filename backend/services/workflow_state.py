@@ -74,6 +74,26 @@ class WorkflowStateManager:
             return []
         return session['steps']
     
+    def store_uploaded_file(self, session_id: str, file_data: Dict[str, Any]) -> bool:
+        """Store individual uploaded file data in session"""
+        session = self.get_session(session_id)
+        if not session:
+            return False
+        
+        if 'uploaded_files' not in session['data']:
+            session['data']['uploaded_files'] = []
+        
+        session['data']['uploaded_files'].append(file_data)
+        session['last_updated'] = datetime.now()
+        return True
+    
+    def get_uploaded_files(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all uploaded files from session"""
+        session = self.get_session(session_id)
+        if not session:
+            return []
+        return session['data'].get('uploaded_files', [])
+    
     def store_merged_data(self, session_id: str, merged_data: Dict[str, Any]) -> bool:
         """Store merged CSV data in session"""
         return self.update_session_data(session_id, 'merged_data', merged_data)
@@ -89,6 +109,26 @@ class WorkflowStateManager:
     def get_visualization_data(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Get stored visualization data from session"""
         return self.get_session_data(session_id, 'visualization_data')
+    
+    def store_filtered_data(self, session_id: str, filtered_data: Dict[str, Any]) -> bool:
+        """Store filtered/queried data in session"""
+        return self.update_session_data(session_id, 'filtered_data', filtered_data)
+    
+    def get_filtered_data(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get stored filtered data from session"""
+        return self.get_session_data(session_id, 'filtered_data')
+    
+    def clear_session(self, session_id: str) -> bool:
+        """Clear all data from a session"""
+        if session_id in self.sessions:
+            self.sessions[session_id] = {
+                'created_at': datetime.now(),
+                'last_updated': datetime.now(),
+                'data': {},
+                'steps': []
+            }
+            return True
+        return False
     
     def cleanup_expired_sessions(self):
         """Remove expired sessions"""

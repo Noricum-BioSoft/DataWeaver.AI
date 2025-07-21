@@ -5,11 +5,31 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 80px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 100;
+}
+
+.ai-chat-sidebar.sidebar-visible {
+  transform: translateX(0);
+}
+
+.ai-chat-sidebar.sidebar-hidden {
+  transform: translateX(-100%);
 }
 
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-title-section {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -21,9 +41,43 @@
 
 .sidebar-title {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-weight: 600;
   color: #1f2937;
+}
+
+.sidebar-toggle-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.sidebar-toggle-btn:hover {
+  color: #2563eb;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.sidebar-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotate {
+  transform: rotate(180deg);
 }
 
 .sidebar-nav {
@@ -46,11 +100,11 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.625rem;
   border: none;
   background: transparent;
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 1.125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -75,7 +129,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: #6b7280;
 }
 
@@ -120,6 +174,20 @@
   }
   
   .sidebar-title {
-    font-size: 1rem;
+    font-size: 1.25rem;
+  }
+}
+
+/* Tablet and smaller desktop */
+@media (max-width: 1024px) {
+  .ai-chat-sidebar {
+    width: 260px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .ai-chat-sidebar {
+    width: 300px;
   }
 } 

@@ -16,4 +16,6 @@ redis
 fuzzywuzzy
 pytest
 pytest-asyncio
-httpx 
+httpx
+openai
+pandas 

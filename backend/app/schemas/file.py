@@ -4,20 +4,20 @@ from datetime import datetime
 from enum import Enum
 
 class FileType(str, Enum):
-    CSV = "csv"
-    EXCEL = "excel"
-    TEXT = "text"
-    JSON = "json"
-    XML = "xml"
-    BINARY = "binary"
-    OTHER = "other"
+    CSV = "CSV"
+    EXCEL = "EXCEL"
+    TEXT = "TEXT"
+    JSON = "JSON"
+    XML = "XML"
+    BINARY = "BINARY"
+    OTHER = "OTHER"
 
 class FileStatus(str, Enum):
-    UPLOADING = "uploading"
-    PROCESSING = "processing"
-    READY = "ready"
-    ERROR = "error"
-    DELETED = "deleted"
+    UPLOADING = "UPLOADING"
+    PROCESSING = "PROCESSING"
+    READY = "READY"
+    ERROR = "ERROR"
+    DELETED = "DELETED"
 
 # File Schemas
 class FileCreate(BaseModel):

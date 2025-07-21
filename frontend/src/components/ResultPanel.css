@@ -799,6 +799,150 @@
   border-color: #d1d5db;
 }
 
+/* Debug Fallback */
+.result-card.debug {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.result-card.debug .result-header {
+  background: #fef3c7;
+  border-bottom-color: #f59e0b;
+}
+
+.result-card.debug .result-content {
+  background: #fffbeb;
+}
+
+.result-card.debug pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Query Result Styles */
+.query-result {
+  margin-bottom: 1rem;
+}
+
+.query-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.query-info {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+.query-info p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.query-info strong {
+  color: #1f2937;
+}
+
+.filtered-data-preview {
+  margin-top: 1rem;
+}
+
+.filtered-data-preview h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.no-results-message {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #fefefe;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.no-results-icon {
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.no-results-message h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.no-results-message p {
+  margin: 0 0 1.5rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.query-suggestions {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.query-suggestions p {
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+  color: #374151;
+}
+
+.query-suggestions ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.query-suggestions li {
+  margin: 0.25rem 0;
+}
+
+.filtered-data-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.download-button:hover {
+  background: #2563eb;
+}
+
+.download-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .result-header {
     padding: 0.75rem;

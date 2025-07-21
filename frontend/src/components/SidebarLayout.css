@@ -1,47 +1,31 @@
-.ai-chat-layout {
+.app-container {
   display: flex;
-  flex-direction: column;
   height: 100vh;
-  background: #f9fafb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
-.ai-chat-layout.sidebar-visible {
+.app-container.sidebar-visible {
   /* Default state with sidebar visible */
 }
 
-.ai-chat-layout.sidebar-hidden .ai-chat-sidebar {
+.app-container.sidebar-hidden .sidebar {
   transform: translateX(-100%);
 }
 
-.ai-chat-container {
-  display: flex;
+.main-content {
   flex: 1;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.ai-chat-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: white;
-  border-left: 1px solid #e5e7eb;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 0; /* Prevents flex item from overflowing */
 }
 
-.chat-container {
-  flex: 1;
+.content-wrapper {
+  height: 100%;
   overflow-y: auto;
-  background: #f9fafb;
-}
-
-.prompt-section {
-  flex-shrink: 0;
-  background: white;
-  border-top: 1px solid #e5e7eb;
+  padding: 2rem;
+  transition: padding 0.3s ease;
 }
 
 /* Floating toggle button */
@@ -85,14 +69,14 @@
   transform: scale(0.95);
 }
 
+/* Responsive design */
 @media (max-width: 768px) {
-  .ai-chat-container {
-    flex-direction: column;
+  .app-container.sidebar-hidden .sidebar {
+    transform: translateX(-100%);
   }
   
-  .ai-chat-main {
-    border-left: none;
-    border-top: 1px solid #e5e7eb;
+  .content-wrapper {
+    padding: 1rem;
   }
   
   .floating-toggle-btn {
@@ -100,5 +84,19 @@
     left: 10px;
     width: 45px;
     height: 45px;
+  }
+}
+
+/* Tablet and smaller desktop */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 280px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .sidebar {
+    width: 350px;
   }
 } 

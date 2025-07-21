@@ -110,6 +110,14 @@ class WorkflowStateManager:
         """Get stored visualization data from session"""
         return self.get_session_data(session_id, 'visualization_data')
     
+    def store_filtered_data(self, session_id: str, filtered_data: Dict[str, Any]) -> bool:
+        """Store filtered/queried data in session"""
+        return self.update_session_data(session_id, 'filtered_data', filtered_data)
+    
+    def get_filtered_data(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get stored filtered data from session"""
+        return self.get_session_data(session_id, 'filtered_data')
+    
     def clear_session(self, session_id: str) -> bool:
         """Clear all data from a session"""
         if session_id in self.sessions:

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isVisible: boolean;
+  onToggle: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isVisible, onToggle }) => {
   const [command, setCommand] = useState('');
 
   const handleCommandSubmit = (e: React.FormEvent) => {
@@ -12,9 +17,29 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isVisible ? 'sidebar-visible' : 'sidebar-hidden'}`}>
       <div className="sidebar-header">
-        <h1 className="sidebar-title">Data Management</h1>
+        <div className="sidebar-header-content">
+          <h1 className="sidebar-title">Data Management</h1>
+          <button 
+            className="sidebar-toggle-btn"
+            onClick={onToggle}
+            aria-label={isVisible ? 'Hide sidebar' : 'Show sidebar'}
+            title={`${isVisible ? 'Hide' : 'Show'} sidebar (Ctrl+B)`}
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2"
+              className={`toggle-icon ${isVisible ? 'rotate' : ''}`}
+            >
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+        </div>
       </div>
       
       <div className="sidebar-content">

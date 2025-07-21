@@ -14,6 +14,7 @@ import {
   FileDown
 } from 'lucide-react';
 import Plot from 'react-plotly.js';
+import { bioMatcherApi } from '../services/api';
 import './ResultPanel.css';
 
 interface ResultPanelProps {
@@ -45,76 +46,75 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
     </div>
   );
 
-  const renderMergedData = (data: any) => (
-    <div className="result-card merged-data">
-      <div className="result-header">
-        <Database size={20} />
-        <h3>Merged CSV Data</h3>
-        <div className="merge-stats">
-          <span className="stat-item">
-            <strong>{data.totalRows}</strong> total rows
-          </span>
-          <span className="stat-item">
-            <strong>{data.matchedRows}</strong> matched
-          </span>
-          <span className="stat-item">
-            <strong>{data.unmatchedRows}</strong> unmatched
-          </span>
+  const renderMergedData = (data: any) => {
+    return (
+      <div className="result-card merged-data">
+        <div className="result-header">
+          <Database size={20} />
+          <h3>Merged CSV Data</h3>
+          <div className="merge-stats">
+            <span className="stat-item">
+              <strong>{data.totalRows}</strong> total rows
+            </span>
+            <span className="stat-item">
+              <strong>{data.matchedRows}</strong> matched
+            </span>
+            <span className="stat-item">
+              <strong>{data.unmatchedRows}</strong> unmatched
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="result-content">
-        <div className="merged-data-preview">
-          <div className="data-table">
-            <table>
-              <thead>
-                <tr>
-                  {data.headers.map((header: string, index: number) => (
-                    <th key={index}>{header}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.sampleRows.map((row: any[], rowIndex: number) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell: any, cellIndex: number) => (
-                      <td key={cellIndex}>{cell}</td>
+        <div className="result-content">
+          <div className="merged-data-preview">
+            <div className="data-table">
+              <table>
+                <thead>
+                  <tr>
+                    {data.headers.map((header: string, index: number) => (
+                      <th key={index}>{header}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.sampleRows.map((row: any[], rowIndex: number) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell: any, cellIndex: number) => (
+                        <td key={cellIndex}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {data.sampleRows.length < data.totalRows && (
+              <p className="table-note">
+                Showing first {data.sampleRows.length} rows of {data.totalRows} total rows
+              </p>
+            )}
           </div>
-          {data.sampleRows.length < data.totalRows && (
-            <p className="table-note">
-              Showing first {data.sampleRows.length} rows of {data.totalRows} total rows
-            </p>
-          )}
-        </div>
-        <div className="merged-data-actions">
-          <a
-            href={data.downloadUrl}
-            download={data.fileName}
-            className="download-button"
-          >
-            <FileDown size={16} />
-            <span>Download Merged CSV</span>
-          </a>
+          <div className="merged-data-actions">
+            <a
+              href={data.downloadUrl}
+              download={data.fileName}
+              className="download-button"
+            >
+              <FileDown size={16} />
+              <span>Download Merged CSV</span>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const VisualizationResult: React.FC<{ data: any }> = ({ data }) => {
     const [plotData, setPlotData] = React.useState<any>(null);
     const [layout, setLayout] = React.useState<any>(null);
-    const [selectedColumns, setSelectedColumns] = React.useState<string[]>([]);
-    const [originalPlotData, setOriginalPlotData] = React.useState<any>(null);
     
     useEffect(() => {
       if (data.plotJson || data.plotData) {
         try {
           const parsedData = JSON.parse(data.plotJson || data.plotData);
-          setOriginalPlotData(parsedData);
           setPlotData(parsedData.data);
           setLayout({
             ...parsedData.layout,
@@ -126,67 +126,6 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
         }
       }
     }, [data.plotJson, data.plotData]);
-
-    const handleColumnClick = async (column: string) => {
-      // Toggle column selection
-      const newSelectedColumns = selectedColumns.includes(column)
-        ? selectedColumns.filter(col => col !== column)
-        : [...selectedColumns, column];
-      
-      setSelectedColumns(newSelectedColumns);
-
-      // If we have selected columns, regenerate the plot
-      if (newSelectedColumns.length > 0) {
-        try {
-          // Call the backend to regenerate the plot with selected columns
-          const response = await fetch('/api/bio/generate-visualization', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              plot_type: data.plotType || 'scatter',
-              x_column: newSelectedColumns[0],
-              y_column: newSelectedColumns[1] || newSelectedColumns[0],
-              session_id: data.sessionId,
-              use_session_data: true
-            })
-          });
-
-          if (response.ok) {
-            const newPlotData = await response.json();
-            const parsedData = JSON.parse(newPlotData.plot_json);
-            setPlotData(parsedData.data);
-            setLayout({
-              ...parsedData.layout,
-              autosize: true,
-              margin: { l: 50, r: 50, t: 50, b: 50 }
-            });
-          }
-        } catch (error) {
-          console.error('Error regenerating plot:', error);
-          // Fallback to original plot if regeneration fails
-          if (originalPlotData) {
-            setPlotData(originalPlotData.data);
-            setLayout({
-              ...originalPlotData.layout,
-              autosize: true,
-              margin: { l: 50, r: 50, t: 50, b: 50 }
-            });
-          }
-        }
-      } else {
-        // If no columns selected, show original plot
-        if (originalPlotData) {
-          setPlotData(originalPlotData.data);
-          setLayout({
-            ...originalPlotData.layout,
-            autosize: true,
-            margin: { l: 50, r: 50, t: 50, b: 50 }
-          });
-        }
-      }
-    };
 
     return (
       <div className="result-card visualization-result">
@@ -219,37 +158,6 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
                 <p>Loading visualization...</p>
               </div>
             )}
-          </div>
-          <div className="visualization-details">
-            <div className="data-columns">
-              <h4>Available Columns (Click to update plot):</h4>
-              <div className="columns-list">
-                {data.columns.map((col: string, index: number) => (
-                  <button
-                    key={index}
-                    className={`column-tag clickable ${data.numericColumns.includes(col) ? 'numeric' : 'text'} ${selectedColumns.includes(col) ? 'selected' : ''}`}
-                    onClick={() => handleColumnClick(col)}
-                    title={`Click to ${selectedColumns.includes(col) ? 'deselect' : 'select'} ${col} for visualization`}
-                  >
-                    {col}
-                  </button>
-                ))}
-              </div>
-              {selectedColumns.length > 0 && (
-                <div className="selected-columns-info">
-                  <small>Selected: {selectedColumns.join(', ')}</small>
-                </div>
-              )}
-            </div>
-            <div className="visualization-actions">
-              <button className="download-plot-button" onClick={() => {
-                // Download functionality will be handled by Plotly's built-in download button
-                console.log('Download plot functionality');
-              }}>
-                <Download size={16} />
-                <span>Download Plot</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -486,7 +394,117 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
     );
   };
 
+  const renderQueryResult = (data: any) => {
+    const handleDownload = async () => {
+      try {
+        const blob = await bioMatcherApi.downloadFilteredData(data.sessionId);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `filtered_data_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error downloading filtered data:', error);
+      }
+    };
+
+    const hasResults = data.filteredShape[0] > 0;
+
+    return (
+      <div className="result-card query-result">
+        <div className="result-header">
+          <Database size={20} />
+          <h3>Query Results</h3>
+          <div className="query-stats">
+            <span className="stat-item">
+              <strong>{data.filteredShape[0]}</strong> filtered rows
+            </span>
+            <span className="stat-item">
+              <strong>{data.rowsRemoved}</strong> rows removed
+            </span>
+            <span className="stat-item">
+              <strong>{data.filteredShape[1]}</strong> columns
+            </span>
+          </div>
+        </div>
+        <div className="result-content">
+          <div className="query-info">
+            <p><strong>Query:</strong> {data.query}</p>
+            <p><strong>Original data:</strong> {data.originalShape[0]} rows × {data.originalShape[1]} columns</p>
+            <p><strong>Filtered data:</strong> {data.filteredShape[0]} rows × {data.filteredShape[1]} columns</p>
+          </div>
+          
+          {hasResults ? (
+            // Show dataframe when there are results
+            <div className="filtered-data-preview">
+              <h4>Filtered Data Results:</h4>
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      {data.columns.map((column: string, index: number) => (
+                        <th key={index}>{column}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.sampleRows.map((row: any, rowIndex: number) => (
+                      <tr key={rowIndex}>
+                        {Object.values(row).map((cell: any, cellIndex: number) => (
+                          <td key={cellIndex}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {data.sampleRows.length < data.filteredShape[0] && (
+                <p className="table-note">
+                  Showing first {data.sampleRows.length} rows of {data.filteredShape[0]} filtered rows
+                </p>
+              )}
+              <div className="filtered-data-actions">
+                <button
+                  onClick={handleDownload}
+                  className="download-button"
+                >
+                  <FileDown size={16} />
+                  <span>Download Filtered CSV</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            // Show no results message when there are no matches
+            <div className="no-results-message">
+              <div className="no-results-icon">
+                <AlertCircle size={48} />
+              </div>
+              <h4>No matching results found</h4>
+              <p>Your query returned no rows that match the specified criteria.</p>
+              <div className="query-suggestions">
+                <p><strong>Try adjusting your query:</strong></p>
+                <ul>
+                  <li>Check spelling of column names and values</li>
+                  <li>Use different comparison operators (&gt;, &lt;, &gt;=, &lt;=, =)</li>
+                  <li>Try broader conditions or different values</li>
+                  <li>Use OR instead of AND for more inclusive results</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderResult = () => {
+    if (!result) {
+      return null;
+    }
+    
     switch (result.type) {
       case 'connector':
         return renderConnectorResult(result.data);
@@ -506,7 +524,35 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ result }) => {
         return renderSuggestions(result.data);
       case 'analysis-result':
         return renderAnalysisResult(result.data);
+      case 'query':
+        return renderQueryResult(result.data);
+      case 'test-merged-data':
+        return renderMergedData({
+          totalRows: 100,
+          matchedRows: 85,
+          unmatchedRows: 15,
+          headers: ['ID', 'Name', 'Value', 'Category'],
+          sampleRows: [
+            ['1', 'Item A', '10.5', 'Category 1'],
+            ['2', 'Item B', '20.3', 'Category 2'],
+            ['3', 'Item C', '15.7', 'Category 1'],
+            ['4', 'Item D', '8.9', 'Category 3'],
+            ['5', 'Item E', '12.1', 'Category 2']
+          ],
+          downloadUrl: '#',
+          fileName: 'test_merged.csv'
+        });
+      case 'general-chat':
+        // General chat results don't need special rendering, just return null
+        return null;
+      case 'plot-explanation':
+        // Plot explanation results don't need special rendering, just return null
+        return null;
+      case 'session-cleared':
+        // Session cleared results don't need special rendering, just return null
+        return null;
       default:
+        // For truly unknown types, just return null instead of debug display
         return null;
     }
   };

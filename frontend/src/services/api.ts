@@ -435,7 +435,7 @@ export const bioMatcherApi = {
   },
 
   // Merge files that are already uploaded to a session
-  mergeSessionFiles: async (formData: FormData): Promise<{
+  mergeSessionFiles: async (formData: FormData, forceRemerge: boolean = false): Promise<{
     headers: string[];
     rows: any[][];
     totalRows: number;
@@ -444,7 +444,11 @@ export const bioMatcherApi = {
     session_id?: string;
     workflow_step: string;
     message?: string;
+    cached?: boolean;
   }> => {
+    // Add force_remerge parameter to form data
+    formData.append('force_remerge', forceRemerge.toString());
+    
     const response = await api.post('/bio/merge-session-files', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -460,7 +464,9 @@ export const bioMatcherApi = {
     xColumn?: string,
     yColumn?: string,
     sessionId?: string,
-    useSessionData: boolean = false
+    useSessionData: boolean = false,
+    columns?: string,
+    isSubplot: boolean = false
   ): Promise<{
     plot_type: string;
     plot_json: string;
@@ -469,6 +475,8 @@ export const bioMatcherApi = {
     numeric_columns: string[];
     session_id?: string;
     workflow_step: string;
+    is_subplot?: boolean;
+    matched_columns?: string[];
   }> => {
     const formData = new FormData();
     
@@ -482,6 +490,7 @@ export const bioMatcherApi = {
     
     formData.append('plot_type', plotType);
     formData.append('use_session_data', useSessionData.toString());
+    formData.append('is_subplot', isSubplot.toString());
     
     if (xColumn) {
       formData.append('x_column', xColumn);
@@ -489,6 +498,10 @@ export const bioMatcherApi = {
     
     if (yColumn) {
       formData.append('y_column', yColumn);
+    }
+    
+    if (columns) {
+      formData.append('columns', columns);
     }
     
     const response = await api.post('/bio/generate-visualization', formData, {
@@ -655,6 +668,58 @@ export const bioMatcherApi = {
     data_lineage: Record<string, any>;
   }> => {
     const response = await api.get(`/bio/data-context/${sessionId}`);
+    return response.data;
+  },
+
+  // Get filtered data
+  getFilteredData: async (sessionId: string): Promise<{
+    session_id: string;
+    query: string;
+    original_shape: [number, number];
+    filtered_shape: [number, number];
+    rows_removed: number;
+    filtered_data: any;
+    columns: string[];
+    sample_rows: any[];
+  }> => {
+    const response = await api.get(`/bio/filtered-data/${sessionId}`);
+    return response.data;
+  },
+
+  // Download filtered data as CSV
+  downloadFilteredData: async (sessionId: string): Promise<Blob> => {
+    const response = await api.get(`/bio/download-filtered-data/${sessionId}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // Query and filter data
+  queryData: async (
+    sessionId: string,
+    query: string,
+    useSessionData: boolean = true
+  ): Promise<{
+    session_id: string;
+    query: string;
+    original_shape: [number, number];
+    filtered_shape: [number, number];
+    rows_removed: number;
+    filtered_data: any;
+    columns: string[];
+    sample_rows: any[];
+  }> => {
+    const formData = new FormData();
+    formData.append('session_id', sessionId);
+    formData.append('query', query);
+    formData.append('use_session_data', useSessionData.toString());
+    
+    const response = await api.post('/bio/query-data', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
     return response.data;
   },
 };

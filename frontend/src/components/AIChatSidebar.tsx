@@ -7,11 +7,14 @@ import {
   Building, 
   GitBranch, 
   BarChart3,
-  MessageSquare
+  MessageSquare,
+  ChevronLeft
 } from 'lucide-react';
 import './AIChatSidebar.css';
 
 interface AIChatSidebarProps {
+  isVisible: boolean;
+  onToggle: () => void;
   onPromptSelect: (prompt: string) => void;
   onFilesClick?: () => void;
   onConnectorsClick?: () => void;
@@ -20,6 +23,8 @@ interface AIChatSidebarProps {
 }
 
 const AIChatSidebar: React.FC<AIChatSidebarProps> = ({ 
+  isVisible,
+  onToggle,
   onPromptSelect,
   onFilesClick,
   onConnectorsClick,
@@ -72,10 +77,25 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
   ];
 
   return (
-    <aside className="ai-chat-sidebar">
+    <aside className={`ai-chat-sidebar ${isVisible ? 'sidebar-visible' : 'sidebar-hidden'}`}>
       <div className="sidebar-header">
-        <MessageSquare size={24} className="sidebar-icon" />
-        <h2 className="sidebar-title">AI Assistant</h2>
+        <div className="sidebar-header-content">
+          <div className="sidebar-title-section">
+            <MessageSquare size={24} className="sidebar-icon" />
+            <h2 className="sidebar-title">AI Assistant</h2>
+          </div>
+          <button 
+            className="sidebar-toggle-btn"
+            onClick={onToggle}
+            aria-label={isVisible ? 'Hide sidebar' : 'Show sidebar'}
+            title={`${isVisible ? 'Hide' : 'Show'} sidebar (Ctrl+B)`}
+          >
+            <ChevronLeft 
+              size={20} 
+              className={`toggle-icon ${isVisible ? 'rotate' : ''}`}
+            />
+          </button>
+        </div>
       </div>
 
       <nav className="sidebar-nav">

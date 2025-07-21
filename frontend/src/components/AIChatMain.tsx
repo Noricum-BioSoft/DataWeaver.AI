@@ -39,6 +39,12 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showFilesModal, setShowFilesModal] = useState(false);
+  const [generatedFiles, setGeneratedFiles] = useState<Array<{
+    name: string;
+    size: string;
+    downloadUrl: string;
+    type: string;
+  }>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -106,6 +112,13 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
         (uploadedFiles.length > 0 || currentSessionId)) {
       await handleDataAnalysis(prompt);
     }
+    // Check for data query requests
+    else if ((lowerPrompt.includes('filter') || lowerPrompt.includes('query') || lowerPrompt.includes('show rows') || 
+         lowerPrompt.includes('get rows') || lowerPrompt.includes('where') || lowerPrompt.includes('like') || 
+         lowerPrompt.includes('contains') || lowerPrompt.includes('is not null') || lowerPrompt.includes('is null')) && 
+        (uploadedFiles.length > 0 || currentSessionId)) {
+      await handleDataQuery(prompt);
+    }
     // Check if this is a workflow creation command
     else if (isWorkflowCreationCommand(prompt)) {
       const parsed = parseWorkflowCommand(prompt);
@@ -132,8 +145,15 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
       setIsProcessing(false);
     } else {
       // Check if this is a merge request
-      if ((lowerPrompt.includes('merge') || lowerPrompt.includes('combine')) && uploadedFiles.length >= 2) {
-        await handleFileMerge();
+      if ((lowerPrompt.includes('merge') || lowerPrompt.includes('combine')) && currentSessionId) {
+        // Check if user wants to re-merge
+        const wantsReMerge = lowerPrompt.includes('re-merge') || 
+                            lowerPrompt.includes('remerge') || 
+                            lowerPrompt.includes('merge again') ||
+                            lowerPrompt.includes('merge the files again') ||
+                            lowerPrompt.includes('force merge');
+        
+        await handleFileMerge(wantsReMerge);
       } else {
         // Use general AI chat for other commands
         await handleGeneralChat(prompt);
@@ -141,13 +161,13 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     }
   };
 
-  const handleFileMerge = async () => {
+  const handleFileMerge = async (forceRemerge: boolean = false) => {
     try {
-      if (uploadedFiles.length < 2) {
+      if (!currentSessionId) {
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
-          content: 'I need at least 2 CSV files to merge them. Please upload more files.',
+          content: 'I need a session to merge files. Please upload files first.',
           timestamp: new Date(),
           result: null
         };
@@ -156,54 +176,60 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
         return;
       }
 
-      // Create workflow session if not exists
-      let sessionId = currentSessionId;
-      if (!sessionId) {
-        sessionId = await createWorkflowSession();
-        if (!sessionId) {
-          throw new Error('Failed to create workflow session');
-        }
-      }
-
       // Use the new session-based merge endpoint
       const formData = new FormData();
-      formData.append('session_id', sessionId);
+      formData.append('session_id', currentSessionId);
+      formData.append('force_remerge', forceRemerge.toString());
+      
+      const result = await bioMatcherApi.mergeSessionFiles(formData, forceRemerge);
+      
+      // Create download URL for the merged data
+      const url = URL.createObjectURL(new Blob([JSON.stringify(result)], { type: 'application/json' }));
 
-      // Call the bio-matcher API to merge session files
-      const result = await bioMatcherApi.mergeSessionFiles(formData);
+      // Determine message based on whether it was cached or re-merged
+      let messageContent: string;
+      if (result.cached) {
+        messageContent = `📋 Using previously merged data (${result.matchedRows} matched rows, ${result.unmatchedRows} unmatched rows). The merged data is ready for visualization.`;
+      } else {
+        messageContent = `✅ Successfully merged your CSV files! I found ${result.matchedRows} matched rows and ${result.unmatchedRows} unmatched rows. The merged data is now stored in your workflow session and ready for visualization.`;
+      }
 
-      // Create merged CSV content
-      const headers = result.headers.join(',');
-      const rows = result.rows.map((row: any[]) => row.join(',')).join('\n');
-      const mergedCsv = `${headers}\n${rows}`;
-
-      // Create downloadable blob
-      const blob = new Blob([mergedCsv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
+      const mergedData = {
+        totalRows: result.totalRows,
+        matchedRows: result.matchedRows,
+        unmatchedRows: result.unmatchedRows,
+        headers: result.headers,
+        sampleRows: result.rows.slice(0, 5), // Show first 5 rows from the 'rows' field
+        downloadUrl: url,
+        fileName: `merged_${uploadedFiles.map(f => f.name.replace('.csv', '')).join('_')}.csv`,
+        sessionId: currentSessionId,
+        workflowStep: result.workflow_step,
+        cached: result.cached
+      };
 
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: `✅ Successfully merged your CSV files! I found ${result.matchedRows} matched rows and ${result.unmatchedRows} unmatched rows. The merged data is now stored in your workflow session and ready for visualization.`,
+        content: messageContent,
         timestamp: new Date(),
         result: {
           type: 'merged-data',
-          data: {
-            totalRows: result.totalRows,
-            matchedRows: result.matchedRows,
-            unmatchedRows: result.unmatchedRows,
-            headers: result.headers,
-            sampleRows: result.rows.slice(0, 5), // Show first 5 rows
-            downloadUrl: url,
-            fileName: `merged_${uploadedFiles.map(f => f.name.replace('.csv', '')).join('_')}.csv`,
-            sessionId: sessionId,
-            workflowStep: result.workflow_step
-          }
+          data: mergedData
         }
       };
 
+      // Add the generated file to the state
+      const generatedFile = {
+        name: `merged_${uploadedFiles.map(f => f.name.replace('.csv', '')).join('_')}.csv`,
+        size: `${result.totalRows} rows`,
+        downloadUrl: url,
+        type: 'merged-csv'
+      };
+      setGeneratedFiles(prev => [...prev, generatedFile]);
+
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
+      console.error('Error in handleFileMerge:', error);
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -351,8 +377,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
   const handleVisualization = async (prompt: string) => {
     try {
       // Determine if we should use session data or uploaded file
-      // Priority: use session data if available (merged data), otherwise use uploaded files
-      const useSessionData = currentSessionId; // Use session data if available, regardless of uploaded files
+      const useSessionData = currentSessionId;
       const hasData = currentSessionId || uploadedFiles.length > 0;
       
       if (!hasData) {
@@ -368,34 +393,30 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
         return;
       }
 
-      // Extract plot type from prompt
-      let plotType = "scatter";
-      if (prompt.toLowerCase().includes("correlation")) {
-        plotType = "correlation";
-      } else if (prompt.toLowerCase().includes("histogram")) {
-        plotType = "histogram";
-      } else if (prompt.toLowerCase().includes("scatter")) {
-        plotType = "scatter";
-      }
+      // Parse the user's visualization request
+      const parsedRequest = parseVisualizationRequest(prompt);
+      console.log('Parsed visualization request:', parsedRequest);
 
       // Use the first uploaded file if no session data
       const file = uploadedFiles.length > 0 ? uploadedFiles[0] : undefined;
       const sessionId = currentSessionId;
 
-      // Generate visualization
+      // Generate visualization with parsed parameters
       const result = await bioMatcherApi.generateVisualization(
         file,
-        plotType,
-        undefined, // xColumn - let backend auto-detect
-        undefined, // yColumn - let backend auto-detect
+        parsedRequest.plotType,
+        parsedRequest.xColumn || undefined,
+        parsedRequest.yColumn || undefined,
         sessionId || undefined,
-        !!useSessionData // Convert to boolean
+        !!useSessionData,
+        parsedRequest.isSubplot ? JSON.stringify(parsedRequest.columns) : undefined,
+        parsedRequest.isSubplot
       );
 
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: `I've generated a ${plotType} visualization for your data. The dataset contains ${result.data_shape[0]} rows and ${result.data_shape[1]} columns, with ${result.numeric_columns.length} numeric columns available for analysis.`,
+        content: `I've generated ${parsedRequest.isSubplot ? 'multiple' : 'a'} ${parsedRequest.plotType} visualization(s) for your data. The dataset contains ${result.data_shape[0]} rows and ${result.data_shape[1]} columns, with ${result.numeric_columns.length} numeric columns available for analysis.`,
         timestamp: new Date(),
         result: {
           type: 'visualization',
@@ -406,7 +427,9 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
             dataShape: result.data_shape,
             numericColumns: result.numeric_columns,
             sessionId: result.session_id,
-            workflowStep: result.workflow_step
+            workflowStep: result.workflow_step,
+            isSubplot: parsedRequest.isSubplot,
+            requestedColumns: parsedRequest.columns
           }
         }
       };
@@ -425,6 +448,112 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Parse visualization request to extract plot type and column names
+  const parseVisualizationRequest = (prompt: string) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Extract plot type
+    let plotType = "scatter";
+    if (lowerPrompt.includes("correlation") || lowerPrompt.includes("heatmap")) {
+      plotType = "correlation";
+    } else if (lowerPrompt.includes("histogram") || lowerPrompt.includes("bar chart")) {
+      plotType = "histogram";
+    } else if (lowerPrompt.includes("scatter")) {
+      plotType = "scatter";
+    } else if (lowerPrompt.includes("boxplot") || lowerPrompt.includes("box plot")) {
+      plotType = "boxplot";
+    }
+
+    // Extract column names using more precise patterns
+    let columns: string[] = [];
+    let isSubplot = false;
+
+    // Pattern 1: "histogram of X and Y" or "histograms of X and Y"
+    const histogramPattern = /(?:histogram|histograms|bar chart|bar charts) of ([a-zA-Z_\s]+) and ([a-zA-Z_\s]+)/gi;
+    const histogramMatch = histogramPattern.exec(lowerPrompt);
+    if (histogramMatch) {
+      columns = [histogramMatch[1].trim(), histogramMatch[2].trim()];
+    } else {
+      // Pattern 2: "scatter plot of X vs Y"
+      const scatterPattern = /(?:scatter|plot) of ([a-zA-Z_\s]+) vs ([a-zA-Z_\s]+)/gi;
+      const scatterMatch = scatterPattern.exec(lowerPrompt);
+      if (scatterMatch) {
+        columns = [scatterMatch[1].trim(), scatterMatch[2].trim()];
+      } else {
+        // Pattern 3: "X and Y" (for any plot type)
+        const andPattern = /([a-zA-Z_\s]+) and ([a-zA-Z_\s]+)/gi;
+        const andMatch = andPattern.exec(lowerPrompt);
+        if (andMatch) {
+          columns = [andMatch[1].trim(), andMatch[2].trim()];
+        } else {
+          // Pattern 4: "X, Y, Z" (comma-separated)
+          const commaPattern = /([a-zA-Z_\s]+),\s*([a-zA-Z_\s]+)(?:,\s*([a-zA-Z_\s]+))?/gi;
+          const commaMatch = commaPattern.exec(lowerPrompt);
+          if (commaMatch) {
+            columns = [commaMatch[1].trim(), commaMatch[2].trim()];
+            if (commaMatch[3]) {
+              columns.push(commaMatch[3].trim());
+            }
+          } else {
+            // Pattern 5: Single column - "histogram of X" or "visualize X"
+            const singlePattern = /(?:histogram|bar chart|visualize|plot|show) ([a-zA-Z_\s]+)/gi;
+            const singleMatch = singlePattern.exec(lowerPrompt);
+            if (singleMatch) {
+              columns = [singleMatch[1].trim()];
+            }
+          }
+        }
+      }
+    }
+
+    // Clean up columns - remove common words and duplicates
+    const cleanColumns = columns
+      .filter((col: string) => 
+        col && 
+        col.length > 0 && 
+        !['the', 'a', 'an', 'of', 'and', 'or', 'vs', 'versus', 'level', 'levels'].includes(col)
+      )
+      .map((col: string) => col.replace(/\s+/g, ' ').trim());
+
+    // Remove duplicates while preserving order
+    const uniqueColumns = cleanColumns.filter((col: string, index: number) => 
+      cleanColumns.indexOf(col) === index
+    );
+
+    // Determine if this should be a subplot (multiple columns)
+    isSubplot = uniqueColumns.length > 1 && (plotType === "histogram" || plotType === "boxplot");
+
+    // For scatter plots, we need exactly 2 columns
+    if (plotType === "scatter" && uniqueColumns.length >= 2) {
+      return {
+        plotType,
+        xColumn: uniqueColumns[0],
+        yColumn: uniqueColumns[1],
+        columns: uniqueColumns.slice(0, 2),
+        isSubplot: false
+      };
+    }
+
+    // For correlation, we don't need specific columns
+    if (plotType === "correlation") {
+      return {
+        plotType,
+        xColumn: null,
+        yColumn: null,
+        columns: [],
+        isSubplot: false
+      };
+    }
+
+    return {
+      plotType,
+      xColumn: uniqueColumns[0] || null,
+      yColumn: uniqueColumns[1] || null,
+      columns: uniqueColumns,
+      isSubplot
+    };
   };
 
   const handleDataQA = async (prompt: string) => {
@@ -580,6 +709,95 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     }
   };
 
+  const handleDataQuery = async (prompt: string) => {
+    try {
+      // Ensure we have a session ID
+      let sessionId = currentSessionId;
+      if (!sessionId) {
+        sessionId = await createWorkflowSession();
+        if (!sessionId) {
+          throw new Error('Failed to create workflow session');
+        }
+      }
+
+      // Parse the query to extract filter conditions
+      const parsedQuery = parseDataQuery(prompt);
+      console.log('Parsed data query:', parsedQuery);
+
+      // Call the query API
+      const result = await bioMatcherApi.queryData(sessionId, parsedQuery.query);
+
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `I've filtered your data based on your query. Found ${result.filtered_shape[0]} rows (removed ${result.rows_removed} rows). The filtered dataset contains ${result.filtered_shape[1]} columns.`,
+        timestamp: new Date(),
+        result: {
+          type: 'query',
+          data: {
+            query: result.query,
+            originalShape: result.original_shape,
+            filteredShape: result.filtered_shape,
+            rowsRemoved: result.rows_removed,
+            columns: result.columns,
+            sampleRows: result.sample_rows,
+            sessionId: result.session_id
+          }
+        }
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error in data query:', error);
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `❌ Sorry, I couldn't query your data. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date(),
+        result: null
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Parse data query to extract filter conditions
+  const parseDataQuery = (prompt: string) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // Common query patterns
+    const queryPatterns = [
+      // "where column = value"
+      /where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=|is)\s*["\']?([^"\']+)["\']?/gi,
+      // "filter rows where column like pattern"
+      /filter\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:like|contains)\s*["\']?([^"\']+)["\']?/gi,
+      // "show rows where column > value"
+      /show\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(>=?|<=?|>|<)\s*([0-9.]+)/gi,
+      // "get rows where column in (value1, value2)"
+      /get\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+in\s*\(([^)]+)\)/gi,
+      // "query where column is not null"
+      /query\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+is\s+(not\s+)?null/gi
+    ];
+
+    // Try to match patterns and construct query
+    for (const pattern of queryPatterns) {
+      const match = pattern.exec(lowerPrompt);
+      if (match) {
+        // Return the original prompt as the query (backend will parse it)
+        return {
+          query: prompt,
+          type: 'filter'
+        };
+      }
+    }
+
+    // If no specific pattern found, treat as general query
+    return {
+      query: prompt,
+      type: 'general'
+    };
+  };
 
 
   const handleVoiceToggle = () => {
@@ -818,6 +1036,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
       // Clear local state
       setUploadedFiles([]);
       setCurrentSessionId(null);
+      setGeneratedFiles([]);
       
       // Add success message to chat
       const successMessage: ChatMessage = {
@@ -870,6 +1089,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
           isListening={isListening}
           isProcessing={isProcessing}
           onFileUpload={handleFileUpload}
+          generatedFiles={generatedFiles}
         />
       </div>
 

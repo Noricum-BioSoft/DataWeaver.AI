@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Response
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 import io
@@ -11,6 +11,7 @@ from ..services.data_analyzer import DataAnalyzer
 from ..services.simple_visualizer import simple_visualizer
 from ..database import get_db
 from services.workflow_state import workflow_state_manager
+import re
 
 # Try to import pandas and numpy, but provide fallbacks if not available
 try:
@@ -306,11 +307,16 @@ async def merge_files(
 @router.post("/merge-session-files")
 async def merge_session_files(
     session_id: str = Form(...),
+    force_remerge: bool = Form(False),
     db: Session = Depends(get_db)
 ):
     """
     Merge files that are already uploaded to a session.
     This allows users to upload files individually and then merge them.
+    
+    Args:
+        session_id: The workflow session ID
+        force_remerge: If True, re-merge even if merge was already performed
     """
     if not PANDAS_AVAILABLE:
         raise HTTPException(
@@ -334,6 +340,17 @@ async def merge_session_files(
                 status_code=400,
                 detail="At least 2 files are required for merging. Please upload more files first."
             )
+        
+        # Check if merge was already performed and force_remerge is False
+        existing_merged_data = workflow_state_manager.get_merged_data(session_id)
+        if existing_merged_data and not force_remerge:
+            return {
+                **existing_merged_data,
+                "session_id": session_id,
+                "workflow_step": "merge_session_files",
+                "message": "Using previously merged data. Set force_remerge=true to re-merge.",
+                "cached": True
+            }
         
         # Convert stored file data back to pandas DataFrames
         dataframes = []
@@ -414,7 +431,8 @@ async def merge_session_files(
             "file_names": [f.get('filename', 'unknown') for f in uploaded_files],
             "total_rows": total_rows,
             "matched_rows": matched_rows,
-            "unmatched_rows": unmatched_rows
+            "unmatched_rows": unmatched_rows,
+            "force_remerge": force_remerge
         })
         
         return {
@@ -423,7 +441,8 @@ async def merge_session_files(
             "workflow_step": "merge_session_files",
             "merge_column": merge_column,
             "common_columns": list(common_columns),
-            "message": "Successfully merged session files"
+            "message": "Successfully merged session files",
+            "cached": False
         }
         
     except Exception as e:
@@ -440,11 +459,14 @@ async def generate_visualization(
     x_column: Optional[str] = Form(None),
     y_column: Optional[str] = Form(None),
     use_session_data: bool = Form(False),
+    columns: Optional[str] = Form(None),  # New parameter for multiple columns
+    is_subplot: bool = Form(False),  # New parameter to indicate subplot request
     db: Session = Depends(get_db)
 ):
     """
     Generate visualizations from CSV data.
     Can use uploaded file or data from workflow session.
+    Supports intelligent column matching and subplots.
     """
     if not PANDAS_AVAILABLE:
         # Use simple visualizer instead of raising error
@@ -518,11 +540,138 @@ async def generate_visualization(
                 detail="Either provide a file or use session data with use_session_data=true"
             )
         
+        # Intelligent column matching function
+        def find_best_column_match(requested_column: str, available_columns: list) -> str:
+            """Find the best matching column using fuzzy matching"""
+            if not requested_column:
+                return None
+            
+            requested_lower = requested_column.lower().replace(' ', '_')
+            
+            # Exact match first
+            for col in available_columns:
+                if col.lower() == requested_lower:
+                    return col
+            
+            # Partial match
+            for col in available_columns:
+                col_lower = col.lower()
+                if requested_lower in col_lower or col_lower in requested_lower:
+                    return col
+            
+            # Fuzzy match using string similarity
+            best_match = None
+            best_score = 0
+            
+            for col in available_columns:
+                col_lower = col.lower()
+                # Simple similarity score
+                common_chars = sum(1 for c in requested_lower if c in col_lower)
+                score = common_chars / max(len(requested_lower), len(col_lower))
+                
+                if score > best_score and score > 0.3:  # Minimum threshold
+                    best_score = score
+                    best_match = col
+            
+            return best_match
+        
+        # Parse columns if provided as JSON string
+        requested_columns = []
+        if columns:
+            try:
+                requested_columns = json.loads(columns)
+            except:
+                # Fallback to comma-separated string
+                requested_columns = [col.strip() for col in columns.split(',') if col.strip()]
+        
+        # Match requested columns to actual columns
+        available_columns = df.columns.tolist()
+        matched_columns = []
+        
+        if requested_columns:
+            for col in requested_columns:
+                matched_col = find_best_column_match(col, available_columns)
+                if matched_col:
+                    matched_columns.append(matched_col)
+                    print(f"Column matching: requested '{col}' -> matched '{matched_col}'")
+        else:
+            # Fallback to x_column and y_column
+            matched_x_column = find_best_column_match(x_column, available_columns) if x_column else None
+            matched_y_column = find_best_column_match(y_column, available_columns) if y_column else None
+            if matched_x_column:
+                matched_columns.append(matched_x_column)
+            if matched_y_column:
+                matched_columns.append(matched_y_column)
+            print(f"Column matching: requested x='{x_column}' -> matched '{matched_x_column}'")
+            print(f"Column matching: requested y='{y_column}' -> matched '{matched_y_column}'")
+        
         # Generate different types of plots using Plotly
-        if plot_type == "scatter":
-            if x_column and y_column and x_column in df.columns and y_column in df.columns:
-                fig = px.scatter(df, x=x_column, y=y_column, 
-                               title=f'Scatter Plot: {x_column} vs {y_column}',
+        if is_subplot and len(matched_columns) > 1 and plot_type in ["histogram", "boxplot"]:
+            # Create subplots for multiple columns
+            fig = go.Figure()
+            
+            if plot_type == "histogram":
+                # Create subplots for histograms
+                from plotly.subplots import make_subplots
+                
+                n_cols = min(2, len(matched_columns))  # Max 2 columns for subplots
+                n_rows = (len(matched_columns) + n_cols - 1) // n_cols
+                
+                fig = make_subplots(
+                    rows=n_rows, 
+                    cols=n_cols,
+                    subplot_titles=[f'Histogram of {col}' for col in matched_columns],
+                    specs=[[{"secondary_y": False}] * n_cols] * n_rows
+                )
+                
+                for i, col in enumerate(matched_columns):
+                    row = (i // n_cols) + 1
+                    col_idx = (i % n_cols) + 1
+                    
+                    fig.add_trace(
+                        go.Histogram(x=df[col], name=col, nbinsx=20),
+                        row=row, col=col_idx
+                    )
+                
+                fig.update_layout(
+                    title=f'Histograms of {", ".join(matched_columns)}',
+                    height=300 * n_rows,
+                    showlegend=False
+                )
+                
+            elif plot_type == "boxplot":
+                # Create subplots for boxplots
+                from plotly.subplots import make_subplots
+                
+                n_cols = min(2, len(matched_columns))
+                n_rows = (len(matched_columns) + n_cols - 1) // n_cols
+                
+                fig = make_subplots(
+                    rows=n_rows, 
+                    cols=n_cols,
+                    subplot_titles=[f'Box Plot of {col}' for col in matched_columns],
+                    specs=[[{"secondary_y": False}] * n_cols] * n_rows
+                )
+                
+                for i, col in enumerate(matched_columns):
+                    row = (i // n_cols) + 1
+                    col_idx = (i % n_cols) + 1
+                    
+                    fig.add_trace(
+                        go.Box(y=df[col], name=col),
+                        row=row, col=col_idx
+                    )
+                
+                fig.update_layout(
+                    title=f'Box Plots of {", ".join(matched_columns)}',
+                    height=300 * n_rows,
+                    showlegend=False
+                )
+        
+        elif plot_type == "scatter":
+            if len(matched_columns) >= 2:
+                fig = px.scatter(df, x=matched_columns[0], y=matched_columns[1], 
+                               title=f'Scatter Plot: {matched_columns[0]} vs {matched_columns[1]}',
                                opacity=0.6)
             else:
                 # Default scatter plot for biological data
@@ -544,9 +693,9 @@ async def generate_visualization(
                         )
         
         elif plot_type == "histogram":
-            if x_column and x_column in df.columns:
-                fig = px.histogram(df, x=x_column, 
-                                 title=f'Histogram of {x_column}',
+            if matched_columns:
+                fig = px.histogram(df, x=matched_columns[0], 
+                                 title=f'Histogram of {matched_columns[0]}',
                                  nbins=20)
             else:
                 # Default histogram for biological data
@@ -597,9 +746,12 @@ async def generate_visualization(
                 )
         
         elif plot_type == "boxplot":
-            if x_column and y_column and x_column in df.columns and y_column in df.columns:
-                fig = px.box(df, x=x_column, y=y_column,
-                           title=f'Box Plot: {y_column} by {x_column}')
+            if len(matched_columns) >= 2:
+                fig = px.box(df, x=matched_columns[0], y=matched_columns[1],
+                           title=f'Box Plot: {matched_columns[1]} by {matched_columns[0]}')
+            elif matched_columns:
+                fig = px.box(df, y=matched_columns[0],
+                           title=f'Box Plot of {matched_columns[0]}')
             else:
                 # Default box plot for biological data
                 if 'Activity_Score' in df.columns and 'Mutation' in df.columns:
@@ -644,7 +796,9 @@ async def generate_visualization(
             "data_shape": list(df.shape),
             "numeric_columns": numeric_columns,
             "session_id": session_id,
-            "workflow_step": "visualization"
+            "workflow_step": "visualization",
+            "is_subplot": is_subplot,
+            "matched_columns": matched_columns
         }
         
         # Store visualization data in session if session_id provided
@@ -655,7 +809,9 @@ async def generate_visualization(
                 "x_column": x_column,
                 "y_column": y_column,
                 "data_shape": list(df.shape),
-                "columns": columns
+                "columns": columns,
+                "is_subplot": is_subplot,
+                "matched_columns": matched_columns
             })
             
             # Track visualization in context
@@ -1200,3 +1356,369 @@ async def analyze_data(
     except Exception as e:
         print(f"Error analyzing data: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error analyzing data: {str(e)}") 
+
+@router.post("/query-data")
+async def query_data(
+    session_id: str = Form(...),
+    query: str = Form(...),
+    use_session_data: bool = Form(True),
+    db: Session = Depends(get_db)
+):
+    """
+    Query and filter data from session using natural language or SQL-like conditions.
+    Supports pattern matching, numeric comparisons, and complex filters.
+    """
+    if not PANDAS_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="Data querying service is temporarily unavailable. Please try again later."
+        )
+    
+    try:
+        # Get data from session - try merged data first, then uploaded files
+        merged_data = workflow_state_manager.get_merged_data(session_id)
+        if not merged_data:
+            # Try to get uploaded files data
+            uploaded_files = workflow_state_manager.get_uploaded_files(session_id)
+            if not uploaded_files or len(uploaded_files) == 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No data found in session. Please upload or merge data first."
+                )
+            
+            # Use the first uploaded file for querying
+            first_file = uploaded_files[0]
+            merged_data = {
+                'headers': first_file['headers'],
+                'rows': first_file['rows']
+            }
+            print(f"Using uploaded file data with shape: {len(merged_data['rows'])} rows, {len(merged_data['headers'])} columns")
+        else:
+            print(f"Using merged data with shape: {len(merged_data['rows'])} rows, {len(merged_data['headers'])} columns")
+        
+        # Convert stored data back to DataFrame
+        df = pd.DataFrame(merged_data['rows'], columns=merged_data['headers'])
+        print(f"Querying data with shape: {df.shape}")
+        
+        # Parse the query and apply filters
+        filtered_df = parse_and_apply_query(df, query)
+        
+        # Convert filtered data back to format for storage
+        filtered_data = {
+            'headers': filtered_df.columns.tolist(),
+            'rows': filtered_df.values.tolist(),
+            'total_rows': len(filtered_df),
+            'total_columns': len(filtered_df.columns)
+        }
+        
+        # Store filtered data in session
+        workflow_state_manager.store_filtered_data(session_id, filtered_data)
+        
+        # Add to workflow history
+        workflow_state_manager.add_workflow_step(session_id, "query_data", {
+            "query": query,
+            "original_shape": list(df.shape),
+            "filtered_shape": list(filtered_df.shape),
+            "rows_removed": len(df) - len(filtered_df)
+        })
+        
+        return {
+            "session_id": session_id,
+            "query": query,
+            "original_shape": list(df.shape),
+            "filtered_shape": list(filtered_df.shape),
+            "rows_removed": len(df) - len(filtered_df),
+            "filtered_data": filtered_data,
+            "columns": filtered_df.columns.tolist(),
+            "sample_rows": filtered_df.head(5).to_dict('records') if len(filtered_df) > 0 else []
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error querying data: {str(e)}"
+        )
+
+@router.get("/download-filtered-data/{session_id}")
+async def download_filtered_data(
+    session_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Download filtered data as CSV file.
+    """
+    if not PANDAS_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="Download service is temporarily unavailable. Please try again later."
+        )
+    
+    try:
+        # Get filtered data from session
+        filtered_data = workflow_state_manager.get_filtered_data(session_id)
+        if not filtered_data:
+            raise HTTPException(
+                status_code=400,
+                detail="No filtered data found in session. Please query data first."
+            )
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(filtered_data['rows'], columns=filtered_data['headers'])
+        
+        # Create CSV content
+        csv_content = df.to_csv(index=False)
+        
+        # Create filename with timestamp
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"filtered_data_{timestamp}.csv"
+        
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Type": "text/csv"
+            }
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error downloading filtered data: {str(e)}"
+        )
+
+def parse_and_apply_query(df: pd.DataFrame, query: str) -> pd.DataFrame:
+    """
+    Parse natural language query and apply filters to DataFrame.
+    Supports various query formats:
+    - "where column = value"
+    - "where column like pattern"
+    - "where column > value"
+    - "where column contains text"
+    - "filter rows where column is value"
+    - "where column1 = value1 AND column2 > value2"
+    - "where column1 like pattern1 OR column2 = value2"
+    - "where NOT column = value"
+    """
+    query_lower = query.lower().strip()
+    
+    # Remove common prefixes
+    prefixes = ["query", "filter", "show", "get", "find", "select"]
+    for prefix in prefixes:
+        if query_lower.startswith(prefix):
+            query_lower = query_lower[len(prefix):].strip()
+    
+    # Remove "where" if present
+    if query_lower.startswith("where"):
+        query_lower = query_lower[5:].strip()
+    
+    # Function to find best column match (same as in visualization)
+    def find_best_column_match(requested_column: str, available_columns: list) -> str:
+        """Find the best matching column name using fuzzy matching"""
+        if not available_columns:
+            return requested_column
+        
+        # Direct match first
+        if requested_column in available_columns:
+            return requested_column
+        
+        # Try exact match with different cases
+        for col in available_columns:
+            if col.lower() == requested_column.lower():
+                return col
+        
+        # Fuzzy matching
+        best_match = None
+        best_score = 0
+        
+        for col in available_columns:
+            # Handle column names with underscores
+            col_normalized = col.lower().replace('_', ' ')
+            requested_normalized = requested_column.lower().replace('_', ' ')
+            
+            # Try different matching strategies
+            scores = []
+            
+            # Exact substring match
+            if requested_normalized in col_normalized or col_normalized in requested_normalized:
+                scores.append(90)
+            
+            # Word-based matching
+            requested_words = requested_normalized.split()
+            col_words = col_normalized.split()
+            
+            word_matches = sum(1 for word in requested_words if any(word in cw for cw in col_words))
+            if word_matches > 0:
+                scores.append(70 + word_matches * 10)
+            
+            # Character-based similarity
+            from fuzzywuzzy import fuzz
+            char_similarity = fuzz.ratio(requested_normalized, col_normalized)
+            scores.append(char_similarity)
+            
+            # Partial ratio for better matching
+            partial_ratio = fuzz.partial_ratio(requested_normalized, col_normalized)
+            scores.append(partial_ratio)
+            
+            # Use the best score
+            score = max(scores)
+            
+            if score > best_score and score > 60:  # Minimum threshold
+                best_score = score
+                best_match = col
+        
+        return best_match if best_match else requested_column
+    
+    def parse_single_condition(condition_text: str) -> pd.Series:
+        """Parse a single condition and return a boolean Series"""
+        condition_text = condition_text.strip()
+        
+        # Handle NOT conditions
+        is_not = False
+        if condition_text.startswith("not "):
+            is_not = True
+            condition_text = condition_text[4:].strip()
+        
+        # Pattern 1: "column = value" or "column is value"
+        equals_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=|is)\s*["\']?([^"\']+)["\']?'
+        equals_matches = re.findall(equals_pattern, condition_text)
+        for column, value in equals_matches:
+            matched_column = find_best_column_match(column, df.columns.tolist())
+            print(f"Column matching: requested '{column}' -> matched '{matched_column}'")
+            if matched_column in df.columns:
+                try:
+                    numeric_value = float(value)
+                    condition = df[matched_column] == numeric_value
+                except ValueError:
+                    condition = df[matched_column].astype(str).str.lower() == value.lower()
+                return ~condition if is_not else condition
+        
+        # Pattern 2: "column like pattern" or "column contains pattern"
+        like_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:like|contains)\s*["\']?([^"\']+)["\']?'
+        like_matches = re.findall(like_pattern, condition_text)
+        for column, pattern in like_matches:
+            matched_column = find_best_column_match(column, df.columns.tolist())
+            print(f"Column matching: requested '{column}' -> matched '{matched_column}'")
+            if matched_column in df.columns:
+                condition = df[matched_column].astype(str).str.lower().str.contains(pattern.lower(), na=False)
+                return ~condition if is_not else condition
+        
+        # Pattern 3: "column > value" or "column >= value" or "column < value" or "column <= value"
+        comparison_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s*(>=?|<=?|>|<)\s*([0-9.]+)'
+        comparison_matches = re.findall(comparison_pattern, condition_text)
+        for column, operator, value in comparison_matches:
+            matched_column = find_best_column_match(column, df.columns.tolist())
+            print(f"Column matching: requested '{column}' -> matched '{matched_column}'")
+            if matched_column in df.columns:
+                try:
+                    numeric_value = float(value)
+                    if operator == '>':
+                        condition = df[matched_column] > numeric_value
+                    elif operator == '>=':
+                        condition = df[matched_column] >= numeric_value
+                    elif operator == '<':
+                        condition = df[matched_column] < numeric_value
+                    elif operator == '<=':
+                        condition = df[matched_column] <= numeric_value
+                    return ~condition if is_not else condition
+                except ValueError:
+                    continue
+        
+        # Pattern 4: "column in (value1, value2, ...)"
+        in_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s+in\s*\(([^)]+)\)'
+        in_matches = re.findall(in_pattern, condition_text)
+        for column, values_str in in_matches:
+            matched_column = find_best_column_match(column, df.columns.tolist())
+            print(f"Column matching: requested '{column}' -> matched '{matched_column}'")
+            if matched_column in df.columns:
+                values = [v.strip().strip('"\'') for v in values_str.split(',')]
+                condition = df[matched_column].astype(str).str.lower().isin([v.lower() for v in values])
+                return ~condition if is_not else condition
+        
+        # Pattern 5: "column is not null" or "column is null"
+        null_pattern = r'([a-zA-Z_][a-zA-Z0-9_]*)\s+is\s+(not\s+)?null'
+        null_matches = re.findall(null_pattern, condition_text)
+        for column, not_null in null_matches:
+            matched_column = find_best_column_match(column, df.columns.tolist())
+            print(f"Column matching: requested '{column}' -> matched '{matched_column}'")
+            if matched_column in df.columns:
+                if not_null:
+                    condition = df[matched_column].notna()
+                else:
+                    condition = df[matched_column].isna()
+                return ~condition if is_not else condition
+        
+        # If no pattern matches, return all True (no filtering)
+        return pd.Series([True] * len(df))
+    
+    def parse_logical_expression(expression: str) -> pd.Series:
+        """Parse logical expression with AND, OR, NOT operators"""
+        expression = expression.strip()
+        
+        # Handle parentheses first (recursive)
+        while '(' in expression and ')' in expression:
+            start = expression.rfind('(')
+            end = expression.find(')', start)
+            if start != -1 and end != -1:
+                inner_expr = expression[start+1:end]
+                inner_result = parse_logical_expression(inner_expr)
+                # Replace the parenthesized expression with a placeholder
+                expression = expression[:start] + f"__PLACEHOLDER_{len(inner_result)}__" + expression[end+1:]
+                # Store the result for later replacement
+                if not hasattr(parse_logical_expression, 'placeholders'):
+                    parse_logical_expression.placeholders = {}
+                parse_logical_expression.placeholders[f"__PLACEHOLDER_{len(inner_result)}__"] = inner_result
+        
+        # Split by OR (lower precedence)
+        or_parts = [part.strip() for part in re.split(r'\s+or\s+', expression, flags=re.IGNORECASE)]
+        
+        if len(or_parts) > 1:
+            # Handle OR logic
+            results = []
+            for part in or_parts:
+                if part.startswith("__PLACEHOLDER_") and hasattr(parse_logical_expression, 'placeholders'):
+                    results.append(parse_logical_expression.placeholders[part])
+                else:
+                    results.append(parse_single_condition(part))
+            
+            # Combine with OR
+            combined = results[0]
+            for result in results[1:]:
+                combined = combined | result
+            return combined
+        
+        # Split by AND (higher precedence)
+        and_parts = [part.strip() for part in re.split(r'\s+and\s+', expression, flags=re.IGNORECASE)]
+        
+        if len(and_parts) > 1:
+            # Handle AND logic
+            results = []
+            for part in and_parts:
+                if part.startswith("__PLACEHOLDER_") and hasattr(parse_logical_expression, 'placeholders'):
+                    results.append(parse_logical_expression.placeholders[part])
+                else:
+                    results.append(parse_single_condition(part))
+            
+            # Combine with AND
+            combined = results[0]
+            for result in results[1:]:
+                combined = combined & result
+            return combined
+        
+        # Single condition
+        if expression.startswith("__PLACEHOLDER_") and hasattr(parse_logical_expression, 'placeholders'):
+            return parse_logical_expression.placeholders[expression]
+        else:
+            return parse_single_condition(expression)
+    
+    # Parse the logical expression
+    result_condition = parse_logical_expression(query_lower)
+    
+    # Apply the condition
+    if result_condition is not None:
+        filtered_df = df[result_condition]
+    else:
+        filtered_df = df
+    
+    return filtered_df 

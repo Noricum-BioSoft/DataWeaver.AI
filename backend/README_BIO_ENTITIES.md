@@ -56,7 +56,7 @@ The backend service for DataWeaver.AI, providing API endpoints for data processi
 
 3. **Set up environment**:
    ```bash
-   cp env.example .env
+   cp ../docs/env.example .env
    # Edit .env with your configuration
    ```
 

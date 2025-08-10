@@ -29,7 +29,7 @@ const PipelineSection: React.FC = () => {
 
   const handleAddPipeline = () => {
     console.log('Adding new pipeline...');
-    // Add pipeline logic will be implemented in future versions
+    // TODO: Implement pipeline creation functionality
   };
 
   return (

@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isVisible, onToggle }) => {
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Command submitted:', command);
-    // Command processing will be implemented in future versions
+    // TODO: Implement command processing
     setCommand('');
   };
 

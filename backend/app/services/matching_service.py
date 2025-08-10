@@ -1,9 +1,5 @@
-# import pandas as pd  # Temporarily disabled for Python 3.13 compatibility
-# import numpy as np  # Temporarily disabled for Python 3.13 compatibility
 from typing import List, Dict, Any, Optional, Tuple
 from fuzzywuzzy import fuzz, process
-# from sklearn.feature_extraction.text import TfidfVectorizer  # Temporarily disabled for Python 3.13 compatibility
-# from sklearn.metrics.pairwise import cosine_similarity  # Temporarily disabled for Python 3.13 compatibility
 from sqlalchemy.orm import Session
 from ..models.workflow import Workflow, WorkflowStep
 from ..models.file import File, FileMetadata
@@ -12,7 +8,6 @@ from ..schemas.dataset import MatchingConfig
 
 class MatchingService:
     def __init__(self):
-        # ML-based matching is disabled due to missing sklearn
         pass
     
     def extract_identifiers(self, file_path: str, config: MatchingConfig) -> Dict[str, Any]:
@@ -123,7 +118,7 @@ class MatchingService:
         
         return matches
     
-    # ML-based matching is disabled due to missing sklearn
+    # TODO: Implement ML-based matching when sklearn is available
     # def ml_based_match(
     #     self, 
     #     dataset_identifiers: Dict[str, Any], 
@@ -131,33 +126,7 @@ class MatchingService:
     #     db: Session
     # ) -> List[Tuple[File, float]]:
     #     """Perform ML-based matching using TF-IDF and cosine similarity."""
-    #     matches = []
-    #     
-    #     # Prepare dataset text
-    #     dataset_text = self._prepare_text_for_ml(dataset_identifiers)
-    #     
-    #     for file in workflow_files:
-    #         if file.file_type.value in ['csv', 'excel']:
-    #             metadata = db.query(FileMetadata).filter(
-    #                 FileMetadata.file_id == file.id
-    #             ).all()
-    #             
-    #             file_identifiers = {m.key: m.value for m in metadata}
-    #             file_text = self._prepare_text_for_ml(file_identifiers)
-    #             
-    #             if dataset_text and file_text:
-    #                 # Calculate similarity using TF-IDF
-    #                 try:
-    #                     texts = [dataset_text, file_text]
-    #                     tfidf_matrix = self.vectorizer.fit_transform(texts)
-    #                     similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-    #                     
-    #                     if similarity > 0.3:  # Lower threshold for ML matching
-    #                         matches.append((file, similarity))
-    #                 except Exception:
-    #                     continue
-    #     
-    #     return matches
+    #     pass
     
     def _prepare_text_for_ml(self, identifiers: Dict[str, Any]) -> str:
         """Prepare text for ML-based matching."""
@@ -199,7 +168,7 @@ class MatchingService:
         matches = []
         
         # Perform different types of matching
-        # ML-based matching is disabled due to missing sklearn
+        # TODO: Enable ML-based matching when sklearn is available
         # if config.ml_model:
         #     ml_matches = self.ml_based_match(dataset.identifiers, workflow_files, db)
         #     for file, score in ml_matches:

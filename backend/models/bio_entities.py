@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import hashlib
+import datetime
 from app.database import Base
 
 
@@ -27,8 +28,8 @@ class Design(Base):
     generation = Column(Integer, default=0)
     
     # Metadata
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.datetime('now'))
+    updated_at = Column(DateTime(timezone=True), onupdate=func.datetime('now'))
     is_active = Column(Boolean, default=True)
     
     # Relationships
@@ -93,8 +94,8 @@ class Build(Base):
     build_status = Column(String(50), default='planned')  # 'planned', 'in_progress', 'completed', 'failed'
     
     # Metadata
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.datetime('now'))
+    updated_at = Column(DateTime(timezone=True), onupdate=func.datetime('now'))
     is_active = Column(Boolean, default=True)
     
     # Relationships
@@ -152,8 +153,8 @@ class Test(Base):
     lab_conditions = Column(Text, nullable=True)  # JSON string
     
     # Metadata
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.datetime('now'))
+    updated_at = Column(DateTime(timezone=True), onupdate=func.datetime('now'))
     is_active = Column(Boolean, default=True)
     
     # Relationships

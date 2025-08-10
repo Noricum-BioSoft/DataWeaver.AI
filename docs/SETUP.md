@@ -126,7 +126,7 @@ pip install -r requirements.txt
 #### 1.3 Configure Environment
 ```bash
 # Copy environment template
-cp env.example .env
+cp docs/env.example .env
 
 # Edit environment variables
 nano .env  # or use your preferred editor
@@ -199,7 +199,7 @@ npm install
 #### 2.2 Configure Environment
 ```bash
 # Copy environment template
-cp env.example .env
+cp docs/env.example .env
 
 # Edit environment variables
 nano .env

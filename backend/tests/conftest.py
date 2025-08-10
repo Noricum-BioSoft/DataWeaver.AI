@@ -51,7 +51,6 @@ def db_session(test_engine):
     )
     session = TestingSessionLocal()
     yield session
-    session.rollback()
     session.close()
 
 @pytest.fixture(scope="function")
@@ -67,6 +66,29 @@ def client(db_session):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+@pytest.fixture(scope="function")
+def client_shared_session(test_engine):
+    """Create test client with truly shared database session"""
+    TestingSessionLocal = sessionmaker(
+        autocommit=False, 
+        autoflush=False, 
+        expire_on_commit=False, 
+        bind=test_engine
+    )
+    session = TestingSessionLocal()
+    
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            pass
+    
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+    session.close()
 
 @pytest.fixture
 def sample_design_data():

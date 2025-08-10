@@ -16,7 +16,7 @@ const PipelineStep: React.FC<PipelineStepProps> = ({
 }) => {
   const handleAction = () => {
     console.log(`${action} ${name}...`);
-    // Action logic will be implemented in future versions
+    // TODO: Implement pipeline step actions
   };
 
   return (

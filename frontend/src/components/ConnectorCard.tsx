@@ -5,7 +5,7 @@ interface ConnectorCardProps {
   name: string;
   icon: string;
   status: string;
-  lastSynced: string;
+  lastSynced?: string;
   isConnected: boolean;
 }
 
@@ -35,7 +35,7 @@ const ConnectorCard: React.FC<ConnectorCardProps> = ({
       </div>
       
       <div className="connector-details">
-        <p className="last-synced">Last synced: {lastSynced}</p>
+        {lastSynced && <p className="last-synced">Last synced: {lastSynced}</p>}
         <button
           className={`connect-button ${isConnected ? 'connected' : ''}`}
           onClick={handleConnect}

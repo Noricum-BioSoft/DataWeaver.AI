@@ -14,7 +14,6 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
       name: 'Google Drive',
       icon: '📁',
       status: 'Connected',
-      lastSynced: '2 hours ago',
       isConnected: true
     },
     {
@@ -22,7 +21,6 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
       name: 'Amazon S3',
       icon: '☁️',
       status: 'Connected',
-      lastSynced: '1 day ago',
       isConnected: true
     },
     {
@@ -30,7 +28,6 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
       name: 'FTP',
       icon: '📡',
       status: 'Connected',
-      lastSynced: '3 hours ago',
       isConnected: true
     }
   ];

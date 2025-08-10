@@ -2,11 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import AIChatHeader from './AIChatHeader';
 import AIChatSidebar from './AIChatSidebar';
 import AIChatMain from './AIChatMain';
+import ConnectorsModal from './ConnectorsModal';
 import './AIChatLayout.css';
 
 const AIChatLayout: React.FC = () => {
   // const [filesModalOpen, setFilesModalOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [connectorsModalOpen, setConnectorsModalOpen] = useState(false);
 
   const handlePromptSelect = (prompt: string) => {
     // In a real implementation, this would automatically submit the prompt
@@ -16,6 +18,10 @@ const AIChatLayout: React.FC = () => {
   const handleFilesClick = () => {
     // TODO: Implement files modal functionality
     console.log('Files clicked');
+  };
+
+  const handleConnectorsClick = () => {
+    setConnectorsModalOpen(true);
   };
 
   const toggleSidebar = useCallback(() => {
@@ -44,6 +50,7 @@ const AIChatLayout: React.FC = () => {
           onToggle={toggleSidebar}
           onPromptSelect={handlePromptSelect}
           onFilesClick={handleFilesClick}
+          onConnectorsClick={handleConnectorsClick}
         />
         <AIChatMain 
           onPromptSelect={handlePromptSelect}
@@ -71,6 +78,12 @@ const AIChatLayout: React.FC = () => {
           </svg>
         </button>
       )}
+
+      {/* Connectors Modal */}
+      <ConnectorsModal 
+        isOpen={connectorsModalOpen}
+        onClose={() => setConnectorsModalOpen(false)}
+      />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import AIChatMain from './AIChatMain';
 import './AIChatLayout.css';
 
 const AIChatLayout: React.FC = () => {
-  const [filesModalOpen, setFilesModalOpen] = useState(false);
+  // const [filesModalOpen, setFilesModalOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
   const handlePromptSelect = (prompt: string) => {
@@ -14,7 +14,8 @@ const AIChatLayout: React.FC = () => {
   };
 
   const handleFilesClick = () => {
-    setFilesModalOpen(true);
+    // TODO: Implement files modal functionality
+    console.log('Files clicked');
   };
 
   const toggleSidebar = useCallback(() => {

@@ -120,7 +120,7 @@ class LineageResponse(BaseModel):
 @router.post("/designs", response_model=DesignResponse)
 def create_design(design: DesignCreate, db: Session = Depends(get_db)):
     """Create a new biological design"""
-    db_design = Design(**design.dict())
+    db_design = Design(**design.model_dump())
     db.add(db_design)
     db.commit()
     db.refresh(db_design)
@@ -136,8 +136,6 @@ def get_designs(
     db: Session = Depends(get_db)
 ):
     """Get all designs with optional filtering"""
-    print("DEBUG: get_designs endpoint called")
-    
     query = db.query(Design).filter(Design.is_active == True)
     
     if name:
@@ -146,31 +144,7 @@ def get_designs(
         query = query.filter(Design.sequence.ilike(f"%{sequence}%"))
     
     results = query.offset(skip).limit(limit).all()
-    print(f"DEBUG: Found {len(results)} designs in database")
-    for r in results:
-        print(f"DEBUG: Design {r.id}: {r.name}, is_active: {r.is_active}")
-    
-    # Return plain dicts instead of Pydantic models for testing
-    plain_results = []
-    for r in results:
-        plain_dict = {
-            "id": str(r.id),
-            "name": r.name,
-            "alias": r.alias,
-            "description": r.description,
-            "sequence": r.sequence,
-            "sequence_type": r.sequence_type,
-            "mutation_list": r.mutation_list,
-            "parent_design_id": str(r.parent_design_id) if r.parent_design_id is not None else None,
-            "lineage_hash": r.lineage_hash,
-            "generation": r.generation,
-            "created_at": r.created_at,
-            "updated_at": r.updated_at
-        }
-        plain_results.append(plain_dict)
-    
-    print(f"DEBUG: Returning {len(plain_results)} plain dicts")
-    return plain_results
+    return results
 
 
 @router.get("/designs/{design_id}", response_model=DesignResponse)
@@ -191,7 +165,7 @@ def get_design(design_id: UUID4, db: Session = Depends(get_db)):
 @router.post("/builds", response_model=BuildResponse)
 def create_build(build: BuildCreate, db: Session = Depends(get_db)):
     """Create a new biological build"""
-    db_build = Build(**build.dict())
+    db_build = Build(**build.model_dump())
     db.add(db_build)
     db.commit()
     db.refresh(db_build)
@@ -237,7 +211,7 @@ def get_build(build_id: UUID4, db: Session = Depends(get_db)):
 @router.post("/tests", response_model=TestResponse)
 def create_test(test: TestCreate, db: Session = Depends(get_db)):
     """Create a new biological test"""
-    db_test = Test(**test.dict())
+    db_test = Test(**test.model_dump())
     db.add(db_test)
     db.commit()
     db.refresh(db_test)

@@ -802,7 +802,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
 
   const handleVoiceToggle = () => {
     setIsListening(!isListening);
-    // Voice input will be implemented in future versions
+    // TODO: Implement voice input functionality
   };
 
   const handleWorkflowCreated = (workflow: any) => {

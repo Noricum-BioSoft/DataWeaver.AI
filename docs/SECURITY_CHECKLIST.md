@@ -4,7 +4,7 @@
 
 ### Environment Files
 - [x] **`.env` files removed** from repository
-- [x] **`env.example` files created** as templates
+- [x] **`docs/env.example` file created** as template
 - [x] **`.gitignore` updated** to exclude sensitive files
 - [x] **No credentials** in example files
 
@@ -28,8 +28,7 @@
 ### 1. Environment Configuration
 ```bash
 # ✅ Example files provided
-backend/env.example
-frontend/env.example
+docs/env.example
 
 # ❌ Actual .env files removed
 backend/.env (removed)
@@ -70,7 +69,7 @@ Before committing to the repository, ensure:
 ### Environment Files
 - [ ] No `.env` files are being committed
 - [ ] No `.env.backup` files are being committed
-- [ ] `env.example` files contain only placeholder values
+- [ ] `docs/env.example` file contains only placeholder values
 - [ ] No real passwords or secrets in example files
 
 ### Database Files

@@ -47,38 +47,29 @@ A comprehensive data management system with AI-powered workflow automation, file
 
 ## 🚀 Quick Start
 
-### Option 1: Automated Startup (Recommended)
+### Option 1: Unified Startup Script (Recommended)
 
-**macOS/Linux:**
+**All Platforms:**
 ```bash
-# Make script executable (first time only)
-chmod +x start.sh
+# Install dependencies and setup database
+python start.py --install-deps --setup-db
 
-# Start all services
-./start.sh
+# Or just start with existing setup
+python start.py
 
-# Or start specific services
-./start.sh backend    # Backend only
-./start.sh frontend   # Frontend only
-./start.sh status     # Check service status
-./start.sh help       # Show all options
-```
-
-**Windows:**
-```cmd
-# Start all services
-start.bat
-
-# Or start specific services
-start.bat backend    # Backend only
-start.bat frontend   # Frontend only
-start.bat status     # Check service status
-start.bat help       # Show all options
+# Show help
+python start.py --help
 ```
 
 ### Option 2: Manual Setup
 
-1. **Backend Setup**:
+1. **Configure environment:**
+   ```bash
+   cp docs/env.example .env
+   # Edit .env with your configuration
+   ```
+
+2. **Backend Setup**:
    ```bash
    cd backend
    python3 -m venv venv
@@ -92,7 +83,7 @@ start.bat help       # Show all options
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-2. **Frontend Setup**:
+3. **Frontend Setup**:
    ```bash
    cd frontend
    npm install
@@ -103,6 +94,18 @@ start.bat help       # Show all options
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
+
+## 🎉 Release v1.0.0
+
+**DataWeaver.AI v1.0.0 is now available!** This release includes:
+
+- ✅ **Unified startup experience** with single `start.py` script
+- ✅ **Bio entities API** for biological data management
+- ✅ **Enhanced documentation** with comprehensive guides
+- ✅ **SQLite support** for development and testing
+- ✅ **Improved error handling** and validation
+
+📖 **View the [Release Summary](docs/RELEASE_1.0.0_SUMMARY.md) for complete details**
 
 ## 📖 Usage Guide
 
@@ -314,7 +317,11 @@ DataWeaver.AI/
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+### Commercial Licensing
+
+For commercial use, enterprise deployments, or SaaS offerings, please contact us for commercial licensing options that may be available.
 
 ## 🆘 Support
 

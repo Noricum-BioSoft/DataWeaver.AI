@@ -16,7 +16,7 @@ class TestDesignEndpoints:
         assert "id" in data
         assert "lineage_hash" in data
     
-    def test_get_designs(self, client):
+    def test_get_designs(self, client_shared_session):
         """Test getting all designs"""
         # Create test designs via API
         design1_data = {
@@ -33,20 +33,20 @@ class TestDesignEndpoints:
         }
         
         # Create designs via API
-        response1 = client.post("/api/bio/designs", json=design1_data)
-        response2 = client.post("/api/bio/designs", json=design2_data)
+        response1 = client_shared_session.post("/api/bio/designs", json=design1_data)
+        response2 = client_shared_session.post("/api/bio/designs", json=design2_data)
         assert response1.status_code == 200
         assert response2.status_code == 200
         
         # Get all designs
-        response = client.get("/api/bio/designs")
+        response = client_shared_session.get("/api/bio/designs")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
         assert data[0]["name"] == "Design 1"
         assert data[1]["name"] == "Design 2"
     
-    def test_get_designs_with_filter(self, client):
+    def test_get_designs_with_filter(self, client_shared_session):
         """Test getting designs with name filter"""
         # Create design via API
         design_data = {
@@ -56,11 +56,11 @@ class TestDesignEndpoints:
             "mutation_list": "L72F"
         }
         
-        response = client.post("/api/bio/designs", json=design_data)
+        response = client_shared_session.post("/api/bio/designs", json=design_data)
         assert response.status_code == 200
         
         # Get designs with filter
-        response = client.get("/api/bio/designs?name=Specific")
+        response = client_shared_session.get("/api/bio/designs?name=Specific")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1

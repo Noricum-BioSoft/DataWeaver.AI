@@ -4,10 +4,22 @@ import './FilesModal.css';
 interface FilesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  files?: any[];
+  onFileSelect?: (file: any) => void;
+  onFileDelete?: (fileId: string) => void;
+  onFileDownload?: (file: any) => void;
 }
 
-const FilesModal: React.FC<FilesModalProps> = ({ isOpen, onClose }) => {
-  const files = [
+const FilesModal: React.FC<FilesModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  files: propFiles, 
+  onFileSelect, 
+  onFileDelete, 
+  onFileDownload 
+}) => {
+  // Use provided files or fallback to default files
+  const files = propFiles || [
     {
       id: 1,
       name: 'protein_data.csv',
@@ -66,6 +78,37 @@ const FilesModal: React.FC<FilesModalProps> = ({ isOpen, onClose }) => {
                     {file.status}
                   </span>
                 </div>
+                {(onFileSelect || onFileDelete || onFileDownload) && (
+                  <div className="file-actions">
+                    {onFileSelect && (
+                      <button 
+                        className="action-btn select-btn"
+                        onClick={() => onFileSelect(file)}
+                        title="Select file"
+                      >
+                        Select
+                      </button>
+                    )}
+                    {onFileDownload && (
+                      <button 
+                        className="action-btn download-btn"
+                        onClick={() => onFileDownload(file)}
+                        title="Download file"
+                      >
+                        Download
+                      </button>
+                    )}
+                    {onFileDelete && (
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={() => onFileDelete(file.id)}
+                        title="Delete file"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

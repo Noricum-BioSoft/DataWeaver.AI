@@ -208,4 +208,75 @@
   .file-details {
     color: #9ca3af;
   }
+}
+
+/* Action buttons */
+.file-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn.select-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.action-btn.select-btn:hover {
+  background-color: #2563eb;
+}
+
+.action-btn.download-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.action-btn.download-btn:hover {
+  background-color: #059669;
+}
+
+.action-btn.delete-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.action-btn.delete-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Dark mode action buttons */
+@media (prefers-color-scheme: dark) {
+  .action-btn.select-btn {
+    background-color: #3b82f6;
+  }
+  
+  .action-btn.select-btn:hover {
+    background-color: #2563eb;
+  }
+  
+  .action-btn.download-btn {
+    background-color: #10b981;
+  }
+  
+  .action-btn.download-btn:hover {
+    background-color: #059669;
+  }
+  
+  .action-btn.delete-btn {
+    background-color: #ef4444;
+  }
+  
+  .action-btn.delete-btn:hover {
+    background-color: #dc2626;
+  }
 } 

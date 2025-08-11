@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import ConnectorsSection from './ConnectorsSection';
 import PipelineSection from './PipelineSection';
 import DashboardSection from './DashboardSection';
+import ChatSection from './ChatSection';
 import './SidebarLayout.css';
 
 const SidebarLayout: React.FC = () => {
@@ -30,6 +31,7 @@ const SidebarLayout: React.FC = () => {
       <Sidebar isVisible={sidebarVisible} onToggle={toggleSidebar} />
       <main className="main-content">
         <div className="content-wrapper">
+          <ChatSection />
           <ConnectorsSection />
           <PipelineSection />
           <DashboardSection />

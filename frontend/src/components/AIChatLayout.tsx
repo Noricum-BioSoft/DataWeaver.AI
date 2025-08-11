@@ -8,6 +8,7 @@ import WorkflowsModal from './WorkflowsModal';
 import VendorsModal from './VendorsModal';
 import PipelinesModal from './PipelinesModal';
 import DashboardModal from './DashboardModal';
+import ChatModal from './ChatModal';
 import './AIChatLayout.css';
 
 const AIChatLayout: React.FC = () => {
@@ -19,6 +20,7 @@ const AIChatLayout: React.FC = () => {
   const [vendorsModalOpen, setVendorsModalOpen] = useState(false);
   const [pipelinesModalOpen, setPipelinesModalOpen] = useState(false);
   const [dashboardModalOpen, setDashboardModalOpen] = useState(false);
+  const [chatModalOpen, setChatModalOpen] = useState(false);
 
   const handlePromptSelect = (prompt: string) => {
     // In a real implementation, this would automatically submit the prompt
@@ -27,6 +29,10 @@ const AIChatLayout: React.FC = () => {
 
   const handleConnectorsClick = () => {
     setConnectorsModalOpen(true);
+  };
+
+  const handleChatClick = () => {
+    setChatModalOpen(true);
   };
 
   const handleFilesClick = () => {
@@ -73,13 +79,14 @@ const AIChatLayout: React.FC = () => {
         <AIChatSidebar 
           isVisible={sidebarVisible}
           onToggle={toggleSidebar}
-          onPromptSelect={handlePromptSelect}
-          onFilesClick={handleFilesClick}
-          onConnectorsClick={handleConnectorsClick}
-          onWorkflowsClick={handleWorkflowsClick}
-          onVendorsClick={handleVendorsClick}
-          onPipelinesClick={handlePipelinesClick}
-          onDashboardClick={handleDashboardClick}
+                  onPromptSelect={handlePromptSelect}
+        onChatClick={handleChatClick}
+        onFilesClick={handleFilesClick}
+        onConnectorsClick={handleConnectorsClick}
+        onWorkflowsClick={handleWorkflowsClick}
+        onVendorsClick={handleVendorsClick}
+        onPipelinesClick={handlePipelinesClick}
+        onDashboardClick={handleDashboardClick}
         />
         <AIChatMain 
           onPromptSelect={handlePromptSelect}
@@ -142,6 +149,12 @@ const AIChatLayout: React.FC = () => {
       <DashboardModal 
         isOpen={dashboardModalOpen}
         onClose={() => setDashboardModalOpen(false)}
+      />
+
+      {/* Chat Modal */}
+      <ChatModal 
+        isOpen={chatModalOpen}
+        onClose={() => setChatModalOpen(false)}
       />
     </div>
   );

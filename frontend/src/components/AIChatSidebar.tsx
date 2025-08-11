@@ -16,6 +16,7 @@ interface AIChatSidebarProps {
   isVisible: boolean;
   onToggle: () => void;
   onPromptSelect: (prompt: string) => void;
+  onChatClick?: () => void;
   onFilesClick?: () => void;
   onConnectorsClick?: () => void;
   onWorkflowsClick?: () => void;
@@ -28,6 +29,7 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
   isVisible,
   onToggle,
   onPromptSelect,
+  onChatClick,
   onFilesClick,
   onConnectorsClick,
   onWorkflowsClick,
@@ -41,6 +43,12 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
       icon: Home,
       label: 'Home',
       prompt: 'Show me an overview of my data and workflows'
+    },
+    {
+      id: 'chat',
+      icon: MessageSquare,
+      label: 'Chat',
+      prompt: 'Start a new chat or manage existing conversations'
     },
     {
       id: 'files',
@@ -113,6 +121,9 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                   onClick={() => {
                     // Handle specific sidebar actions
                     switch (item.id) {
+                      case 'chat':
+                        onChatClick?.();
+                        break;
                       case 'files':
                         onFilesClick?.();
                         break;
@@ -135,7 +146,8 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                         onPromptSelect(item.prompt);
                     }
                   }}
-                  title={`${item.prompt}${item.id === 'workflows' ? ' - User-defined business processes and data analysis tasks' : 
+                  title={`${item.prompt}${item.id === 'chat' ? ' - Start new conversations and manage existing chat history' :
+                    item.id === 'workflows' ? ' - User-defined business processes and data analysis tasks' : 
                     item.id === 'pipelines' ? ' - Technical infrastructure for data processing and ETL operations' : 
                     item.id === 'connectors' ? ' - External data source integrations and APIs' :
                     item.id === 'vendors' ? ' - Third-party data providers and their datasets' :

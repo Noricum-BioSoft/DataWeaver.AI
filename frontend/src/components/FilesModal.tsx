@@ -53,6 +53,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
       <div className="files-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>📁 Files</h2>
+          <div className="simulation-badge">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -111,6 +112,9 @@ const FilesModal: React.FC<FilesModalProps> = ({
                 )}
               </div>
             ))}
+          </div>
+          <div className="integration-note">
+            <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual file storage systems and APIs.</p>
           </div>
         </div>
       </div>

@@ -54,7 +54,6 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
                 name={connector.name}
                 icon={connector.icon}
                 status={connector.status}
-                lastSynced={connector.lastSynced}
                 isConnected={connector.isConnected}
               />
             ))}

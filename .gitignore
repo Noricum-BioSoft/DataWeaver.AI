@@ -350,7 +350,44 @@ settings_local.py
 backend/storage/
 backend/uploads/
 backend/logs/
+
+# Release files (should not be in version control)
+RELEASE_ANNOUNCEMENT.md
+RELEASE_SUMMARY.md
+RELEASE_*.md
+*RELEASE*.md
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+test_*.db
+test_*.sqlite
+test_*.sqlite3
+*_test.db
+*_test.sqlite
+*_test.sqlite3
+
+# Test database files
+backend/test.db
+backend/test_*.db
+backend/tests/test_*.db
+backend/tests/test_*.sqlite
+backend/tests/test_*.sqlite3
+
+# Generated files
 *.csv
 *.json
 *.xlsx
 *.xls
+*.parquet
+*.h5
+*.hdf5
+
+# Temporary and generated files
+temp/
+tmp/
+generated/
+output/
+results/

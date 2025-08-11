@@ -1,25 +1,22 @@
 # DataWeaver.AI
 
-A comprehensive data management system with AI-powered workflow automation, file processing, and visualization capabilities.
+An AI-powered data analysis platform that makes data science accessible through natural language processing, intelligent data merging, and automated visualization.
 
-## 🚀 Features
+## 🎯 MVP Features
 
-### Core Functionality
-- **AI Chat Interface**: Natural language data processing and analysis
-- **Drag-and-Drop File Upload**: Seamless file handling with automatic format detection
-- **Smart File Merging**: Automatic CSV merging with intelligent column matching
-- **Data Visualization**: Generate scatter plots, histograms, correlation heatmaps, and boxplots
-- **Workflow Session Management**: Persistent data storage between processing steps
-- **Biological Entity Management**: Specialized support for protein sequences and assay data
-- **Real File Processing**: Complete file upload, storage, and processing pipeline
+### Core Capabilities
+- **🔬 Natural Language Processing**: Ask questions about your data in plain English
+- **🔄 AI-based Data Merging**: Intelligently combine multiple datasets automatically
+- **📊 Data Science Tools**: Analysis, visualization, and Q&A capabilities
+- **📁 File Upload**: Drag-and-drop CSV file upload with validation
+- **💬 Interactive Chat**: AI assistant for data exploration and analysis
 
-### Technical Capabilities
-- **Multi-file Upload**: Upload multiple CSV files individually
-- **Intelligent Merging**: Merge files based on common ID columns (e.g., protein_id)
-- **Session-based Workflows**: Maintain state across multiple processing steps
-- **Data Analysis**: Q&A interface for exploring uploaded data
-- **Visualization Generation**: Create plots from merged datasets
-- **Error Handling**: Robust error handling with user-friendly messages
+### What You Can Do
+- **Upload CSV files** and ask questions about your data
+- **Merge multiple datasets** with intelligent column matching
+- **Generate visualizations** like scatter plots, histograms, and charts
+- **Ask data questions** and get AI-powered insights
+- **Explore data patterns** and discover relationships
 
 ## 🏗️ Architecture
 
@@ -95,65 +92,59 @@ python start.py --help
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
 
-## 🎉 Release v1.0.0
+## 🎉 MVP Release
 
-**DataWeaver.AI v1.0.0 is now available!** This release includes:
+**DataWeaver.AI MVP is now available!** This release focuses on the core data science capabilities:
 
-- ✅ **Unified startup experience** with single `start.py` script
-- ✅ **Bio entities API** for biological data management
-- ✅ **Enhanced documentation** with comprehensive guides
-- ✅ **SQLite support** for development and testing
-- ✅ **Improved error handling** and validation
+- ✅ **Natural Language Interface** - Ask questions about your data in plain English
+- ✅ **Intelligent Data Merging** - AI-powered combination of multiple datasets
+- ✅ **Data Science Tools** - Analysis, visualization, and Q&A capabilities
+- ✅ **Unified Startup** - Single `start.py` script for easy setup
+- ✅ **Comprehensive Testing** - All test data files verified and working
 
 📖 **View the [Release Summary](docs/RELEASE_1.0.0_SUMMARY.md) for complete details**
 
 ## 📖 Usage Guide
 
-### Basic Workflow
+### Quick Start
 
-1. **Upload Files**:
+1. **Upload Your Data**:
    - Drag and drop CSV files into the upload area
-   - Files are uploaded individually and stored in session
-   - Supported formats: CSV, JSON, Excel (basic support)
+   - Supported formats: CSV files
+   - Files are automatically validated and processed
 
-2. **Merge Files**:
-   - Ask "merge the files" in the chat interface
-   - System automatically identifies common ID columns
-   - Merges all uploaded files into a single dataset
+2. **Ask Questions**:
+   - Use natural language: "Show me a summary of this data"
+   - Get insights: "What are the main trends?"
+   - Request analysis: "Create a scatter plot of the data"
 
-3. **Analyze Data**:
-   - Ask questions about your data: "What columns are in the data?"
-   - Get statistical summaries: "Show me the average values"
-   - Explore relationships: "Are there correlations between columns?"
+3. **Merge Datasets**:
+   - Upload multiple files and ask: "Merge these datasets together"
+   - AI automatically identifies common columns for merging
+   - Get a unified dataset for analysis
 
-4. **Visualize Data**:
-   - Request visualizations: "Create a scatter plot"
-   - Generate different chart types: "Make a histogram"
-   - Get plot explanations: "Explain this visualization"
+4. **Explore and Visualize**:
+   - Ask for specific visualizations: "Create a histogram"
+   - Get data summaries: "How many records are in this dataset?"
+   - Discover patterns: "Are there any correlations?"
 
 ### Example Workflow
 
 ```
-1. Upload protein_abundance.csv, protein_expression.csv, protein_sequences.csv, protein_spr.csv
-2. Ask: "merge the files"
-3. Ask: "What columns are in the merged data?"
-4. Ask: "Create a scatter plot of abundance vs expression_level"
-5. Ask: "Explain this visualization"
+1. Upload customers.csv and sales.csv
+2. Ask: "Merge these datasets together"
+3. Ask: "Show me a summary of the merged data"
+4. Ask: "Create a scatter plot of sales vs customer age"
+5. Ask: "What are the main trends in this data?"
 ```
 
-### Supported File Types
+### Supported Features
 
-- **CSV Files**: Primary format with automatic column detection
-- **JSON Files**: Basic support for structured data
-- **Excel Files**: Limited support (requires pandas)
-
-### Data Analysis Features
-
-- **Column Analysis**: Identify data types, missing values, unique counts
-- **Statistical Summaries**: Mean, median, standard deviation
-- **Correlation Analysis**: Find relationships between numeric columns
-- **Outlier Detection**: Identify unusual data points
-- **Data Quality**: Check for missing values and data consistency
+- **📊 Data Analysis**: Statistical summaries, correlations, patterns
+- **📈 Visualizations**: Scatter plots, histograms, charts
+- **🔄 Data Merging**: Intelligent combination of multiple datasets
+- **❓ Q&A Interface**: Ask questions about your data in plain English
+- **📁 File Management**: Upload, validate, and process CSV files
 
 ## 🔧 Configuration
 
@@ -329,17 +320,16 @@ For commercial use, enterprise deployments, or SaaS offerings, please contact us
 - **Issues**: Report bugs and feature requests via GitHub Issues
 - **Discussions**: Use GitHub Discussions for questions and ideas
 
-## 🚀 Roadmap
+## 🚀 Future Enhancements
 
 ### Planned Features
 - [ ] Advanced visualization options (3D plots, interactive charts)
 - [ ] Machine learning integration for data analysis
-- [ ] Real-time collaboration features
+- [ ] Workflow automation and templates
 - [ ] Advanced file format support (Parquet, HDF5)
 - [ ] Cloud storage integration (AWS S3, Google Cloud Storage)
-- [ ] Workflow templates and sharing
-- [ ] Advanced data validation and cleaning tools
 - [ ] Export capabilities (PDF reports, Excel exports)
+- [ ] Real-time collaboration features
 
 ### Technical Improvements
 - [ ] Performance optimization for large datasets
@@ -347,7 +337,6 @@ For commercial use, enterprise deployments, or SaaS offerings, please contact us
 - [ ] Advanced security features
 - [ ] Multi-tenant architecture
 - [ ] API rate limiting and authentication
-- [ ] Comprehensive test coverage
 - [ ] CI/CD pipeline setup
 
 ---

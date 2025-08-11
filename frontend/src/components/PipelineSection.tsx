@@ -36,6 +36,7 @@ const PipelineSection: React.FC = () => {
     <div className="section">
       <div className="section-header">
         <h2>🔄 Data Processing Pipelines</h2>
+        <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real pipeline infrastructure needs to be implemented for production use.">🧪 Simulation Data</div>
       </div>
       <div className="section-content">
         <div className="pipeline-container">
@@ -64,6 +65,9 @@ const PipelineSection: React.FC = () => {
             </svg>
             Add Pipeline
           </button>
+        </div>
+        <div className="integration-note" title="Click to learn more about implementing real pipeline infrastructure">
+          <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual data pipeline infrastructure and APIs.</p>
         </div>
       </div>
     </div>

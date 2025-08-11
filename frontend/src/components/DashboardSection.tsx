@@ -45,6 +45,7 @@ const DashboardSection: React.FC = () => {
     <div className="section">
       <div className="section-header">
         <h2>📊 Data Dashboard</h2>
+        <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real monitoring and analytics need to be implemented for production use.">🧪 Simulation Data</div>
       </div>
       <div className="section-content">
         <div className="dashboard-grid">
@@ -92,6 +93,9 @@ const DashboardSection: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+        <div className="integration-note" title="Click to learn more about implementing real monitoring and analytics">
+          <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual monitoring and analytics systems.</p>
         </div>
       </div>
     </div>

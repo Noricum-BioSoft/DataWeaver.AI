@@ -18,7 +18,9 @@ interface AIChatSidebarProps {
   onPromptSelect: (prompt: string) => void;
   onFilesClick?: () => void;
   onConnectorsClick?: () => void;
+  onWorkflowsClick?: () => void;
   onVendorsClick?: () => void;
+  onPipelinesClick?: () => void;
   onDashboardClick?: () => void;
 }
 
@@ -28,7 +30,9 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
   onPromptSelect,
   onFilesClick,
   onConnectorsClick,
+  onWorkflowsClick,
   onVendorsClick,
+  onPipelinesClick,
   onDashboardClick
 }) => {
   const menuItems = [
@@ -112,11 +116,17 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                       case 'files':
                         onFilesClick?.();
                         break;
+                      case 'workflows':
+                        onWorkflowsClick?.();
+                        break;
                       case 'connectors':
                         onConnectorsClick?.();
                         break;
                       case 'vendors':
                         onVendorsClick?.();
+                        break;
+                      case 'pipelines':
+                        onPipelinesClick?.();
                         break;
                       case 'dashboard':
                         onDashboardClick?.();

@@ -27,10 +27,10 @@ const ConnectorCard: React.FC<ConnectorCardProps> = ({
         <div className="connector-icon">{icon}</div>
         <div className="connector-info">
           <h3 className="connector-name">{name}</h3>
-          <div className="connector-status">
-            <span className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}></span>
-            <span className="status-text">{status}</span>
-          </div>
+                  <div className="connector-status">
+          <span className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`} title={isConnected ? 'Connected and ready for data transfer' : 'Not connected - click to authenticate'}></span>
+          <span className="status-text" title={`Current status: ${status}`}>{status}</span>
+        </div>
         </div>
       </div>
       
@@ -39,6 +39,7 @@ const ConnectorCard: React.FC<ConnectorCardProps> = ({
         <button
           className={`connect-button ${isConnected ? 'connected' : ''}`}
           onClick={handleConnect}
+          title={isConnected ? 'Already connected - click to disconnect' : 'Click to connect and authenticate'}
         >
           {isConnected ? 'Connected' : 'Connect'}
         </button>

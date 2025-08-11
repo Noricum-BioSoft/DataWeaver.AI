@@ -39,7 +39,7 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
       <div className="connectors-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>🔹 Connectors</h2>
-          <div className="simulation-badge">🧪 Simulation Data</div>
+          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real integrations need to be implemented for production use.">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -50,16 +50,17 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
         <div className="modal-content">
           <div className="connectors-grid">
             {connectors.map(connector => (
-              <ConnectorCard
-                key={connector.id}
-                name={connector.name}
-                icon={connector.icon}
-                status={connector.status}
-                isConnected={connector.isConnected}
-              />
+              <div key={connector.id} title={`${connector.name}: ${connector.status} - ${connector.isConnected ? 'Connected and ready for data transfer' : 'Not connected - requires authentication'}`}>
+                <ConnectorCard
+                  name={connector.name}
+                  icon={connector.icon}
+                  status={connector.status}
+                  isConnected={connector.isConnected}
+                />
+              </div>
             ))}
           </div>
-          <div className="integration-note">
+          <div className="integration-note" title="Click to learn more about implementing real integrations">
             <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual data sources and APIs.</p>
           </div>
         </div>

@@ -135,7 +135,12 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                         onPromptSelect(item.prompt);
                     }
                   }}
-                  title={item.prompt}
+                  title={`${item.prompt}${item.id === 'workflows' ? ' - User-defined business processes and data analysis tasks' : 
+                    item.id === 'pipelines' ? ' - Technical infrastructure for data processing and ETL operations' : 
+                    item.id === 'connectors' ? ' - External data source integrations and APIs' :
+                    item.id === 'vendors' ? ' - Third-party data providers and their datasets' :
+                    item.id === 'files' ? ' - Uploaded and processed data files' :
+                    item.id === 'dashboard' ? ' - System metrics and performance monitoring' : ''}`}
                 >
                   <IconComponent size={20} />
                   <span>{item.label}</span>

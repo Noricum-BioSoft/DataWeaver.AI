@@ -38,7 +38,7 @@ const VendorsModal: React.FC<VendorsModalProps> = ({ isOpen, onClose }) => {
       <div className="vendors-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>🏢 Vendors</h2>
-          <div className="simulation-badge">🧪 Simulation Data</div>
+          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real vendor management needs to be implemented for production use.">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -49,18 +49,18 @@ const VendorsModal: React.FC<VendorsModalProps> = ({ isOpen, onClose }) => {
         <div className="modal-content">
           <div className="vendors-list">
             {vendors.map(vendor => (
-              <div key={vendor.id} className="vendor-item">
+              <div key={vendor.id} className="vendor-item" title={`${vendor.name} - ${vendor.datasets} datasets available. Status: ${vendor.status}. Last sync: ${vendor.lastSync}`}>
                 <div className="vendor-info">
                   <h3 className="vendor-name">{vendor.name}</h3>
                   <p className="vendor-details">{vendor.datasets} datasets • Last sync: {vendor.lastSync}</p>
                 </div>
-                <span className={`status-badge ${vendor.status.toLowerCase()}`}>
-                  {vendor.status}
-                </span>
+                                            <span className={`status-badge ${vendor.status.toLowerCase()}`} title={`Vendor status: ${vendor.status} - ${vendor.status === 'Active' ? 'Vendor is active and providing data' : 'Vendor is inactive or suspended'}`}>
+                              {vendor.status}
+                            </span>
               </div>
             ))}
           </div>
-          <div className="integration-note">
+          <div className="integration-note" title="Click to learn more about implementing real vendor management">
             <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual vendor management systems and APIs.</p>
           </div>
         </div>

@@ -45,7 +45,7 @@ const DashboardModal: React.FC<DashboardModalProps> = ({ isOpen, onClose }) => {
       <div className="dashboard-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>📊 Dashboard</h2>
-          <div className="simulation-badge">🧪 Simulation Data</div>
+          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real monitoring and analytics need to be implemented for production use.">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -56,16 +56,16 @@ const DashboardModal: React.FC<DashboardModalProps> = ({ isOpen, onClose }) => {
         <div className="modal-content">
           <div className="metrics-grid">
             {metrics.map(metric => (
-              <div key={metric.id} className="metric-card">
+              <div key={metric.id} className="metric-card" title={`${metric.name}: ${metric.value} (${metric.change} from previous period)`}>
                 <h3 className="metric-name">{metric.name}</h3>
                 <p className="metric-value">{metric.value}</p>
-                <span className={`metric-change ${metric.trend}`}>
-                  {metric.change}
-                </span>
+                                            <span className={`metric-change ${metric.trend}`} title={`Change from previous period: ${metric.change} (${metric.trend === 'up' ? 'Improving' : metric.trend === 'down' ? 'Declining' : 'Stable'})`}>
+                              {metric.change}
+                            </span>
               </div>
             ))}
           </div>
-          <div className="integration-note">
+          <div className="integration-note" title="Click to learn more about implementing real monitoring and analytics">
             <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual monitoring and analytics systems.</p>
           </div>
         </div>

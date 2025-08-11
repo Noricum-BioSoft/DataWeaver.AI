@@ -53,7 +53,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
       <div className="files-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>📁 Files</h2>
-          <div className="simulation-badge">🧪 Simulation Data</div>
+          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real file management needs to be implemented for production use.">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -64,7 +64,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
         <div className="modal-content">
           <div className="files-list">
             {files.map(file => (
-              <div key={file.id} className="file-item">
+              <div key={file.id} className="file-item" title={`${file.name} (${file.size}) - ${file.type} file uploaded ${file.uploaded}. Status: ${file.status}`}>
                 <div className="file-icon">
                   {file.type === 'CSV' && '📊'}
                   {file.type === 'Excel' && '📈'}
@@ -75,7 +75,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
                   <p className="file-details">{file.size} • {file.type} • {file.uploaded}</p>
                 </div>
                 <div className="file-status">
-                  <span className={`status-badge ${file.status.toLowerCase()}`}>
+                  <span className={`status-badge ${file.status.toLowerCase()}`} title={`File status: ${file.status} - ${file.status === 'Ready' ? 'File is processed and ready for use' : 'File is currently being processed'}`}>
                     {file.status}
                   </span>
                 </div>
@@ -85,7 +85,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
                       <button 
                         className="action-btn select-btn"
                         onClick={() => onFileSelect(file)}
-                        title="Select file"
+                        title="Select this file for processing or analysis"
                       >
                         Select
                       </button>
@@ -94,7 +94,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
                       <button 
                         className="action-btn download-btn"
                         onClick={() => onFileDownload(file)}
-                        title="Download file"
+                        title="Download this file to your local system"
                       >
                         Download
                       </button>
@@ -103,7 +103,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
                       <button 
                         className="action-btn delete-btn"
                         onClick={() => onFileDelete(file.id)}
-                        title="Delete file"
+                        title="Permanently delete this file from the system"
                       >
                         Delete
                       </button>
@@ -113,7 +113,7 @@ const FilesModal: React.FC<FilesModalProps> = ({
               </div>
             ))}
           </div>
-          <div className="integration-note">
+          <div className="integration-note" title="Click to learn more about implementing real file management">
             <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual file storage systems and APIs.</p>
           </div>
         </div>

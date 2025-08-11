@@ -61,7 +61,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Create a message about the uploaded files
       const fileNames = csvFiles.map(f => f.name).join(', ');
-      const uploadMessage = `I've uploaded ${csvFiles.length} CSV file(s): ${fileNames}. What would you like me to do with these files?`;
+      const uploadMessage = `I've uploaded ${csvFiles.length} CSV file(s): ${fileNames}. You can now ask me to analyze, visualize, or merge this data. Try asking questions like "Show me a summary of this data" or "Create a scatter plot of the data".`;
       
       // Call the file upload handler if provided
       if (onFileUpload) {
@@ -96,7 +96,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
       
       // Create a message about the uploaded files
       const fileNames = csvFiles.map(f => f.name).join(', ');
-      const uploadMessage = `I've uploaded ${csvFiles.length} CSV file(s): ${fileNames}. What would you like me to do with these files?`;
+      const uploadMessage = `I've uploaded ${csvFiles.length} CSV file(s): ${fileNames}. You can now ask me to analyze, visualize, or merge this data. Try asking questions like "Show me a summary of this data" or "Create a scatter plot of the data".`;
       
       // Call the file upload handler if provided
       if (onFileUpload) {
@@ -213,7 +213,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Ask me anything about your data, workflows, or visualizations... (or drag CSV files here)"
+            placeholder="Ask me to analyze, visualize, or merge your data... (or drag CSV files here)"
             className="prompt-input"
             disabled={isProcessing}
           />

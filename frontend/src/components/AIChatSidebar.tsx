@@ -19,9 +19,7 @@ interface AIChatSidebarProps {
   onChatClick?: () => void;
   onFilesClick?: () => void;
   onConnectorsClick?: () => void;
-  onWorkflowsClick?: () => void;
   onVendorsClick?: () => void;
-  onPipelinesClick?: () => void;
   onDashboardClick?: () => void;
 }
 
@@ -32,9 +30,7 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
   onChatClick,
   onFilesClick,
   onConnectorsClick,
-  onWorkflowsClick,
   onVendorsClick,
-  onPipelinesClick,
   onDashboardClick
 }) => {
   const menuItems = [
@@ -57,12 +53,6 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
       prompt: 'Show my recent files and datasets'
     },
     {
-      id: 'workflows',
-      icon: Workflow,
-      label: 'Workflows',
-      prompt: 'Display all my active workflows and their status'
-    },
-    {
       id: 'connectors',
       icon: Link,
       label: 'Connectors',
@@ -73,12 +63,6 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
       icon: Building,
       label: 'Vendors',
       prompt: 'List all vendors and their associated datasets'
-    },
-    {
-      id: 'pipelines',
-      icon: GitBranch,
-      label: 'Pipelines',
-      prompt: 'Show my data processing pipelines and their performance'
     },
     {
       id: 'dashboard',
@@ -127,17 +111,11 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                       case 'files':
                         onFilesClick?.();
                         break;
-                      case 'workflows':
-                        onWorkflowsClick?.();
-                        break;
                       case 'connectors':
                         onConnectorsClick?.();
                         break;
                       case 'vendors':
                         onVendorsClick?.();
-                        break;
-                      case 'pipelines':
-                        onPipelinesClick?.();
                         break;
                       case 'dashboard':
                         onDashboardClick?.();
@@ -147,8 +125,6 @@ const AIChatSidebar: React.FC<AIChatSidebarProps> = ({
                     }
                   }}
                   title={`${item.prompt}${item.id === 'chat' ? ' - Start new conversations and manage existing chat history' :
-                    item.id === 'workflows' ? ' - User-defined business processes and data analysis tasks' : 
-                    item.id === 'pipelines' ? ' - Technical infrastructure for data processing and ETL operations' : 
                     item.id === 'connectors' ? ' - External data source integrations and APIs' :
                     item.id === 'vendors' ? ' - Third-party data providers and their datasets' :
                     item.id === 'files' ? ' - Uploaded and processed data files' :

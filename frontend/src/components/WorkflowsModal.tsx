@@ -7,7 +7,7 @@ interface WorkflowsModalProps {
 }
 
 const WorkflowsModal: React.FC<WorkflowsModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'existing' | 'create' | 'templates'>('existing');
+  const [activeTab, setActiveTab] = useState<'analysis' | 'visualization' | 'qa'>('analysis');
   const workflows = [
     {
       id: 1,
@@ -38,51 +38,85 @@ const WorkflowsModal: React.FC<WorkflowsModalProps> = ({ isOpen, onClose }) => {
     }
   ];
 
-  const workflowTemplates = [
+  const dataAnalysisExamples = [
     {
       id: 1,
-      name: '🧬 Bioinformatics Pipeline',
-      description: 'Complete pipeline for protein sequence analysis and visualization',
-      steps: 6,
-      estimatedTime: '15-30 min',
-      category: 'Biology'
+      name: '📊 Statistical Analysis',
+      description: 'Perform statistical tests, correlations, and descriptive statistics',
+      examples: ['Calculate correlation between variables', 'Perform t-test analysis', 'Generate summary statistics']
     },
     {
       id: 2,
-      name: '📊 Data Analysis Workflow',
-      description: 'Standard workflow for data cleaning, analysis, and reporting',
-      steps: 4,
-      estimatedTime: '10-20 min',
-      category: 'General'
+      name: '🔍 Data Exploration',
+      description: 'Explore data patterns, distributions, and relationships',
+      examples: ['Show data distribution', 'Find outliers', 'Analyze trends over time']
     },
     {
       id: 3,
-      name: '🔄 ETL Pipeline',
-      description: 'Extract, Transform, Load pipeline for data integration',
-      steps: 5,
-      estimatedTime: '20-45 min',
-      category: 'Data Engineering'
-    },
-    {
-      id: 4,
-      name: '📈 Business Intelligence',
-      description: 'Workflow for creating dashboards and business reports',
-      steps: 3,
-      estimatedTime: '5-15 min',
-      category: 'Business'
+      name: '📈 Trend Analysis',
+      description: 'Identify patterns and trends in your data',
+      examples: ['Detect seasonal patterns', 'Forecast future values', 'Identify growth trends']
     }
   ];
 
-  const handleCreateWorkflow = () => {
-    console.log('Creating new workflow...');
-    // TODO: Implement workflow creation
-    setActiveTab('existing');
+  const visualizationExamples = [
+    {
+      id: 1,
+      name: '📊 Charts & Graphs',
+      description: 'Create various types of charts and visualizations',
+      examples: ['Bar charts', 'Line plots', 'Scatter plots', 'Histograms']
+    },
+    {
+      id: 2,
+      name: '🗺️ Geographic Visualizations',
+      description: 'Map-based visualizations for location data',
+      examples: ['Choropleth maps', 'Point maps', 'Heat maps']
+    },
+    {
+      id: 3,
+      name: '📋 Interactive Dashboards',
+      description: 'Interactive visualizations with filtering and exploration',
+      examples: ['Filterable charts', 'Drill-down capabilities', 'Real-time updates']
+    }
+  ];
+
+  const qaExamples = [
+    {
+      id: 1,
+      name: '❓ Data Questions',
+      description: 'Ask specific questions about your data',
+      examples: ['What is the average value?', 'Which records have missing data?', 'How many unique values?']
+    },
+    {
+      id: 2,
+      name: '🔍 Pattern Discovery',
+      description: 'Discover patterns and insights in your data',
+      examples: ['Find correlations', 'Identify clusters', 'Detect anomalies']
+    },
+    {
+      id: 3,
+      name: '📋 Summary Reports',
+      description: 'Generate comprehensive data summaries',
+      examples: ['Data quality report', 'Statistical summary', 'Key insights report']
+    }
+  ];
+
+  const handleAnalysisRequest = (example: string) => {
+    console.log('Analysis request:', example);
+    // TODO: Implement analysis request
+    onClose();
   };
 
-  const handleUseTemplate = (templateId: number) => {
-    console.log('Using template:', templateId);
-    // TODO: Implement template usage
-    setActiveTab('existing');
+  const handleVisualizationRequest = (example: string) => {
+    console.log('Visualization request:', example);
+    // TODO: Implement visualization request
+    onClose();
+  };
+
+  const handleQARequest = (example: string) => {
+    console.log('QA request:', example);
+    // TODO: Implement QA request
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -91,8 +125,8 @@ const WorkflowsModal: React.FC<WorkflowsModalProps> = ({ isOpen, onClose }) => {
     <div className="workflows-modal-overlay" onClick={onClose}>
       <div className="workflows-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>⚙️ Workflows</h2>
-          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real workflow management needs to be implemented for production use.">🧪 Simulation Data</div>
+          <h2>🔬 Data Science</h2>
+          <div className="simulation-badge" title="This data is simulated for demonstration purposes. Real data science capabilities need to be implemented for production use.">🧪 Simulation Data</div>
           <button className="modal-close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12"/>
@@ -104,124 +138,111 @@ const WorkflowsModal: React.FC<WorkflowsModalProps> = ({ isOpen, onClose }) => {
           {/* Tab Navigation */}
           <div className="workflow-tabs">
             <button 
-              className={`tab-button ${activeTab === 'existing' ? 'active' : ''}`}
-              onClick={() => setActiveTab('existing')}
+              className={`tab-button ${activeTab === 'analysis' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analysis')}
             >
-              Existing Workflows ({workflows.length})
+              Data Analysis
             </button>
             <button 
-              className={`tab-button ${activeTab === 'create' ? 'active' : ''}`}
-              onClick={() => setActiveTab('create')}
+              className={`tab-button ${activeTab === 'visualization' ? 'active' : ''}`}
+              onClick={() => setActiveTab('visualization')}
             >
-              Create New
+              Visualization
             </button>
             <button 
-              className={`tab-button ${activeTab === 'templates' ? 'active' : ''}`}
-              onClick={() => setActiveTab('templates')}
+              className={`tab-button ${activeTab === 'qa' ? 'active' : ''}`}
+              onClick={() => setActiveTab('qa')}
             >
-              Templates
+              Q&A
             </button>
           </div>
 
-          {/* Existing Workflows Tab */}
-          {activeTab === 'existing' && (
-            <div className="workflows-list">
-              {workflows.map(workflow => (
-                <div key={workflow.id} className="workflow-item" title={`${workflow.name} - ${workflow.status} workflow with ${workflow.completedSteps}/${workflow.steps} steps completed. Created ${workflow.created}`}>
-                  <div className="workflow-header">
-                    <h3 className="workflow-name">{workflow.name}</h3>
-                    <span className={`status-badge ${workflow.status.toLowerCase()}`} title={`Workflow status: ${workflow.status} - ${workflow.status === 'Running' ? 'Currently executing' : workflow.status === 'Completed' ? 'Successfully finished' : 'Waiting to start'}`}>
-                      {workflow.status}
-                    </span>
-                  </div>
-                  
-                  <div className="workflow-progress">
-                    <div className="progress-bar" title={`Progress: ${workflow.progress}% complete (${workflow.completedSteps} of ${workflow.steps} steps finished)`}>
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${workflow.progress}%` }}
-                      ></div>
+          {/* Data Analysis Tab */}
+          {activeTab === 'analysis' && (
+            <div className="analysis-section">
+              <div className="examples-grid">
+                {dataAnalysisExamples.map(example => (
+                  <div key={example.id} className="example-card">
+                    <div className="example-header">
+                      <h3 className="example-name">{example.name}</h3>
                     </div>
-                    <span className="progress-text">{workflow.progress}%</span>
-                  </div>
-                  
-                  <div className="workflow-details">
-                    <span className="workflow-steps">
-                      {workflow.completedSteps}/{workflow.steps} steps completed
-                    </span>
-                    <span className="workflow-created">Created {workflow.created}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Create New Workflow Tab */}
-          {activeTab === 'create' && (
-            <div className="create-workflow-section">
-              <div className="create-options">
-                <div className="option-card" onClick={handleCreateWorkflow}>
-                  <div className="option-icon">🎨</div>
-                  <h3>Visual Workflow Builder</h3>
-                  <p>Drag and drop interface to create custom workflows with predefined tasks</p>
-                  <div className="option-features">
-                    <span>• Visual designer</span>
-                    <span>• Task library</span>
-                    <span>• Conditional logic</span>
-                  </div>
-                </div>
-                
-                <div className="option-card" onClick={() => setActiveTab('templates')}>
-                  <div className="option-icon">📝</div>
-                  <h3>Natural Language</h3>
-                  <p>Describe your workflow in plain English and let AI generate it for you</p>
-                  <div className="option-features">
-                    <span>• AI-powered</span>
-                    <span>• Natural language</span>
-                    <span>• Smart suggestions</span>
-                  </div>
-                </div>
-                
-                <div className="option-card" onClick={() => setActiveTab('templates')}>
-                  <div className="option-icon">⚡</div>
-                  <h3>Quick Start</h3>
-                  <p>Choose from pre-built templates and customize them for your needs</p>
-                  <div className="option-features">
-                    <span>• Pre-built templates</span>
-                    <span>• One-click setup</span>
-                    <span>• Easy customization</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Templates Tab */}
-          {activeTab === 'templates' && (
-            <div className="templates-section">
-              <div className="templates-grid">
-                {workflowTemplates.map(template => (
-                  <div key={template.id} className="template-card" onClick={() => handleUseTemplate(template.id)}>
-                    <div className="template-header">
-                      <h3 className="template-name">{template.name}</h3>
-                      <span className="template-category">{template.category}</span>
+                    <p className="example-description">{example.description}</p>
+                    <div className="example-list">
+                      {example.examples.map((item, index) => (
+                        <button 
+                          key={index}
+                          className="example-item"
+                          onClick={() => handleAnalysisRequest(item)}
+                          title={`Click to request: ${item}`}
+                        >
+                          {item}
+                        </button>
+                      ))}
                     </div>
-                    <p className="template-description">{template.description}</p>
-                    <div className="template-meta">
-                      <span className="template-steps">{template.steps} steps</span>
-                      <span className="template-time">{template.estimatedTime}</span>
-                    </div>
-                    <button className="use-template-btn">
-                      Use Template
-                    </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="integration-note" title="Click to learn more about implementing real workflow management">
-            <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual workflow management systems and APIs.</p>
+          {/* Visualization Tab */}
+          {activeTab === 'visualization' && (
+            <div className="visualization-section">
+              <div className="examples-grid">
+                {visualizationExamples.map(example => (
+                  <div key={example.id} className="example-card">
+                    <div className="example-header">
+                      <h3 className="example-name">{example.name}</h3>
+                    </div>
+                    <p className="example-description">{example.description}</p>
+                    <div className="example-list">
+                      {example.examples.map((item, index) => (
+                        <button 
+                          key={index}
+                          className="example-item"
+                          onClick={() => handleVisualizationRequest(item)}
+                          title={`Click to request: ${item}`}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Q&A Tab */}
+          {activeTab === 'qa' && (
+            <div className="qa-section">
+              <div className="examples-grid">
+                {qaExamples.map(example => (
+                  <div key={example.id} className="example-card">
+                    <div className="example-header">
+                      <h3 className="example-name">{example.name}</h3>
+                    </div>
+                    <p className="example-description">{example.description}</p>
+                    <div className="example-list">
+                      {example.examples.map((item, index) => (
+                        <button 
+                          key={index}
+                          className="example-item"
+                          onClick={() => handleQARequest(item)}
+                          title={`Click to request: ${item}`}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="integration-note" title="Click to learn more about implementing real data science capabilities">
+            <p>💡 <strong>Production Integration Required:</strong> This demo shows simulated data. For production use, implement custom integrations with your actual data science and analytics systems.</p>
           </div>
         </div>
       </div>

@@ -4,9 +4,7 @@ import AIChatSidebar from './AIChatSidebar';
 import AIChatMain from './AIChatMain';
 import ConnectorsModal from './ConnectorsModal';
 import FilesModal from './FilesModal';
-import WorkflowsModal from './WorkflowsModal';
 import VendorsModal from './VendorsModal';
-import PipelinesModal from './PipelinesModal';
 import DashboardModal from './DashboardModal';
 import ChatModal from './ChatModal';
 import './AIChatLayout.css';
@@ -16,9 +14,7 @@ const AIChatLayout: React.FC = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [connectorsModalOpen, setConnectorsModalOpen] = useState(false);
   const [filesModalOpen, setFilesModalOpen] = useState(false);
-  const [workflowsModalOpen, setWorkflowsModalOpen] = useState(false);
   const [vendorsModalOpen, setVendorsModalOpen] = useState(false);
-  const [pipelinesModalOpen, setPipelinesModalOpen] = useState(false);
   const [dashboardModalOpen, setDashboardModalOpen] = useState(false);
   const [chatModalOpen, setChatModalOpen] = useState(false);
 
@@ -39,16 +35,8 @@ const AIChatLayout: React.FC = () => {
     setFilesModalOpen(true);
   };
 
-  const handleWorkflowsClick = () => {
-    setWorkflowsModalOpen(true);
-  };
-
   const handleVendorsClick = () => {
     setVendorsModalOpen(true);
-  };
-
-  const handlePipelinesClick = () => {
-    setPipelinesModalOpen(true);
   };
 
   const handleDashboardClick = () => {
@@ -79,14 +67,12 @@ const AIChatLayout: React.FC = () => {
         <AIChatSidebar 
           isVisible={sidebarVisible}
           onToggle={toggleSidebar}
-                  onPromptSelect={handlePromptSelect}
-        onChatClick={handleChatClick}
-        onFilesClick={handleFilesClick}
-        onConnectorsClick={handleConnectorsClick}
-        onWorkflowsClick={handleWorkflowsClick}
-        onVendorsClick={handleVendorsClick}
-        onPipelinesClick={handlePipelinesClick}
-        onDashboardClick={handleDashboardClick}
+          onPromptSelect={handlePromptSelect}
+          onChatClick={handleChatClick}
+          onFilesClick={handleFilesClick}
+          onConnectorsClick={handleConnectorsClick}
+          onVendorsClick={handleVendorsClick}
+          onDashboardClick={handleDashboardClick}
         />
         <AIChatMain 
           onPromptSelect={handlePromptSelect}
@@ -127,22 +113,10 @@ const AIChatLayout: React.FC = () => {
         onClose={() => setFilesModalOpen(false)}
       />
 
-      {/* Workflows Modal */}
-      <WorkflowsModal 
-        isOpen={workflowsModalOpen}
-        onClose={() => setWorkflowsModalOpen(false)}
-      />
-
       {/* Vendors Modal */}
       <VendorsModal 
         isOpen={vendorsModalOpen}
         onClose={() => setVendorsModalOpen(false)}
-      />
-
-      {/* Pipelines Modal */}
-      <PipelinesModal 
-        isOpen={pipelinesModalOpen}
-        onClose={() => setPipelinesModalOpen(false)}
       />
 
       {/* Dashboard Modal */}

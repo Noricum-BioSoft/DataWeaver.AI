@@ -26,7 +26,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     {
       id: '1',
       type: 'ai',
-      content: 'Hello! I\'m your AI assistant. I can help you with data sources, workflows, and visualizations. What would you like to do?',
+      content: 'Hello! I\'m your AI data assistant. I can help you with:\n\n🔬 **Data Analysis** - Ask questions about your data\n📊 **Visualizations** - Create charts, plots, and graphs\n🔄 **Data Merging** - Intelligently combine multiple datasets\n\nUpload your data files and start asking questions in natural language!',
       timestamp: new Date(),
       result: null
     }

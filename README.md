@@ -62,7 +62,7 @@ python start.py --help
 
 1. **Configure environment:**
    ```bash
-   cp docs/env.example .env
+   cp .env.example .env
    # Edit .env with your configuration (single file for both backend and frontend)
    ```
 

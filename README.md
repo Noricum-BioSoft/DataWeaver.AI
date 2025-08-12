@@ -63,7 +63,7 @@ python start.py --help
 1. **Configure environment:**
    ```bash
    cp docs/env.example .env
-   # Edit .env with your configuration
+   # Edit .env with your configuration (single file for both backend and frontend)
    ```
 
 2. **Backend Setup**:
@@ -150,15 +150,16 @@ python start.py --help
 
 ### Environment Variables
 
-**Backend (.env)**:
+**Root .env** (single file for both backend and frontend):
 ```bash
-DATABASE_URL=postgresql://user:password@localhost/dataweaver
+# Database Configuration
+DATABASE_URL=sqlite:///./dataweaver.db
+
+# Backend Configuration
 SECRET_KEY=your-secret-key
 DEBUG=True
-```
 
-**Frontend (.env)**:
-```bash
+# Frontend Configuration
 REACT_APP_API_URL=http://localhost:8000/api
 REACT_APP_ENVIRONMENT=development
 ```

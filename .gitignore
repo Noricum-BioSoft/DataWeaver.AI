@@ -356,6 +356,7 @@ RELEASE_ANNOUNCEMENT.md
 RELEASE_SUMMARY.md
 RELEASE_*.md
 *RELEASE*.md
+RELEASE_v1.0.0_FINAL.md
 
 # Database files
 *.db

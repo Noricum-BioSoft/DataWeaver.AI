@@ -311,6 +311,8 @@ DataWeaver.AI/
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
+**Why AGPL-3.0?** This license ensures that DataWeaver.AI and its improvements remain open source, benefiting the entire community. It's particularly important for AI and data science tools that run on servers, as it ensures users have access to the source code.
+
 ### Commercial Licensing
 
 For commercial use, enterprise deployments, or SaaS offerings, please contact us for commercial licensing options that may be available.

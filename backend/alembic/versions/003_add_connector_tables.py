@@ -18,9 +18,9 @@ depends_on = None
 
 def upgrade():
     # Create enum types
-    op.execute("CREATE TYPE connectortype AS ENUM ('google_workspace', 'microsoft_365', 'slack', 'email', 'database', 'api', 'file_system', 'lims', 'omics', 'literature', 'clinical')")
-    op.execute("CREATE TYPE connectorstatus AS ENUM ('disconnected', 'connecting', 'connected', 'error', 'syncing')")
-    op.execute("CREATE TYPE authenticationtype AS ENUM ('oauth2', 'api_key', 'username_password', 'token', 'none')")
+            op.execute("CREATE TYPE connectortype AS ENUM ('GOOGLE_WORKSPACE', 'MICROSOFT_365', 'SLACK', 'EMAIL', 'DATABASE', 'API', 'FILE_SYSTEM', 'LIMS', 'OMICS', 'LITERATURE', 'CLINICAL')")
+        op.execute("CREATE TYPE connectorstatus AS ENUM ('disconnected', 'connecting', 'connected', 'error', 'syncing')")
+        op.execute("CREATE TYPE authenticationtype AS ENUM ('OAUTH2', 'API_KEY', 'USERNAME_PASSWORD', 'TOKEN', 'NONE')")
     
     # Create connectors table
     op.create_table('connectors',
@@ -51,7 +51,7 @@ def upgrade():
         sa.Column('source_type', sa.String(length=100), nullable=True),
         sa.Column('source_path', sa.String(length=500), nullable=True),
         sa.Column('schema', sa.JSON(), nullable=True),
-        sa.Column('metadata', sa.JSON(), nullable=True),
+        sa.Column('source_metadata', sa.JSON(), nullable=True),
         sa.Column('last_updated', sa.DateTime(timezone=True), nullable=True),
         sa.Column('is_active', sa.Boolean(), nullable=True),
         sa.Column('sync_enabled', sa.Boolean(), nullable=True),

@@ -4,17 +4,17 @@ from datetime import datetime
 from enum import Enum
 
 class ConnectorType(str, Enum):
-    GOOGLE_WORKSPACE = "google_workspace"
-    MICROSOFT_365 = "microsoft_365"
-    SLACK = "slack"
-    EMAIL = "email"
-    DATABASE = "database"
-    API = "api"
-    FILE_SYSTEM = "file_system"
-    LIMS = "lims"
-    OMICS = "omics"
-    LITERATURE = "literature"
-    CLINICAL = "clinical"
+    GOOGLE_WORKSPACE = "GOOGLE_WORKSPACE"
+    MICROSOFT_365 = "MICROSOFT_365"
+    SLACK = "SLACK"
+    EMAIL = "EMAIL"
+    DATABASE = "DATABASE"
+    API = "API"
+    FILE_SYSTEM = "FILE_SYSTEM"
+    LIMS = "LIMS"
+    OMICS = "OMICS"
+    LITERATURE = "LITERATURE"
+    CLINICAL = "CLINICAL"
 
 class ConnectorStatus(str, Enum):
     DISCONNECTED = "disconnected"
@@ -24,11 +24,11 @@ class ConnectorStatus(str, Enum):
     SYNCING = "syncing"
 
 class AuthenticationType(str, Enum):
-    OAUTH2 = "oauth2"
-    API_KEY = "api_key"
-    USERNAME_PASSWORD = "username_password"
-    TOKEN = "token"
-    NONE = "none"
+    OAUTH2 = "OAUTH2"
+    API_KEY = "API_KEY"
+    USERNAME_PASSWORD = "USERNAME_PASSWORD"
+    TOKEN = "TOKEN"
+    NONE = "NONE"
 
 # Base schemas
 class ConnectorBase(BaseModel):
@@ -69,8 +69,8 @@ class DataSourceBase(BaseModel):
     description: Optional[str] = Field(None, description="Data source description")
     source_type: str = Field(..., description="Type of data source")
     source_path: str = Field(..., description="Path or identifier for the data source")
-    schema: Optional[Dict[str, Any]] = Field(None, description="Data schema definition")
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+    data_schema: Optional[Dict[str, Any]] = Field(None, description="Data schema definition")
+    source_metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
     is_active: bool = Field(True, description="Whether the data source is active")
     sync_enabled: bool = Field(True, description="Enable sync for this data source")
 
@@ -81,8 +81,8 @@ class DataSourceUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     source_path: Optional[str] = None
-    schema: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    data_schema: Optional[Dict[str, Any]] = None
+    source_metadata: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
     sync_enabled: Optional[bool] = None
 

@@ -5,17 +5,17 @@ from ..database import Base
 import enum
 
 class ConnectorType(enum.Enum):
-    GOOGLE_WORKSPACE = "google_workspace"
-    MICROSOFT_365 = "microsoft_365"
-    SLACK = "slack"
-    EMAIL = "email"
-    DATABASE = "database"
-    API = "api"
-    FILE_SYSTEM = "file_system"
-    LIMS = "lims"
-    OMICS = "omics"
-    LITERATURE = "literature"
-    CLINICAL = "clinical"
+    GOOGLE_WORKSPACE = "GOOGLE_WORKSPACE"
+    MICROSOFT_365 = "MICROSOFT_365"
+    SLACK = "SLACK"
+    EMAIL = "EMAIL"
+    DATABASE = "DATABASE"
+    API = "API"
+    FILE_SYSTEM = "FILE_SYSTEM"
+    LIMS = "LIMS"
+    OMICS = "OMICS"
+    LITERATURE = "LITERATURE"
+    CLINICAL = "CLINICAL"
 
 class ConnectorStatus(enum.Enum):
     DISCONNECTED = "disconnected"
@@ -25,11 +25,11 @@ class ConnectorStatus(enum.Enum):
     SYNCING = "syncing"
 
 class AuthenticationType(enum.Enum):
-    OAUTH2 = "oauth2"
-    API_KEY = "api_key"
-    USERNAME_PASSWORD = "username_password"
-    TOKEN = "token"
-    NONE = "none"
+    OAUTH2 = "OAUTH2"
+    API_KEY = "API_KEY"
+    USERNAME_PASSWORD = "USERNAME_PASSWORD"
+    TOKEN = "TOKEN"
+    NONE = "NONE"
 
 class Connector(Base):
     __tablename__ = "connectors"
@@ -71,7 +71,7 @@ class DataSource(Base):
     
     # Data schema and metadata
     schema = Column(JSON)  # Data structure definition
-    metadata = Column(JSON)  # Additional metadata
+    source_metadata = Column(JSON)  # Additional metadata
     last_updated = Column(DateTime(timezone=True))
     
     # Status

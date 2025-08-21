@@ -14,16 +14,92 @@ class ScenarioManager:
         self.db = db
         self.logger = logging.getLogger(__name__)
     
-    def get_available_scenarios(self) -> List[DemoScenario]:
+    def get_available_scenarios(self) -> List[Dict[str, Any]]:
         """Get list of available demo scenarios"""
         return [
-            self._get_customer_intelligence_scenario(),
-            self._get_project_management_scenario(),
-            self._get_financial_consolidation_scenario(),
-            self._get_biotech_research_scenario()
+            {
+                "id": "customer_intelligence",
+                "name": "Customer Intelligence Dashboard",
+                "description": "Integrate customer data from multiple sources to create a comprehensive customer intelligence platform",
+                "scenario_type": "enterprise",
+                "sample_queries": [
+                    "Show me customer satisfaction trends from support channels",
+                    "Identify high-value customers with declining engagement",
+                    "Correlate sales data with customer support interactions",
+                    "Find customers at risk of churning based on communication patterns",
+                    "Generate a customer 360 view combining all data sources"
+                ],
+                "expected_outcomes": [
+                    "Unified customer profiles across all touchpoints",
+                    "Predictive churn models based on multi-source data",
+                    "Customer sentiment analysis from communications",
+                    "Sales opportunity identification and scoring",
+                    "Automated customer health dashboards"
+                ]
+            },
+            {
+                "id": "project_management",
+                "name": "Project Management Analytics",
+                "description": "Analyze project data from various collaboration platforms to optimize project delivery",
+                "scenario_type": "enterprise",
+                "sample_queries": [
+                    "Show me project timeline correlations across teams",
+                    "Identify bottlenecks in project workflows",
+                    "Analyze team collaboration patterns and productivity",
+                    "Predict project completion dates based on current progress",
+                    "Find resource allocation optimization opportunities"
+                ],
+                "expected_outcomes": [
+                    "Project timeline optimization recommendations",
+                    "Team productivity and collaboration insights",
+                    "Resource utilization analysis and forecasting",
+                    "Risk assessment based on communication patterns",
+                    "Automated project status reporting"
+                ]
+            },
+            {
+                "id": "financial_consolidation",
+                "name": "Financial Data Consolidation",
+                "description": "Consolidate financial data from multiple sources for comprehensive financial analysis",
+                "scenario_type": "enterprise",
+                "sample_queries": [
+                    "Consolidate all financial transactions across systems",
+                    "Identify unusual spending patterns and anomalies",
+                    "Generate cash flow forecasts based on historical data",
+                    "Analyze expense patterns by department and category",
+                    "Create compliance reports for regulatory requirements"
+                ],
+                "expected_outcomes": [
+                    "Unified financial data warehouse",
+                    "Automated anomaly detection and alerting",
+                    "Predictive cash flow modeling",
+                    "Expense optimization recommendations",
+                    "Regulatory compliance automation"
+                ]
+            },
+            {
+                "id": "biotech_research",
+                "name": "Multi-Omics Research Intelligence",
+                "description": "Integrate multi-omics data and scientific literature for drug discovery and research",
+                "scenario_type": "biotech",
+                "sample_queries": [
+                    "Find correlations between gene expression and drug response",
+                    "Identify potential drug targets from protein interaction networks",
+                    "Analyze clinical trial data with genomic profiles",
+                    "Discover novel biomarkers from multi-omics integration",
+                    "Generate drug repurposing recommendations"
+                ],
+                "expected_outcomes": [
+                    "Multi-omics data integration platform",
+                    "Drug target identification and validation",
+                    "Biomarker discovery and validation",
+                    "Clinical trial optimization insights",
+                    "Drug repurposing recommendations"
+                ]
+            }
         ]
     
-    def setup_scenario(self, scenario_id: str) -> Dict[str, Any]:
+    async def setup_scenario(self, scenario_id: str) -> Dict[str, Any]:
         """Setup a specific demo scenario"""
         scenario_map = {
             "customer_intelligence": self._setup_customer_intelligence,
@@ -35,7 +111,7 @@ class ScenarioManager:
         if scenario_id not in scenario_map:
             raise ValueError(f"Unknown scenario: {scenario_id}")
         
-        return scenario_map[scenario_id]()
+        return await scenario_map[scenario_id]()
     
     def _get_customer_intelligence_scenario(self) -> DemoScenario:
         """Customer Intelligence Dashboard scenario"""
@@ -137,7 +213,7 @@ class ScenarioManager:
             ]
         )
     
-    def _setup_customer_intelligence(self) -> Dict[str, Any]:
+    async def _setup_customer_intelligence(self) -> Dict[str, Any]:
         """Setup Customer Intelligence scenario"""
         self.logger.info("Setting up Customer Intelligence scenario")
         
@@ -164,13 +240,12 @@ class ScenarioManager:
             )
         )
         
-        # Create data sources
+        # Create data sources using mock data
         data_sources = []
         for connector in [google_connector, slack_connector]:
-            connector_instance = ConnectorFactory.create_connector(connector, self.db)
-            discovered_sources = connector_instance.discover_data_sources()
+            mock_sources = self._get_mock_data_sources(connector.connector_type)
             
-            for source_data in discovered_sources:
+            for source_data in mock_sources:
                 data_source = self._create_data_source(
                     DataSourceCreate(
                         connector_id=connector.id,
@@ -178,20 +253,23 @@ class ScenarioManager:
                         description=source_data["description"],
                         source_type=source_data["source_type"],
                         source_path=source_data["source_path"],
-                        schema=source_data.get("schema"),
-                        metadata=source_data.get("metadata", {})
+                        data_schema=source_data.get("schema"),
+                        source_metadata=source_data.get("metadata", {})
                     )
                 )
                 data_sources.append(data_source)
         
         return {
             "scenario_id": "customer_intelligence",
-            "connectors": [google_connector, slack_connector],
-            "data_sources": data_sources,
+            "connectors": [
+                self._connector_to_dict(google_connector),
+                self._connector_to_dict(slack_connector)
+            ],
+            "data_sources": [self._data_source_to_dict(ds) for ds in data_sources],
             "message": "Customer Intelligence scenario setup completed"
         }
     
-    def _setup_project_management(self) -> Dict[str, Any]:
+    async def _setup_project_management(self) -> Dict[str, Any]:
         """Setup Project Management scenario"""
         self.logger.info("Setting up Project Management scenario")
         
@@ -218,13 +296,12 @@ class ScenarioManager:
             )
         )
         
-        # Create data sources
+        # Create data sources using mock data
         data_sources = []
         for connector in [google_connector, slack_connector]:
-            connector_instance = ConnectorFactory.create_connector(connector, self.db)
-            discovered_sources = connector_instance.discover_data_sources()
+            mock_sources = self._get_mock_data_sources(connector.connector_type)
             
-            for source_data in discovered_sources:
+            for source_data in mock_sources:
                 data_source = self._create_data_source(
                     DataSourceCreate(
                         connector_id=connector.id,
@@ -232,20 +309,23 @@ class ScenarioManager:
                         description=source_data["description"],
                         source_type=source_data["source_type"],
                         source_path=source_data["source_path"],
-                        schema=source_data.get("schema"),
-                        metadata=source_data.get("metadata", {})
+                        data_schema=source_data.get("schema"),
+                        source_metadata=source_data.get("metadata", {})
                     )
                 )
                 data_sources.append(data_source)
         
         return {
             "scenario_id": "project_management",
-            "connectors": [google_connector, slack_connector],
-            "data_sources": data_sources,
+            "connectors": [
+                self._connector_to_dict(google_connector),
+                self._connector_to_dict(slack_connector)
+            ],
+            "data_sources": [self._data_source_to_dict(ds) for ds in data_sources],
             "message": "Project Management scenario setup completed"
         }
     
-    def _setup_financial_consolidation(self) -> Dict[str, Any]:
+    async def _setup_financial_consolidation(self) -> Dict[str, Any]:
         """Setup Financial Consolidation scenario"""
         self.logger.info("Setting up Financial Consolidation scenario")
         
@@ -261,12 +341,11 @@ class ScenarioManager:
             )
         )
         
-        # Create data sources
+        # Create data sources using mock data
         data_sources = []
-        connector_instance = ConnectorFactory.create_connector(google_connector, self.db)
-        discovered_sources = connector_instance.discover_data_sources()
+        mock_sources = self._get_mock_data_sources(google_connector.connector_type)
         
-        for source_data in discovered_sources:
+        for source_data in mock_sources:
             data_source = self._create_data_source(
                 DataSourceCreate(
                     connector_id=google_connector.id,
@@ -274,20 +353,20 @@ class ScenarioManager:
                     description=source_data["description"],
                     source_type=source_data["source_type"],
                     source_path=source_data["source_path"],
-                    schema=source_data.get("schema"),
-                    metadata=source_data.get("metadata", {})
+                    data_schema=source_data.get("schema"),
+                    source_metadata=source_data.get("metadata", {})
                 )
             )
             data_sources.append(data_source)
         
         return {
             "scenario_id": "financial_consolidation",
-            "connectors": [google_connector],
-            "data_sources": data_sources,
+            "connectors": [self._connector_to_dict(google_connector)],
+            "data_sources": [self._data_source_to_dict(ds) for ds in data_sources],
             "message": "Financial Consolidation scenario setup completed"
         }
     
-    def _setup_biotech_research(self) -> Dict[str, Any]:
+    async def _setup_biotech_research(self) -> Dict[str, Any]:
         """Setup Biotech Research scenario"""
         self.logger.info("Setting up Biotech Research scenario")
         
@@ -303,12 +382,11 @@ class ScenarioManager:
             )
         )
         
-        # Create data sources
+        # Create data sources using mock data
         data_sources = []
-        connector_instance = ConnectorFactory.create_connector(lims_connector, self.db)
-        discovered_sources = connector_instance.discover_data_sources()
+        mock_sources = self._get_mock_data_sources(lims_connector.connector_type)
         
-        for source_data in discovered_sources:
+        for source_data in mock_sources:
             data_source = self._create_data_source(
                 DataSourceCreate(
                     connector_id=lims_connector.id,
@@ -316,16 +394,16 @@ class ScenarioManager:
                     description=source_data["description"],
                     source_type=source_data["source_type"],
                     source_path=source_data["source_path"],
-                    schema=source_data.get("schema"),
-                    metadata=source_data.get("metadata", {})
+                    data_schema=source_data.get("schema"),
+                    source_metadata=source_data.get("metadata", {})
                 )
             )
             data_sources.append(data_source)
         
         return {
             "scenario_id": "biotech_research",
-            "connectors": [lims_connector],
-            "data_sources": data_sources,
+            "connectors": [self._connector_to_dict(lims_connector)],
+            "data_sources": [self._data_source_to_dict(ds) for ds in data_sources],
             "message": "Biotech Research scenario setup completed"
         }
     
@@ -358,8 +436,8 @@ class ScenarioManager:
             description=data_source_data.description,
             source_type=data_source_data.source_type,
             source_path=data_source_data.source_path,
-            schema=data_source_data.schema,
-            metadata=data_source_data.metadata,
+            schema=data_source_data.data_schema,
+            source_metadata=data_source_data.source_metadata,
             is_active=data_source_data.is_active,
             sync_enabled=data_source_data.sync_enabled
         )
@@ -370,3 +448,69 @@ class ScenarioManager:
         
         self.logger.info(f"Created data source: {data_source.name} (ID: {data_source.id})")
         return data_source
+
+    def _get_mock_data_sources(self, connector_type: ConnectorType) -> List[Dict[str, Any]]:
+        """Get mock data sources for demo scenarios"""
+        if connector_type == ConnectorType.GOOGLE_WORKSPACE:
+            return [
+                {
+                    "name": "Customer Database",
+                    "description": "Customer information spreadsheet",
+                    "source_type": "spreadsheet",
+                    "source_path": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+                    "schema": {
+                        "columns": ["customer_id", "name", "email", "company", "status"],
+                        "row_count": 1000
+                    }
+                }
+            ]
+        elif connector_type == ConnectorType.SLACK:
+            return [
+                {
+                    "name": "Customer Support Channel",
+                    "description": "Customer support messages and interactions",
+                    "source_type": "channel",
+                    "source_path": "C1234567890",
+                    "schema": {
+                        "columns": ["timestamp", "user", "message", "channel", "thread_ts"],
+                        "row_count": 5000
+                    }
+                }
+            ]
+        elif connector_type == ConnectorType.LIMS:
+            return [
+                {
+                    "name": "Sample Database",
+                    "description": "Laboratory sample tracking data",
+                    "source_type": "database",
+                    "source_path": "lims_samples",
+                    "schema": {
+                        "columns": ["sample_id", "sample_type", "collection_date", "status", "results"],
+                        "row_count": 2000
+                    }
+                }
+            ]
+        else:
+            return []
+
+    def _connector_to_dict(self, connector: Connector) -> Dict[str, Any]:
+        """Convert connector model to dictionary"""
+        return {
+            "id": connector.id,
+            "name": connector.name,
+            "description": connector.description,
+            "connector_type": connector.connector_type.value,
+            "auth_type": connector.auth_type.value,
+            "status": connector.status.value
+        }
+
+    def _data_source_to_dict(self, data_source: DataSource) -> Dict[str, Any]:
+        """Convert data source model to dictionary"""
+        return {
+            "id": data_source.id,
+            "name": data_source.name,
+            "description": data_source.description,
+            "source_type": data_source.source_type,
+            "source_path": data_source.source_path,
+            "connector_id": data_source.connector_id
+        }

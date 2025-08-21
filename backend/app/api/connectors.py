@@ -16,6 +16,33 @@ import logging
 router = APIRouter(prefix="/connectors", tags=["connectors"])
 logger = logging.getLogger(__name__)
 
+# Demo scenarios
+@router.get("/scenarios", response_model=List[Dict[str, Any]])
+def get_demo_scenarios(db: Session = Depends(get_db)):
+    """Get available demo scenarios"""
+    scenario_manager = ScenarioManager(db)
+    return scenario_manager.get_available_scenarios()
+
+@router.post("/scenarios/{scenario_id}/setup", response_model=Dict[str, Any])
+async def setup_demo_scenario(scenario_id: str, db: Session = Depends(get_db)):
+    """Setup a demo scenario"""
+    scenario_manager = ScenarioManager(db)
+    try:
+        result = await scenario_manager.setup_scenario(scenario_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Scenario setup failed for {scenario_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Setup failed: {str(e)}")
+
+# Supported connector types
+@router.get("/types/supported", response_model=List[str])
+def get_supported_connector_types():
+    """Get list of supported connector types"""
+    supported_types = ConnectorFactory.get_supported_types()
+    return [connector_type.value for connector_type in supported_types]
+
 # Connector management endpoints
 @router.get("/", response_model=List[ConnectorResponse])
 def get_connectors(db: Session = Depends(get_db)):
@@ -120,8 +147,8 @@ def create_data_source(connector_id: int, data_source: DataSourceCreate, db: Ses
         description=data_source.description,
         source_type=data_source.source_type,
         source_path=data_source.source_path,
-        schema=data_source.schema,
-        metadata=data_source.metadata,
+        schema=data_source.data_schema,
+        source_metadata=data_source.source_metadata,
         is_active=data_source.is_active,
         sync_enabled=data_source.sync_enabled
     )
@@ -214,31 +241,24 @@ async def sync_connector(connector_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")
 
 # Demo scenarios
-@router.get("/scenarios", response_model=List[DemoScenario])
+@router.get("/scenarios", response_model=List[Dict[str, Any]])
 def get_demo_scenarios(db: Session = Depends(get_db)):
     """Get available demo scenarios"""
     scenario_manager = ScenarioManager(db)
     return scenario_manager.get_available_scenarios()
 
 @router.post("/scenarios/{scenario_id}/setup", response_model=Dict[str, Any])
-def setup_demo_scenario(scenario_id: str, db: Session = Depends(get_db)):
+async def setup_demo_scenario(scenario_id: str, db: Session = Depends(get_db)):
     """Setup a demo scenario"""
     scenario_manager = ScenarioManager(db)
     try:
-        result = scenario_manager.setup_scenario(scenario_id)
+        result = await scenario_manager.setup_scenario(scenario_id)
         return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         logger.error(f"Scenario setup failed for {scenario_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Setup failed: {str(e)}")
-
-# Sync logs
-@router.get("/{connector_id}/sync-logs", response_model=List[ConnectorSyncLogResponse])
-def get_sync_logs(connector_id: int, db: Session = Depends(get_db)):
-    """Get sync logs for a connector"""
-    sync_logs = db.query(ConnectorSyncLog).filter(ConnectorSyncLog.connector_id == connector_id).all()
-    return sync_logs
 
 # Supported connector types
 @router.get("/types/supported", response_model=List[str])

@@ -5,6 +5,7 @@ from app.api import bio_matcher
 from app.api import intelligent_merge
 from app.api import data_qa
 from app.api import general_chat
+from app.api import connectors
 import api.bio_entities
 from sqlalchemy import create_engine, text
 from app.database import get_db
@@ -34,6 +35,7 @@ app.include_router(api.bio_entities.router, prefix="/api/bio")
 app.include_router(intelligent_merge.router, prefix="/api")
 app.include_router(data_qa.router, prefix="/api/data-qa")
 app.include_router(general_chat.router, prefix="/api")
+app.include_router(connectors.router, prefix="/api")
 
 @app.get("/")
 def read_root():

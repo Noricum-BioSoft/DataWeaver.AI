@@ -83,7 +83,7 @@ class TestConnectorSystem:
             "description": "Test connector for Google Workspace",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True},
+            "config": {"demo_mode": True},
             "connection_config": {"scopes": ["sheets.readonly"]},
             "sync_enabled": False
         }
@@ -103,7 +103,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         client_shared_session.post("/api/connectors/", json=connector_data)
         
@@ -121,7 +121,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         create_response = client_shared_session.post("/api/connectors/", json=connector_data)
         connector_id = create_response.json()["id"]
@@ -142,7 +142,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         create_response = client_shared_session.post("/api/connectors/", json=connector_data)
         connector_id = create_response.json()["id"]
@@ -164,7 +164,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         create_response = client_shared_session.post("/api/connectors/", json=connector_data)
         connector_id = create_response.json()["id"]
@@ -196,7 +196,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         create_response = client_shared_session.post("/api/connectors/", json=connector_data)
         connector_id = create_response.json()["id"]
@@ -227,7 +227,7 @@ class TestConnectorSystem:
             "description": "Test connector",
             "connector_type": "GOOGLE_WORKSPACE",
             "auth_type": "OAUTH2",
-            "auth_config": {"demo_mode": True}
+            "config": {"demo_mode": True}
         }
         create_response = client_shared_session.post("/api/connectors/", json=connector_data)
         connector_id = create_response.json()["id"]
@@ -340,7 +340,7 @@ class TestConnectorFactory:
             name="Test Connector",
             connector_type=ConnectorType.GOOGLE_WORKSPACE,
             auth_type=AuthenticationType.OAUTH2,
-            auth_config={"demo_mode": True}
+            config={"demo_mode": True}
         )
         db_session.add(connector)
         db_session.commit()
@@ -360,7 +360,7 @@ class TestConnectorFactory:
             name="Test Connector",
             connector_type=ConnectorType.EMAIL,  # Not registered
             auth_type=AuthenticationType.API_KEY,
-            auth_config={}
+            config={}
         )
         db_session.add(connector)
         db_session.commit()

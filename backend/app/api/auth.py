@@ -69,10 +69,7 @@ async def oauth_callback(
     db: Session = Depends(get_db)
 ):
     """Handle OAuth2 callback from Google"""
-    print(f"🔍 OAuth2 Callback Debug:")
-    print(f"   Code: {code[:20] + '...' if code else 'None'}")
-    print(f"   State: {state}")
-    print(f"   Error: {error}")
+            # OAuth2 callback processing
     
     try:
         if error:

@@ -150,7 +150,7 @@ def create_data_source(connector_id: int, data_source: DataSourceCreate, db: Ses
         description=data_source.description,
         source_type=data_source.source_type,
         source_path=data_source.source_path,
-        schema=data_source.data_schema,
+        data_schema=data_source.data_schema,
         source_metadata=data_source.source_metadata,
         is_active=data_source.is_active,
         sync_enabled=data_source.sync_enabled

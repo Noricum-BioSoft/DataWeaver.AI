@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Bell, User, Wifi, WifiOff, Settings, LogOut } from 'lucide-react';
+import SystemStatusModal from './SystemStatusModal';
 import './AIChatHeader.css';
 
 const AIChatHeader: React.FC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [systemStatus] = useState<'operational' | 'warning' | 'error'>('operational');
+  const [showSystemStatus, setShowSystemStatus] = useState(false);
+  const [systemStatus, setSystemStatus] = useState<'operational' | 'warning' | 'error'>('operational');
+  const [connectorCount, setConnectorCount] = useState({ total: 0, connected: 0, disconnected: 0 });
 
   const getStatusIcon = () => {
     switch (systemStatus) {
@@ -37,9 +40,16 @@ const AIChatHeader: React.FC = () => {
       <div className="header-left">
         <div className="app-brand">
           <h1 className="app-title">DataWeaver.AI</h1>
-          <div className="system-status">
+          <div 
+            className="system-status"
+            onClick={() => setShowSystemStatus(true)}
+            title="Click to view system status and connectors"
+          >
             {getStatusIcon()}
             <span className="status-text">{getStatusText()}</span>
+            {connectorCount.disconnected > 0 && (
+              <span className="system-status-badge">{connectorCount.disconnected}</span>
+            )}
           </div>
         </div>
       </div>
@@ -78,6 +88,13 @@ const AIChatHeader: React.FC = () => {
           )}
         </div>
       </div>
+
+      <SystemStatusModal 
+        isOpen={showSystemStatus}
+        onClose={() => setShowSystemStatus(false)}
+        onStatusChange={setSystemStatus}
+        onConnectorCountChange={setConnectorCount}
+      />
     </header>
   );
 };

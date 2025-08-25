@@ -1,106 +1,241 @@
 .connector-card {
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
 .connector-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
 .connector-header {
   display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
+  align-items: flex-start;
+  margin-bottom: 16px;
 }
 
 .connector-icon {
   font-size: 2rem;
-  margin-right: 1rem;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f9fa;
-  border-radius: 8px;
+  margin-right: 16px;
+  flex-shrink: 0;
 }
 
 .connector-info {
   flex: 1;
+  min-width: 0;
 }
 
 .connector-name {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #111827;
+  line-height: 1.3;
 }
 
 .connector-status {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .status-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  display: inline-block;
+  flex-shrink: 0;
 }
 
 .status-indicator.connected {
-  background: #28a745;
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.status-indicator.connecting {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  animation: pulse 2s infinite;
 }
 
 .status-indicator.disconnected {
-  background: #dc3545;
+  background-color: #6b7280;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2);
+}
+
+.status-indicator.error {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .status-text {
-  font-size: 0.9rem;
-  color: #6c757d;
+  font-size: 0.875rem;
   font-weight: 500;
+  color: #6b7280;
+  text-transform: capitalize;
 }
 
 .connector-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 16px;
 }
 
 .last-synced {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #6c757d;
+  margin: 0 0 16px 0;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
-.connect-button {
-  padding: 8px 16px;
+.action-message {
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.action-message.success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.action-message.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.connector-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: #007bff;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.test-button {
+  background-color: #3b82f6;
   color: white;
 }
 
-.connect-button:hover {
-  background: #0056b3;
-  transform: translateY(-1px);
+.test-button:hover:not(:disabled) {
+  background-color: #2563eb;
 }
 
-.connect-button.connected {
-  background: #28a745;
+.sync-button {
+  background-color: #10b981;
+  color: white;
 }
 
-.connect-button.connected:hover {
-  background: #1e7e34;
+.sync-button:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.delete-button {
+  background-color: #ef4444;
+  color: white;
+}
+
+.delete-button:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .connector-card {
+    padding: 16px;
+  }
+  
+  .connector-header {
+    margin-bottom: 12px;
+  }
+  
+  .connector-icon {
+    font-size: 1.5rem;
+    margin-right: 12px;
+  }
+  
+  .connector-name {
+    font-size: 1rem;
+  }
+  
+  .connector-actions {
+    flex-direction: column;
+  }
+  
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .connector-card {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .connector-card:hover {
+    border-color: #4b5563;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .connector-name {
+    color: #f9fafb;
+  }
+  
+  .status-text {
+    color: #9ca3af;
+  }
+  
+  .connector-details {
+    border-top-color: #374151;
+  }
+  
+  .last-synced {
+    color: #9ca3af;
+  }
+  
+  .action-message.success {
+    background: #064e3b;
+    border-color: #065f46;
+    color: #6ee7b7;
+  }
+  
+  .action-message.error {
+    background: #7f1d1d;
+    border-color: #dc2626;
+    color: #fca5a5;
+  }
 } 

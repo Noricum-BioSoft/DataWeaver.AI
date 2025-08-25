@@ -65,6 +65,14 @@ class ConnectorFactory:
         """Get list of supported connector types"""
         return list(cls._connectors.keys())
 
+# Import real connectors
+try:
+    from .connectors.google_drive_connector import GoogleDriveConnector
+    HAS_GOOGLE_DRIVE = True
+except ImportError as e:
+    HAS_GOOGLE_DRIVE = False
+    logger.warning(f"Google Drive connector not available - missing dependencies: {e}")
+
 # Mock connectors for demo scenarios
 class MockGoogleWorkspaceConnector(BaseConnector):
     """Mock Google Workspace connector for demo purposes"""
@@ -253,7 +261,13 @@ class MockLimsConnector(BaseConnector):
             "results": results
         }
 
-# Register mock connectors
-ConnectorFactory.register_connector(ConnectorType.GOOGLE_WORKSPACE, MockGoogleWorkspaceConnector)
+# Register connectors - use real Google Drive connector if available, otherwise fall back to mock
+if HAS_GOOGLE_DRIVE:
+    ConnectorFactory.register_connector(ConnectorType.GOOGLE_WORKSPACE, GoogleDriveConnector)
+    logger.info("Registered real Google Drive connector")
+else:
+    ConnectorFactory.register_connector(ConnectorType.GOOGLE_WORKSPACE, MockGoogleWorkspaceConnector)
+    logger.info("Registered mock Google Workspace connector")
+
 ConnectorFactory.register_connector(ConnectorType.SLACK, MockSlackConnector)
 ConnectorFactory.register_connector(ConnectorType.LIMS, MockLimsConnector)

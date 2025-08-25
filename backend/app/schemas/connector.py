@@ -36,8 +36,7 @@ class ConnectorBase(BaseModel):
     description: Optional[str] = Field(None, description="Connector description")
     connector_type: ConnectorType = Field(..., description="Type of connector")
     auth_type: AuthenticationType = Field(..., description="Authentication type")
-    auth_config: Optional[Dict[str, Any]] = Field(None, description="Authentication configuration")
-    connection_config: Optional[Dict[str, Any]] = Field(None, description="Connection configuration")
+    config: Optional[Dict[str, Any]] = Field(None, description="Combined configuration")
     sync_enabled: bool = Field(False, description="Enable automatic sync")
     sync_schedule: Optional[str] = Field(None, description="Cron expression for sync schedule")
 
@@ -47,8 +46,7 @@ class ConnectorCreate(ConnectorBase):
 class ConnectorUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    auth_config: Optional[Dict[str, Any]] = None
-    connection_config: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None
     sync_enabled: Optional[bool] = None
     sync_schedule: Optional[str] = None
 
@@ -180,7 +178,7 @@ class ApiKeyConfig(BaseModel):
     base_url: str
 
 class ConnectionTestRequest(BaseModel):
-    connector_id: int
+    connector_id: Optional[int] = None
     test_config: Optional[Dict[str, Any]] = None
 
 class ConnectionTestResponse(BaseModel):

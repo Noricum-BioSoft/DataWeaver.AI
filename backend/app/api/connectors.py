@@ -58,8 +58,7 @@ def create_connector(connector: ConnectorCreate, db: Session = Depends(get_db)):
         description=connector.description,
         connector_type=connector.connector_type,
         auth_type=connector.auth_type,
-        auth_config=connector.auth_config,
-        connection_config=connector.connection_config,
+        config=connector.config,
         sync_enabled=connector.sync_enabled,
         sync_schedule=connector.sync_schedule
     )
@@ -106,6 +105,10 @@ def delete_connector(connector_id: int, db: Session = Depends(get_db)):
 @router.post("/{connector_id}/test", response_model=ConnectionTestResponse)
 async def test_connection(connector_id: int, test_request: ConnectionTestRequest, db: Session = Depends(get_db)):
     """Test connection to a data source"""
+    # Use connector_id from URL path if not provided in request body
+    if test_request.connector_id is None:
+        test_request.connector_id = connector_id
+    
     connector = db.query(Connector).filter(Connector.id == connector_id).first()
     if not connector:
         raise HTTPException(status_code=404, detail="Connector not found")

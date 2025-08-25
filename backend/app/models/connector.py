@@ -42,18 +42,17 @@ class Connector(Base):
     
     # Authentication and configuration
     auth_type = Column(Enum(AuthenticationType), nullable=False)
-    auth_config = Column(JSON)  # OAuth2 tokens, API keys, etc.
-    connection_config = Column(JSON)  # URLs, endpoints, settings
+    config = Column(JSON)  # Combined auth and connection configuration
     
     # Sync configuration
     sync_enabled = Column(Boolean, default=False)
     sync_schedule = Column(String(100))  # Cron expression
-    last_sync = Column(DateTime(timezone=True))
-    next_sync = Column(DateTime(timezone=True))
+    last_sync = Column(DateTime())
+    next_sync = Column(DateTime())
     
     # Metadata
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(), server_default=func.now())
+    updated_at = Column(DateTime(), onupdate=func.now())
     
     # Relationships
     data_sources = relationship("DataSource", back_populates="connector")
@@ -70,9 +69,9 @@ class DataSource(Base):
     source_path = Column(String(500))  # File path, URL, query, etc.
     
     # Data schema and metadata
-    schema = Column(JSON)  # Data structure definition
+    data_schema = Column(JSON)  # Data structure definition
     source_metadata = Column(JSON)  # Additional metadata
-    last_updated = Column(DateTime(timezone=True))
+    last_updated = Column(DateTime())
     
     # Status
     is_active = Column(Boolean, default=True)
@@ -101,9 +100,9 @@ class DataExtract(Base):
     column_count = Column(Integer)
     
     # Timestamps
-    started_at = Column(DateTime(timezone=True))
-    completed_at = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    started_at = Column(DateTime())
+    completed_at = Column(DateTime())
+    created_at = Column(DateTime(), server_default=func.now())
     
     # Relationships
     data_source = relationship("DataSource", back_populates="data_extracts")
@@ -128,9 +127,9 @@ class ConnectorSyncLog(Base):
     error_details = Column(JSON)
     
     # Timestamps
-    started_at = Column(DateTime(timezone=True))
-    completed_at = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    started_at = Column(DateTime())
+    completed_at = Column(DateTime())
+    created_at = Column(DateTime(), server_default=func.now())
     
     # Relationships
     connector = relationship("Connector", back_populates="sync_logs")

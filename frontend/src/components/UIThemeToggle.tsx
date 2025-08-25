@@ -1,10 +1,10 @@
 import React from 'react';
-import { Layout, Grid } from 'lucide-react';
+import { Layout, Grid, Database } from 'lucide-react';
 import './UIThemeToggle.css';
 
 interface UIThemeToggleProps {
-  currentTheme: 'sidebar' | 'dashboard';
-  onThemeChange: (theme: 'sidebar' | 'dashboard') => void;
+  currentTheme: 'sidebar' | 'dashboard' | 'connectors';
+  onThemeChange: (theme: 'sidebar' | 'dashboard' | 'connectors') => void;
 }
 
 const UIThemeToggle: React.FC<UIThemeToggleProps> = ({
@@ -24,7 +24,17 @@ const UIThemeToggle: React.FC<UIThemeToggleProps> = ({
           <span>AI Chat</span>
         </button>
         
-        {/* Sidebar button - secondary option */}
+        {/* Connectors button - secondary option */}
+        <button
+          className={`toggle-button ${currentTheme === 'connectors' ? 'active' : ''}`}
+          onClick={() => onThemeChange('connectors')}
+          title="Connector Management"
+        >
+          <Database size={16} />
+          <span>Connectors</span>
+        </button>
+        
+        {/* Sidebar button - tertiary option */}
         <button
           className={`toggle-button ${currentTheme === 'sidebar' ? 'active' : ''}`}
           onClick={() => onThemeChange('sidebar')}

@@ -12,6 +12,11 @@ import api.bio_entities
 from sqlalchemy import create_engine, text
 from app.database import get_db
 from sqlalchemy.orm import Session
+from app.core.logging import setup_logging, get_logger
+
+# Setup logging
+setup_logging()
+logger = get_logger(__name__)
 
 app = FastAPI(
     title="DataWeaver.AI API",

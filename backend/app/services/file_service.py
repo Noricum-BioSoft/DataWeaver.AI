@@ -6,7 +6,7 @@ from typing import Optional, List, Dict, Any
 from fastapi import UploadFile, HTTPException
 import aiofiles
 import magic
-# TODO: Re-enable pandas import when Python 3.13 compatibility is resolved
+# Note: pandas import disabled due to Python 3.13 compatibility issues
 # import pandas as pd
 from sqlalchemy.orm import Session
 from ..models.file import File, FileMetadata, FileType, FileStatus

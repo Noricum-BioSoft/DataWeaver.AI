@@ -15,7 +15,9 @@ class SimpleVisualizer:
             import plotly.utils
             self.plotly_available = True
         except ImportError:
-            print("Warning: Plotly not available. Using fallback visualization.")
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning("Plotly not available. Using fallback visualization.")
     
     def parse_csv(self, content: bytes) -> Dict[str, Any]:
         """Parse CSV content without pandas"""

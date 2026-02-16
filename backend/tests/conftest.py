@@ -13,6 +13,10 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 from app.database import get_db, Base
 from models.bio_entities import Design, Build, Test
+from app.models.connector import Connector, DataSource, DataExtract, ConnectorSyncLog
+from app.models.workflow import Workflow, WorkflowStep
+from app.models.file import File
+from app.models.dataset import Dataset
 from main import app
 
 # Test database configuration
@@ -34,6 +38,12 @@ def test_engine():
     else:
         # SQLite configuration
         engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+    
+    # Import all models to ensure they're registered with Base
+    from app.models.connector import Connector, DataSource, DataExtract, ConnectorSyncLog
+    from app.models.workflow import Workflow, WorkflowStep
+    from app.models.file import File
+    from app.models.dataset import Dataset
     
     # Create tables
     Base.metadata.create_all(bind=engine)

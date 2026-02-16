@@ -303,6 +303,55 @@
   background: #eff6ff;
 }
 
+.connector-button {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.connector-button:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.connector-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.connector-button.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Dark mode support for connector buttons */
+@media (prefers-color-scheme: dark) {
+  .connector-button {
+    background: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+  }
+  
+  .connector-button:hover:not(:disabled) {
+    background: #4b5563;
+    border-color: #6b7280;
+  }
+  
+  .connector-button.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #2563eb;
+  }
+}
+
 @media (max-width: 768px) {
   .prompt-box {
     padding: 0.75rem;

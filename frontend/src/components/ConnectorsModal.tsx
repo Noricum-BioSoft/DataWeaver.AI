@@ -1,4 +1,5 @@
 import React from 'react';
+import { Connector, ConnectorType, ConnectorStatus } from '../types';
 import ConnectorCard from './ConnectorCard';
 import './ConnectorsModal.css';
 
@@ -8,29 +9,85 @@ interface ConnectorsModalProps {
 }
 
 const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) => {
-  const connectors = [
+  // Mock connectors for demonstration
+  const connectors: Connector[] = [
     {
       id: 1,
-      name: 'Google Drive',
-      icon: '📁',
-      status: 'Connected',
-      isConnected: true
+      name: 'Google Drive Connector',
+      description: 'Access to Google Drive files and folders',
+      connector_type: ConnectorType.GOOGLE_WORKSPACE,
+      auth_type: 'OAUTH2' as any,
+      status: ConnectorStatus.CONNECTED,
+      config: {
+        client_id: 'mock-client-id',
+        scopes: ['https://www.googleapis.com/auth/drive.readonly']
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     },
     {
       id: 2,
-      name: 'Amazon S3',
-      icon: '☁️',
-      status: 'Connected',
-      isConnected: true
+      name: 'Email Connector',
+      description: 'Email integration for data extraction',
+      connector_type: ConnectorType.EMAIL,
+      auth_type: 'USERNAME_PASSWORD' as any,
+      status: ConnectorStatus.CONNECTED,
+      config: {
+        server: 'smtp.gmail.com',
+        port: 587,
+        use_ssl: true
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     },
     {
       id: 3,
-      name: 'FTP',
-      icon: '📡',
-      status: 'Connected',
-      isConnected: true
+      name: 'Slack Connector',
+      description: 'Slack workspace integration',
+      connector_type: ConnectorType.SLACK,
+      auth_type: 'TOKEN' as any,
+      status: ConnectorStatus.CONNECTED,
+      config: {
+        bot_token: 'mock-bot-token'
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   ];
+
+  const getConnectorIcon = (connectorType: ConnectorType): string => {
+    switch (connectorType) {
+      case ConnectorType.GOOGLE_WORKSPACE:
+        return '📁';
+      case ConnectorType.EMAIL:
+        return '📧';
+      case ConnectorType.SLACK:
+        return '💬';
+      case ConnectorType.MICROSOFT_365:
+        return '📄';
+      case ConnectorType.LIMS:
+        return '🧪';
+      default:
+        return '🔌';
+    }
+  };
+
+  const getConnectorDisplayName = (connectorType: ConnectorType): string => {
+    switch (connectorType) {
+      case ConnectorType.GOOGLE_WORKSPACE:
+        return 'Google Drive';
+      case ConnectorType.EMAIL:
+        return 'Email';
+      case ConnectorType.SLACK:
+        return 'Slack';
+      case ConnectorType.MICROSOFT_365:
+        return 'Microsoft 365';
+      case ConnectorType.LIMS:
+        return 'LIMS';
+      default:
+        return connectorType;
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -50,12 +107,14 @@ const ConnectorsModal: React.FC<ConnectorsModalProps> = ({ isOpen, onClose }) =>
         <div className="modal-content">
           <div className="connectors-grid">
             {connectors.map(connector => (
-              <div key={connector.id} title={`${connector.name}: ${connector.status} - ${connector.isConnected ? 'Connected and ready for data transfer' : 'Not connected - requires authentication'}`}>
+              <div key={connector.id} title={`${getConnectorDisplayName(connector.connector_type)}: ${connector.status} - ${connector.status === ConnectorStatus.CONNECTED ? 'Connected and ready for data transfer' : 'Not connected - requires authentication'}`}>
                 <ConnectorCard
-                  name={connector.name}
-                  icon={connector.icon}
+                  connector={connector}
+                  icon={getConnectorIcon(connector.connector_type)}
+                  name={getConnectorDisplayName(connector.connector_type)}
                   status={connector.status}
-                  isConnected={connector.isConnected}
+                  lastSynced="Never"
+                  isConnected={connector.status === ConnectorStatus.CONNECTED}
                 />
               </div>
             ))}

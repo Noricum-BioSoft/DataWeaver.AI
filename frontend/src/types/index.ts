@@ -207,4 +207,148 @@ export interface FileUploadForm {
 export interface DatasetProcessingForm {
   source_provider?: string;
   matching_config?: Record<string, any>;
+}
+
+// Connector Types
+export enum ConnectorType {
+  GOOGLE_WORKSPACE = "GOOGLE_WORKSPACE",
+  MICROSOFT_365 = "MICROSOFT_365",
+  SLACK = "SLACK",
+  EMAIL = "EMAIL",
+  DATABASE = "DATABASE",
+  API = "API",
+  FILE_SYSTEM = "FILE_SYSTEM",
+  LIMS = "LIMS",
+  OMICS = "OMICS",
+  LITERATURE = "LITERATURE",
+  CLINICAL = "CLINICAL"
+}
+
+export enum AuthenticationType {
+  OAUTH2 = "OAUTH2",
+  API_KEY = "API_KEY",
+  USERNAME_PASSWORD = "USERNAME_PASSWORD",
+  TOKEN = "TOKEN",
+  NONE = "NONE"
+}
+
+export enum ConnectorStatus {
+  DISCONNECTED = "disconnected",
+  CONNECTING = "connecting",
+  CONNECTED = "connected",
+  ERROR = "error",
+  SYNCING = "syncing"
+}
+
+export interface Connector {
+  id: number;
+  name: string;
+  description?: string;
+  connector_type: ConnectorType;
+  auth_type: AuthenticationType;
+  status: ConnectorStatus;
+  config: Record<string, any>;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ConnectorCreate {
+  name: string;
+  description?: string;
+  connector_type: ConnectorType;
+  auth_type: AuthenticationType;
+  config: Record<string, any>;
+}
+
+export interface ConnectorUpdate {
+  name?: string;
+  description?: string;
+  auth_type?: AuthenticationType;
+  config?: Record<string, any>;
+}
+
+export interface DataSource {
+  id: number;
+  connector_id: number;
+  name: string;
+  description?: string;
+  source_type: string;
+  source_path: string;
+  data_schema?: Record<string, any>;
+  source_metadata?: Record<string, any>;
+  is_active: boolean;
+  sync_enabled: boolean;
+  last_updated?: string;
+  created_at: string;
+}
+
+export interface DataSourceCreate {
+  connector_id: number;
+  name: string;
+  description?: string;
+  source_type: string;
+  source_path: string;
+  data_schema?: Record<string, any>;
+  source_metadata?: Record<string, any>;
+  is_active?: boolean;
+  sync_enabled?: boolean;
+}
+
+export interface DataSourceUpdate {
+  name?: string;
+  description?: string;
+  source_type?: string;
+  source_path?: string;
+  data_schema?: Record<string, any>;
+  source_metadata?: Record<string, any>;
+  is_active?: boolean;
+  sync_enabled?: boolean;
+}
+
+export interface DataExtract {
+  id: number;
+  data_source_id: number;
+  extract_type: string;
+  status: string;
+  data_file_path?: string;
+  records_processed?: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ConnectorSyncLog {
+  id: number;
+  connector_id: number;
+  sync_type: string;
+  status: string;
+  records_processed?: number;
+  error_message?: string;
+  started_at: string;
+  completed_at?: string;
+}
+
+export interface DemoScenario {
+  id: string;
+  name: string;
+  description: string;
+  connector_types: ConnectorType[];
+  data_sources: string[];
+}
+
+export interface ConnectorTestResult {
+  success: boolean;
+  message: string;
+  details?: Record<string, any>;
+}
+
+export interface DataDiscoveryResult {
+  sources: DataSource[];
+  total_count: number;
+}
+
+export interface SyncResult {
+  success: boolean;
+  message: string;
+  records_processed?: number;
+  sync_log_id?: number;
 } 

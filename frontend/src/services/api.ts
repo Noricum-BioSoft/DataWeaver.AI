@@ -11,6 +11,19 @@ import {
   Dataset,
   DatasetCreate,
   DatasetMatch,
+  Connector,
+  ConnectorCreate,
+  ConnectorUpdate,
+  DataSource,
+  DataSourceCreate,
+  DataSourceUpdate,
+  DataExtract,
+  ConnectorSyncLog,
+  DemoScenario,
+  ConnectorTestResult,
+  DataDiscoveryResult,
+  SyncResult,
+
   // ApiResponse,
   // PaginatedResponse
 } from '../types';
@@ -731,4 +744,112 @@ export default api;
 // Export individual APIs for easier imports
 export const generalChatApi = {
   chat: bioMatcherApi.generalChat
+};
+
+// Connector API
+export const connectorApi = {
+  // Get all connectors
+  getConnectors: async (): Promise<Connector[]> => {
+    const response = await api.get('/connectors');
+    return response.data;
+  },
+
+  // Get connector by ID
+  getConnector: async (id: number): Promise<Connector> => {
+    const response = await api.get(`/connectors/${id}`);
+    return response.data;
+  },
+
+  // Create connector
+  createConnector: async (connector: ConnectorCreate): Promise<Connector> => {
+    const response = await api.post('/connectors', connector);
+    return response.data;
+  },
+
+  // Update connector
+  updateConnector: async (id: number, connector: ConnectorUpdate): Promise<Connector> => {
+    const response = await api.put(`/connectors/${id}`, connector);
+    return response.data;
+  },
+
+  // Delete connector
+  deleteConnector: async (id: number): Promise<void> => {
+    await api.delete(`/connectors/${id}`);
+  },
+
+  // Test connector connection
+  testConnection: async (id: number, testConfig?: Record<string, any>): Promise<ConnectorTestResult> => {
+    const response = await api.post(`/connectors/${id}/test`, { test_config: testConfig });
+    return response.data;
+  },
+
+  // Discover data sources
+  discoverDataSources: async (id: number): Promise<DataDiscoveryResult> => {
+    const response = await api.post(`/connectors/${id}/discover`);
+    return response.data;
+  },
+
+  // Sync data sources
+  syncDataSources: async (id: number): Promise<SyncResult> => {
+    const response = await api.post(`/connectors/${id}/sync`);
+    return response.data;
+  },
+
+  // Get supported connector types
+  getSupportedTypes: async (): Promise<string[]> => {
+    const response = await api.get('/connectors/types/supported');
+    return response.data;
+  },
+
+  // Get demo scenarios
+  getDemoScenarios: async (): Promise<DemoScenario[]> => {
+    const response = await api.get('/connectors/scenarios');
+    return response.data;
+  },
+
+  // Setup demo scenario
+  setupDemoScenario: async (scenarioId: string): Promise<{
+    scenario_id: string;
+    connectors: Connector[];
+    data_sources: DataSource[];
+    message: string;
+  }> => {
+    const response = await api.post(`/connectors/scenarios/${scenarioId}/setup`);
+    return response.data;
+  },
+
+  // Data Source Management
+  getDataSources: async (connectorId: number): Promise<DataSource[]> => {
+    const response = await api.get(`/connectors/${connectorId}/data-sources`);
+    return response.data;
+  },
+
+  // Create data source
+  createDataSource: async (dataSource: DataSourceCreate): Promise<DataSource> => {
+    const response = await api.post('/connectors/data-sources', dataSource);
+    return response.data;
+  },
+
+  // Update data source
+  updateDataSource: async (id: number, dataSource: DataSourceUpdate): Promise<DataSource> => {
+    const response = await api.put(`/connectors/data-sources/${id}`, dataSource);
+    return response.data;
+  },
+
+  // Delete data source
+  deleteDataSource: async (id: number): Promise<void> => {
+    await api.delete(`/connectors/data-sources/${id}`);
+  },
+
+  // Extract data from data source
+  extractData: async (dataSourceId: number, extractConfig?: Record<string, any>): Promise<DataExtract> => {
+    const response = await api.post(`/connectors/data-sources/${dataSourceId}/extract`, { extract_config: extractConfig });
+    return response.data;
+  },
+
+  // Get sync logs
+  getSyncLogs: async (connectorId: number): Promise<ConnectorSyncLog[]> => {
+    const response = await api.get(`/connectors/${connectorId}/sync-logs`);
+    return response.data;
+  },
 }; 

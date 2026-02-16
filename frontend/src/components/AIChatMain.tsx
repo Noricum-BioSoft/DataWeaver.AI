@@ -4,8 +4,10 @@ import ChatHistory from './ChatHistory';
 import WorkflowCreationForm from './WorkflowCreationForm';
 import DataQASuggestions from './DataQASuggestions';
 import FilesModal from './FilesModal';
+import ConnectorSetupModal from './ConnectorSetupModal';
 import { parseWorkflowCommand, isWorkflowCreationCommand } from '../utils/workflowParser';
-import { bioMatcherApi, dataQaApi, generalChatApi } from '../services/api';
+import { bioMatcherApi, dataQaApi, generalChatApi, connectorApi } from '../services/api';
+import { ConnectorType, ConnectorCreate } from '../types';
 import './AIChatMain.css';
 
 interface ChatMessage {
@@ -45,6 +47,8 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     downloadUrl: string;
     type: string;
   }>>([]);
+  const [showConnectorModal, setShowConnectorModal] = useState(false);
+  const [selectedConnectorType, setSelectedConnectorType] = useState<ConnectorType | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -118,6 +122,12 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
          lowerPrompt.includes('contains') || lowerPrompt.includes('is not null') || lowerPrompt.includes('is null')) && 
         (uploadedFiles.length > 0 || currentSessionId)) {
       await handleDataQuery(prompt);
+    }
+    // Check for connector-related commands
+    else if (lowerPrompt.includes('connector') || lowerPrompt.includes('connect') || 
+             lowerPrompt.includes('google drive') || lowerPrompt.includes('email') ||
+             lowerPrompt.includes('sync') || lowerPrompt.includes('data source')) {
+      await handleConnectorCommands(prompt);
     }
     // Check if this is a workflow creation command
     else if (isWorkflowCreationCommand(prompt)) {
@@ -769,9 +779,9 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     // Common query patterns
     const queryPatterns = [
       // "where column = value"
-      /where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=|is)\s*["\']?([^"\']+)["\']?/gi,
+      /where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=|is)\s*["']?([^"']+)["']?/gi,
       // "filter rows where column like pattern"
-      /filter\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:like|contains)\s*["\']?([^"\']+)["\']?/gi,
+      /filter\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:like|contains)\s*["']?([^"']+)["']?/gi,
       // "show rows where column > value"
       /show\s+rows?\s+where\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(>=?|<=?|>|<)\s*([0-9.]+)/gi,
       // "get rows where column in (value1, value2)"
@@ -896,10 +906,10 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
   };
 
   // Files Modal Handlers
-  const handleFilesClick = () => {
-    setShowFilesModal(true);
-    onFilesClick?.();
-  };
+  // const handleFilesClick = () => {
+  //   setShowFilesModal(true);
+  //   onFilesClick?.();
+  // };
 
   const handleFilesModalClose = () => {
     setShowFilesModal(false);
@@ -1025,43 +1035,229 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
     return [...mockFiles, ...uploadedFileItems];
   };
 
-  const handleClearSession = async () => {
-    if (!currentSessionId) {
-      return;
-    }
+  // const handleClearSession = async () => {
+  //   if (!currentSessionId) {
+  //     return;
+  //   }
 
-    try {
-      await bioMatcherApi.clearWorkflowSession(currentSessionId);
+  //   try {
+  //     await bioMatcherApi.clearWorkflowSession(currentSessionId);
       
-      // Clear local state
-      setUploadedFiles([]);
-      setCurrentSessionId(null);
-      setGeneratedFiles([]);
+  //     // Clear local state
+  //     setUploadedFiles([]);
+  //     setCurrentSessionId(null);
+  //     setGeneratedFiles([]);
       
-      // Add success message to chat
-      const successMessage: ChatMessage = {
+  //     // Add success message to chat
+  //     const successMessage: ChatMessage = {
+  //       id: (Date.now() + 1).toString(),
+  //       type: 'ai',
+  //       content: '✅ Session data cleared successfully! You can now upload new files.',
+  //       timestamp: new Date(),
+  //       result: {
+  //         type: 'session-cleared',
+  //         data: { sessionId: currentSessionId }
+  //       }
+  //     };
+      
+  //     setMessages(prev => [...prev, successMessage]);
+  //   } catch (error) {
+  //     console.error('Error clearing session:', error);
+      
+  //     const errorMessage: ChatMessage = {
+  //       id: (Date.now() + 1).toString(),
+  //       type: 'ai',
+  //       content: `❌ Sorry, I couldn't clear the session. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+  //       timestamp: new Date(),
+  //       result: null
+  //     };
+      
+  //       setMessages(prev => [...prev, errorMessage]);
+  //   }
+  // };
+
+  const handleConnectorAction = async (action: string, connectorType?: ConnectorType) => {
+    if (action === 'add' && connectorType) {
+      setSelectedConnectorType(connectorType);
+      setShowConnectorModal(true);
+    } else if (action === 'manage') {
+      // Add a message about connector management
+      const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: '✅ Session data cleared successfully! You can now upload new files.',
+        content: 'I can help you manage your data connectors. You can:\n\n• Add Google Drive connector to access files\n• Add Email connector to extract data from emails\n• Test connections and sync data\n• View connector status and logs\n\nWhat would you like to do?',
+        timestamp: new Date(),
+        result: null
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } else if (action === 'created' && connectorType) {
+      // Handle connector creation success
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `Great! I've successfully configured the ${connectorType} connector. You can now:\n\n• Ask me to sync data from this source\n• Analyze data from multiple sources\n• Create visualizations from connected data\n• Merge data from different connectors\n\nTry asking: "Sync data from my ${connectorType} connector" or "Show me data from all my connectors"`,
         timestamp: new Date(),
         result: {
-          type: 'session-cleared',
-          data: { sessionId: currentSessionId }
+          type: 'connector-created',
+          data: { connectorType }
         }
       };
+      setMessages(prev => [...prev, aiMessage]);
+    }
+  };
+
+  const handleConnectorCommands = async (prompt: string) => {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    try {
+      // Get existing connectors
+      const connectors = await connectorApi.getConnectors();
       
-      setMessages(prev => [...prev, successMessage]);
+      if (lowerPrompt.includes('add') || lowerPrompt.includes('create') || lowerPrompt.includes('setup')) {
+        if (lowerPrompt.includes('google') || lowerPrompt.includes('drive')) {
+          setSelectedConnectorType(ConnectorType.GOOGLE_WORKSPACE);
+          setShowConnectorModal(true);
+          
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: "I'll help you set up a Google Drive connector. Please fill out the configuration form.",
+            timestamp: new Date(),
+            result: null
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        } else if (lowerPrompt.includes('email')) {
+          setSelectedConnectorType(ConnectorType.EMAIL);
+          setShowConnectorModal(true);
+          
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: 'I\'ll help you set up an Email connector. Please fill out the configuration form.',
+            timestamp: new Date(),
+            result: null
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        } else {
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: 'I can help you add connectors for:\n\n• Google Drive - Access files and folders\n• Email - Extract data from emails\n\nWhich type of connector would you like to add?',
+            timestamp: new Date(),
+            result: null
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        }
+      } else if (lowerPrompt.includes('list') || lowerPrompt.includes('show') || lowerPrompt.includes('view')) {
+        if (connectors.length === 0) {
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: 'You don\'t have any connectors configured yet. Would you like to add one? I can help you set up Google Drive or Email connectors.',
+            timestamp: new Date(),
+            result: null
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        } else {
+          const connectorList = connectors.map(conn => `• ${conn.name} (${conn.connector_type}) - ${conn.status}`).join('\n');
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: `Here are your configured connectors:\n\n${connectorList}\n\nYou can test connections, sync data, or add new connectors.`,
+            timestamp: new Date(),
+            result: {
+              type: 'connector-list',
+              data: { connectors }
+            }
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        }
+      } else if (lowerPrompt.includes('sync') || lowerPrompt.includes('sync data')) {
+        if (connectors.length === 0) {
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: 'You don\'t have any connectors configured yet. Please add a connector first before syncing data.',
+            timestamp: new Date(),
+            result: null
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        } else {
+          // Sync all connectors
+          const syncPromises = connectors.map(conn => connectorApi.syncDataSources(conn.id));
+          const results = await Promise.allSettled(syncPromises);
+          
+          const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: `✅ Successfully synced data from ${successCount} out of ${connectors.length} connectors. The data is now available for analysis.`,
+            timestamp: new Date(),
+            result: {
+              type: 'connector-sync',
+              data: { results, successCount, totalCount: connectors.length }
+            }
+          };
+          setMessages(prev => [...prev, aiMessage]);
+        }
+      } else {
+        const aiMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          type: 'ai',
+          content: 'I can help you with connectors! You can:\n\n• Add Google Drive or Email connectors\n• List your configured connectors\n• Sync data from your connectors\n• Test connections\n\nWhat would you like to do?',
+          timestamp: new Date(),
+          result: null
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
     } catch (error) {
-      console.error('Error clearing session:', error);
+      console.error('Error handling connector commands:', error);
       
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: `❌ Sorry, I couldn't clear the session. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        content: '❌ Sorry, I encountered an error while handling your connector request. Please try again.',
         timestamp: new Date(),
         result: null
       };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleConnectorSubmit = async (connectorData: ConnectorCreate) => {
+    try {
+      // Create the connector via API
+      const newConnector = await connectorApi.createConnector(connectorData);
       
+      // Add success message
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `✅ Successfully created ${connectorData.name}! The connector is now ready to use. You can test the connection or start syncing data.`,
+        timestamp: new Date(),
+        result: {
+          type: 'connector-created',
+          data: { connector: newConnector }
+        }
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Close modal
+      setShowConnectorModal(false);
+      setSelectedConnectorType(null);
+    } catch (error) {
+      console.error('Error creating connector:', error);
+      
+      // Add error message
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: `❌ Sorry, I couldn't create the connector. Please check your configuration and try again.`,
+        timestamp: new Date(),
+        result: null
+      };
       setMessages(prev => [...prev, errorMessage]);
     }
   };
@@ -1090,6 +1286,7 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
           isProcessing={isProcessing}
           onFileUpload={handleFileUpload}
           generatedFiles={generatedFiles}
+          onConnectorAction={handleConnectorAction}
         />
       </div>
 
@@ -1109,6 +1306,18 @@ const AIChatMain: React.FC<AIChatMainProps> = ({ onPromptSelect, onFilesClick })
         onFileDelete={handleFileDelete}
         onFileDownload={handleFileDownload}
       />
+
+      {/* Connector Setup Modal */}
+      {showConnectorModal && selectedConnectorType && (
+        <ConnectorSetupModal
+          connectorType={selectedConnectorType}
+          onClose={() => {
+            setShowConnectorModal(false);
+            setSelectedConnectorType(null);
+          }}
+          onSubmit={handleConnectorSubmit}
+        />
+      )}
     </main>
   );
 };

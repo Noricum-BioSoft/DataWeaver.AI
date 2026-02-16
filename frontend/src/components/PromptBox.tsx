@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { Send, Mic, MicOff, Upload, FileText, ChevronDown, ChevronUp, FileDown } from 'lucide-react';
+import { Send, Mic, MicOff, Upload, FileText, ChevronDown, ChevronUp, FileDown, Database, Settings } from 'lucide-react';
+import { ConnectorType } from '../types';
+import ConnectorSetupModal from './ConnectorSetupModal';
 import './PromptBox.css';
 
 interface PromptBoxProps {
@@ -14,6 +16,7 @@ interface PromptBoxProps {
     downloadUrl: string;
     type: string;
   }>;
+  onConnectorAction?: (action: string, connectorType?: ConnectorType) => void;
 }
 
 const PromptBox: React.FC<PromptBoxProps> = ({
@@ -22,13 +25,16 @@ const PromptBox: React.FC<PromptBoxProps> = ({
   isListening,
   isProcessing,
   onFileUpload,
-  generatedFiles = []
+  generatedFiles = [],
+  onConnectorAction
 }) => {
   const [prompt, setPrompt] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [showUploadedFiles, setShowUploadedFiles] = useState(false);
   const [showGeneratedFiles, setShowGeneratedFiles] = useState(false);
+  const [showConnectorModal, setShowConnectorModal] = useState(false);
+  const [selectedConnectorType, setSelectedConnectorType] = useState<ConnectorType | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -114,6 +120,34 @@ const PromptBox: React.FC<PromptBoxProps> = ({
     // Reset the input value so the same file can be selected again
     e.target.value = '';
   }, [onSubmit, onFileUpload]);
+
+  const handleConnectorAction = (action: string, connectorType?: ConnectorType) => {
+    if (action === 'add' && connectorType) {
+      setSelectedConnectorType(connectorType);
+      setShowConnectorModal(true);
+    } else if (onConnectorAction) {
+      onConnectorAction(action, connectorType);
+    }
+  };
+
+  const handleConnectorSubmit = async (connectorData: any) => {
+    try {
+      // Submit connector creation message
+      const message = `I've configured a ${connectorData.connector_type} connector. You can now ask me to sync data from this source or analyze data from multiple sources.`;
+      onSubmit(message);
+      
+      // Close modal
+      setShowConnectorModal(false);
+      setSelectedConnectorType(null);
+      
+      // Call parent handler if provided
+      if (onConnectorAction) {
+        onConnectorAction('created', connectorData.connector_type);
+      }
+    } catch (error) {
+      console.error('Error creating connector:', error);
+    }
+  };
 
   return (
     <div className="prompt-box">
@@ -249,6 +283,26 @@ const PromptBox: React.FC<PromptBoxProps> = ({
             </button>
             
             <button
+              type="button"
+              className="connector-button"
+              onClick={() => handleConnectorAction('add', ConnectorType.GOOGLE_WORKSPACE)}
+              title="Add Google Drive"
+              disabled={isProcessing}
+            >
+              <Database size={18} />
+            </button>
+
+            <button
+              type="button"
+              className="connector-button"
+              onClick={() => handleConnectorAction('manage')}
+              title="Manage Data Sources"
+              disabled={isProcessing}
+            >
+              <Settings size={18} />
+            </button>
+            
+            <button
               type="submit"
               className="send-button"
               disabled={!prompt.trim() || isProcessing}
@@ -266,6 +320,15 @@ const PromptBox: React.FC<PromptBoxProps> = ({
           </div>
         )}
       </form>
+
+      {/* Connector Setup Modal */}
+      {showConnectorModal && selectedConnectorType && (
+        <ConnectorSetupModal
+          connectorType={selectedConnectorType}
+          onClose={() => setShowConnectorModal(false)}
+          onSubmit={handleConnectorSubmit}
+        />
+      )}
     </div>
   );
 };

@@ -81,14 +81,10 @@ class BioEntityMatcher:
         if design:
             design_mutations = self.parse_mutations(design.mutation_list or "")
             overlap = len(set(mutations) & set(design_mutations))
-            print(f"DEBUG: mutations={mutations}, design_mutations={design_mutations}, overlap={overlap}, len(mutations)={len(mutations)}, len(design_mutations)={len(design_mutations)}")
             if overlap == len(mutations) == len(design_mutations):
-                print("DEBUG: exact match")
                 return design, None, 0.8
             elif overlap > 0:
-                print("DEBUG: partial match")
                 return design, None, 0.6
-            print("DEBUG: no match")
             return design, None, 0.4  # Lower score for pattern match but no overlap
         
         # Try builds
@@ -100,14 +96,10 @@ class BioEntityMatcher:
         if build:
             build_mutations = self.parse_mutations(build.mutation_list or "")
             overlap = len(set(mutations) & set(build_mutations))
-            print(f"DEBUG: mutations={mutations}, build_mutations={build_mutations}, overlap={overlap}, len(mutations)={len(mutations)}, len(build_mutations)={len(build_mutations)}")
             if overlap == len(mutations) == len(build_mutations):
-                print("DEBUG: exact match (build)")
                 return None, build, 0.8
             elif overlap > 0:
-                print("DEBUG: partial match (build)")
                 return None, build, 0.6
-            print("DEBUG: no match (build)")
             return None, build, 0.4  # Lower score for pattern match but no overlap
         
         return None, None, 0.0

@@ -1,0 +1,40 @@
+[run]
+source = app
+omit = 
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */migrations/*
+    */alembic/*
+    */venv/*
+    */env/*
+    */\.venv/*
+    */\.env/*
+    */site-packages/*
+    */dist/*
+    */build/*
+    */\.git/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    # TODO:
+    # FIXME:
+    # XXX:
+    # HACK:
+    pass
+    raise ImportError
+    except ImportError:
+    if __name__ == "__main__":
+
+[html]
+directory = coverage_html

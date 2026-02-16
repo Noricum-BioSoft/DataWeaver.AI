@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict, Any, Optional, Tuple
 from fuzzywuzzy import fuzz, process
 from sqlalchemy.orm import Session
@@ -5,6 +6,8 @@ from ..models.workflow import Workflow, WorkflowStep
 from ..models.file import File, FileMetadata
 from ..models.dataset import Dataset, DatasetMatch, MatchType, DatasetStatus
 from ..schemas.dataset import MatchingConfig
+
+logger = logging.getLogger(__name__)
 
 class MatchingService:
     def __init__(self):
@@ -118,15 +121,17 @@ class MatchingService:
         
         return matches
     
-    # TODO: Implement ML-based matching when sklearn is available
-    # def ml_based_match(
-    #     self, 
-    #     dataset_identifiers: Dict[str, Any], 
-    #     workflow_files: List[File],
-    #     db: Session
-    # ) -> List[Tuple[File, float]]:
-    #     """Perform ML-based matching using TF-IDF and cosine similarity."""
-    #     pass
+    def ml_based_match(
+        self, 
+        dataset_identifiers: Dict[str, Any], 
+        workflow_files: List[File],
+        db: Session
+    ) -> List[Tuple[File, float]]:
+        """Perform ML-based matching using TF-IDF and cosine similarity."""
+        # Note: ML-based matching requires sklearn and additional dependencies
+        # This is a placeholder for future implementation
+        logger.info("ML-based matching requested but not yet implemented")
+        return []
     
     def _prepare_text_for_ml(self, identifiers: Dict[str, Any]) -> str:
         """Prepare text for ML-based matching."""
@@ -168,19 +173,19 @@ class MatchingService:
         matches = []
         
         # Perform different types of matching
-        # TODO: Enable ML-based matching when sklearn is available
-        # if config.ml_model:
-        #     ml_matches = self.ml_based_match(dataset.identifiers, workflow_files, db)
-        #     for file, score in ml_matches:
-        #         match = DatasetMatch(
-        #             dataset_id=dataset_id,
-        #             workflow_id=workflow_id,
-        #             file_id=file.id,
-        #             match_type=MatchType.ML_BASED,
-        #             confidence_score=score,
-        #             matching_criteria={'method': 'ml_based', 'model': config.ml_model}
-        #         )
-        #         matches.append(match)
+        # ML-based matching (placeholder for future implementation)
+        if config.ml_model:
+            ml_matches = self.ml_based_match(dataset.identifiers, workflow_files, db)
+            for file, score in ml_matches:
+                match = DatasetMatch(
+                    dataset_id=dataset_id,
+                    workflow_id=workflow_id,
+                    file_id=file.id,
+                    match_type=MatchType.ML_BASED,
+                    confidence_score=score,
+                    matching_criteria={'method': 'ml_based', 'model': config.ml_model}
+                )
+                matches.append(match)
         
         # Fuzzy matching
         fuzzy_matches = self.fuzzy_match(

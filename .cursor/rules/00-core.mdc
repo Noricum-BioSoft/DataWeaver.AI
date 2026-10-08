@@ -1,0 +1,53 @@
+---
+description: Core mission, scope, safety and completion rules for DataWeaver.AI
+alwaysApply: true
+---
+
+# DataWeaver.AI mission
+DataWeaver.AI is the persistent scientific context and memory layer of the Noricum platform: heterogeneous data integration, a canonical scientific domain model, first-class relationships, provenance/versioning, and a Scientific Context API consumed by Helix.AI.
+
+> Helix owns reasoning and orchestration. DataWeaver owns persistent scientific context and memory. Helix never gets raw database access.
+
+# Working plan
+- Platform work follows `.cursor/plans/noricum-scientific-context-layer.md` (derived from the master plan in `Helix.AI/.cursor/plans/noricum-scientific-orchestration-platform.md`). Keep both in sync when either changes.
+- Start substantial tasks in Plan Mode; save plans to `.cursor/plans/`.
+
+# Primary objectives
+- Safe, incremental, test-backed changes; root-cause fixes over patches.
+- Strangler, not rewrite: new canonical tables beside legacy ones; compatibility adapters; no legacy migration or table retirement unless the plan says so.
+- Preserve provenance, reproducibility and traceability (`trace_id` on every canonical record).
+
+# Domain-model rules
+- Shared domain objects arrive from Helix with their UUIDs; never mint IDs for them; duplicate id = integrity error.
+- Context API writes are idempotent upserts (`PUT /api/context/<type>/{id}`); immutable types conflict with 409, versioned types create a new version.
+- Every write creates its `ProvenanceEvent` and `relationships` edges in the same transaction.
+- Persist structured rationale (`RationaleItem[]`), never free-text model reasoning.
+- PostgreSQL + JSONB + a polymorphic `relationships` table; no graph database.
+
+# Scope rules
+- Do not silently broaden scope. Record related issues in `artifacts/worklog.md` and fix only if coupled to the current task.
+- Existing `/api/bio/*`, `/api/workflows/*`, `/api/files/*` behaviour must not change unless the task says so.
+
+# Safety rules
+- Never use production secrets or production data; fixtures and `sample_data/` only.
+- Never hardcode credentials, service keys or model keys; read from environment (`.env.example` documents names).
+- Service auth (`X-Service-Key`) uses constant-time comparison.
+
+# Public repository rules
+This repository is public. Helix.AI and DataWeaver.AI are public; `business-docs`, `outreach`, the website and the other Noricum-BioSoft repos are private.
+- Never put non-public information anywhere in this repo: code, docs, plans, `artifacts/` (including `artifacts/worklog.md`), test fixtures, commit messages, branch names, PR titles/descriptions, or review comments.
+- Non-public includes potential or ongoing partnerships and collaborations, meeting notes, proposals, pricing or negotiation details, customer/prospect/investor information, outreach, fundraising, and website operations.
+- Put that material in the private `Noricum-BioSoft/business-docs` repo (partner work under `partnerships/`).
+- Integrations with third-party services may document the provider's public API, but must not reveal business relationships or intent.
+- If unsure whether something is public, ask before committing or pushing. Removing it after a push requires rewriting history and contacting GitHub Support.
+
+# Testing and completion
+- Run `cd backend && pytest tests/ -q` (SQLite) for every change; run the Postgres compose + `alembic upgrade head` before merging any migration.
+- Regenerate `docs/openapi.yaml` when routers change; Helix consumes it as a fixture.
+- A task is complete only when: tests pass, changed behaviour is covered by tests, results are written to `artifacts/test_results/`, and blockers are documented in `artifacts/worklog.md`.
+
+# Canonical entry points
+- `backend/main.py` (app, router mounting), `backend/app/database.py`, `backend/alembic/`
+- Models: `backend/app/models/`, `backend/models/bio_entities.py` (legacy), `backend/app/models/knowledge/` (canonical, new)
+- Services: `backend/app/services/` (analysis, matching, merging, QA), `backend/app/services/compat/` (legacy adapters, new)
+- API: `backend/app/api/`, `backend/app/api/context/` (Scientific Context API, new)
